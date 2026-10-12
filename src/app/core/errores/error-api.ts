@@ -29,14 +29,23 @@ export class ErrorApi extends Error {
   readonly regla: string | null;
   /** Errores por campo: solo en el 400 de validación; vacío en el resto. */
   readonly campos: readonly ErrorCampoDto[];
+  /** True si el backend no respondió (red caída, backend apagado o proxy sin destino). */
+  readonly sinConexion: boolean;
 
-  constructor(status: number, mensaje: string, regla: string | null, campos: readonly ErrorCampoDto[]) {
+  constructor(
+    status: number,
+    mensaje: string,
+    regla: string | null,
+    campos: readonly ErrorCampoDto[],
+    sinConexion = false,
+  ) {
     super(mensaje);
     this.name = 'ErrorApi';
     this.status = status;
     this.mensaje = mensaje;
     this.regla = regla;
     this.campos = campos;
+    this.sinConexion = sinConexion;
   }
 }
 
@@ -56,7 +65,8 @@ export function parsearErrorApi(respuesta: HttpErrorResponse): ErrorApi {
   if (cuerpo !== null) {
     return new ErrorApi(respuesta.status, cuerpo.message, cuerpo.regla ?? null, cuerpo.errors ?? []);
   }
-  return new ErrorApi(respuesta.status, mensajeGenerico(respuesta.status), null, []);
+  const sinConexion = STATUS_SIN_CONEXION.includes(respuesta.status);
+  return new ErrorApi(respuesta.status, mensajeGenerico(respuesta.status), null, [], sinConexion);
 }
 
 /** Devuelve el cuerpo como ErrorResponseDTO, o null si no tiene esa forma. */
@@ -83,7 +93,7 @@ function esErrorResponseDto(valor: unknown): valor is ErrorResponseDto {
   return typeof objeto['status'] === 'number' && typeof objeto['message'] === 'string';
 }
 
-/** Mensaje cuando la respuesta no trae un ErrorResponseDTO. */
+/** Mensaje cuando la respuesta no trae un ErrorResponseDTO (0, 502 y 504 son sin conexión). */
 function mensajeGenerico(status: number): string {
   if (STATUS_SIN_CONEXION.includes(status)) {
     return MENSAJE_SIN_CONEXION;

@@ -23,6 +23,7 @@ Frontend Angular 22 de MediChain: trazabilidad de medicamentos (ANMAT), cadena d
 ## Arquitectura (conservar siempre)
 - `core/` (api, auth, errores, nombres, tema, layout), `shared/` (estados, ui, escaner, formato), `features/<rol>/` y `features/comun/` (pantallas de varios roles).
 - `dev/`: herramientas solo de desarrollo (muestrario de diseño en `/dev`). En producción, `angular.json` reemplaza `dev.routes.ts` por `dev.routes.produccion.ts` (lista vacía) y no llegan al bundle.
+- `src/testing/`: ayudas compartidas por los tests (por ejemplo, sesiones de prueba). Sin APIs de Vitest y nunca importadas desde la aplicación.
 - Capas: componente → página → `<pantalla>.datos.ts` → servicio generado → HttpClient. Los componentes NUNCA inyectan HttpClient ni servicios generados.
 - Lecturas con `rxResource`; acciones devuelven `Promise<Resultado<T>>`.
 - Errores: el interceptor resuelve lo global (sin conexión, 401, 403, 5xx); 400, 404, 409 y 503 se muestran en la pantalla con `<mc-error-api>`. El código de un 409 viene en `regla`.
@@ -60,4 +61,19 @@ Frontend Angular 22 de MediChain: trazabilidad de medicamentos (ANMAT), cadena d
 
 ## Tests
 - Unitarios (Vitest): helpers puros (GS1, fechas, errores), catálogo de estados contra los arrays generados, servicios, interceptores (`provideHttpClientTesting`), guards y componentes compartidos.
-- e2e (Playwright) contra el backend real con los usuarios de la demo. `lectura` corre siempre; `flujo` necesita la base recién reseteada (`~/con-blockchain/reset-demo.sh`) y aborta si no lo está. Los estados difíciles de provocar (ALTERADA, 503) se prueban con `page.route`. Accesibilidad con axe en los dos modos.
+- e2e (Playwright) contra el backend real con los usuarios de la demo. Los estados difíciles de provocar (ALTERADA, 503) se prueban con `page.route`. Accesibilidad con axe en los dos modos.
+
+### e2e: los corre solo el autor
+- El agente escribe los e2e y NUNCA los corre: no tiene ni necesita las credenciales. Tampoco corre `reset-demo.sh`.
+- El autor los corre a mano, en su terminal, con estas variables de entorno (valores del `.env` del backend; nunca en el código ni en Git):
+
+  | Variable | Qué es |
+  |---|---|
+  | `E2E_DEMO_PASSWORD` | Contraseña de los usuarios de la demo (`*.demo`): `DEMO_PASSWORD` del backend |
+  | `E2E_ADMIN_EMAIL` | Email de la cuenta de la Sede Central: `ADMIN_EMAIL` del backend |
+  | `E2E_ADMIN_PASSWORD` | Contraseña de esa cuenta: `ADMIN_PASSWORD` del backend |
+
+- Dos grupos:
+  - `lectura`: no modifica datos; se puede correr en cualquier momento.
+  - `flujo`: modifica datos. Antes: `~/con-blockchain/reset-demo.sh` y reiniciar el backend. Si la base no está recién reseteada, el test aborta.
+- Cómo se corren: backend levantado (`SWAGGER_HABILITADO` no hace falta) y `npm start`; en otra terminal, con las variables exportadas, `npm run e2e:lectura` o `npm run e2e` (los dos grupos). Los scripts los agrega el paso F6, junto con Playwright.

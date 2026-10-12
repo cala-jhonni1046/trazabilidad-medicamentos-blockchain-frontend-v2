@@ -21,6 +21,7 @@ describe('parsearErrorApi', () => {
     expect(error.mensaje).toBe('La caja ya fue dispensada');
     expect(error.regla).toBe('R11');
     expect(error.campos).toEqual([]);
+    expect(error.sinConexion).toBe(false);
   });
 
   it('400 de validación: conserva los errores por campo (respuesta real del backend)', () => {
@@ -69,6 +70,7 @@ describe('parsearErrorApi', () => {
     );
 
     expect(error.mensaje).toBe('La red Sepolia no responde');
+    expect(error.sinConexion).toBe(false);
   });
 
   it('acepta un ErrorResponseDTO que llega como texto JSON', () => {
@@ -86,6 +88,7 @@ describe('parsearErrorApi', () => {
     expect(error.status).toBe(0);
     expect(error.mensaje).toBe(MENSAJE_SIN_CONEXION);
     expect(error.regla).toBeNull();
+    expect(error.sinConexion).toBe(true);
   });
 
   it.each([502, 504])('%i sin ErrorResponseDTO (proxy sin backend): mensaje de sin conexión', (status) => {
@@ -93,12 +96,14 @@ describe('parsearErrorApi', () => {
     const error = parsearErrorApi(respuestaDeError(status, ''));
 
     expect(error.mensaje).toBe(MENSAJE_SIN_CONEXION);
+    expect(error.sinConexion).toBe(true);
   });
 
   it('500 sin ErrorResponseDTO: mensaje genérico de error del servidor', () => {
     const error = parsearErrorApi(respuestaDeError(500, '<html>Internal Server Error</html>'));
 
     expect(error.mensaje).toBe(MENSAJE_ERROR_DEL_SERVIDOR);
+    expect(error.sinConexion).toBe(false);
   });
 
   it('4xx con un cuerpo que no es ErrorResponseDTO: mensaje genérico con el status', () => {
