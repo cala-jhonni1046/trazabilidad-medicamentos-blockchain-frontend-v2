@@ -60,7 +60,7 @@ Frontend Angular 22 de MediChain: trazabilidad de medicamentos (ANMAT), cadena d
 - Nunca a Git: `node_modules/`, `dist/`, `src/app/core/api/generado/`, `.env*`, reportes de Playwright.
 
 ## Comandos
-`npm start` · `npm run build` · `npm test` · `npm run lint` · `npm run e2e` (todo) · `npm run e2e:lectura` · `npm run api:descargar` · `npm run api:generar` · `npm run api:verificar`
+`npm start` · `npm run build` · `npm test` · `npm run lint` · `npm run e2e` (todos; solo el autor) · `npm run e2e:lectura` · `npm run e2e:flujo` (solo el autor) · `npm run api:descargar` · `npm run api:generar` · `npm run api:verificar`
 
 ## Tests
 - Unitarios (Vitest): helpers puros (GS1, fechas, errores), catálogo de estados contra los arrays generados, servicios, interceptores (`provideHttpClientTesting`), guards y componentes compartidos.
@@ -68,7 +68,9 @@ Frontend Angular 22 de MediChain: trazabilidad de medicamentos (ANMAT), cadena d
 
 ### e2e: quién los corre
 - `lectura` (no modifica datos): los puede correr el agente SOLO si existe `.env.e2e` en la raíz del frontend; si no existe, los corre el autor.
-- `flujo` (modifica datos y necesita `~/con-blockchain/reset-demo.sh`): los corre SOLO el autor, a mano. El agente los escribe pero nunca los corre, y nunca corre `reset-demo.sh`.
+- `flujo` (modifica datos): los corre SOLO el autor, a mano, con `npm run e2e:flujo`. El agente los escribe pero NUNCA los corre, y nunca corre `npm run e2e` (corre `lectura` Y `flujo`): usa siempre `npm run e2e:lectura`. Tampoco corre `reset-demo.sh`.
+  - Cada test de flujo dice en su cabecera qué deja en la base. Los de asignación (`e2e/flujo/asignacion.spec.ts`) **dejan una empresa pendiente (con su cuenta de administrador) por corrida**: registran una farmacia por la API pública con CUIT, GLN, email y contraseña únicos de esa corrida (generados en `e2e/soporte/identificadores.ts`; nada es un secreto) y la asignan desde la pantalla. No necesitan `reset-demo.sh`, pero la base se va llenando: antes de la demo final, el autor corre `~/con-blockchain/reset-demo.sh`.
+  - Si un flujo necesita datos deterministas (base recién reseteada), debe abortar con un mensaje claro si no los encuentra.
 - Credenciales: variables de entorno (valores del `.env` del backend; nunca en el código ni en Git):
 
   | Variable | Qué es |
@@ -80,5 +82,5 @@ Frontend Angular 22 de MediChain: trazabilidad de medicamentos (ANMAT), cadena d
 - `.env.e2e` (lo crea el autor a partir de `.env.e2e.ejemplo`): `playwright.config.ts` lo carga con `process.loadEnvFile` si existe; una variable ya exportada en la terminal gana. Está en `.gitignore`.
 - **`.env.e2e` es intocable para el agente:** nunca leerlo, imprimirlo, copiarlo, moverlo ni commitearlo. Prohibido `cat`, `head`, `grep`, `Read` o cualquier herramienta sobre su contenido, y prohibido mostrar variables de entorno con sus valores (`env`, `printenv`, `echo $E2E_…`). Solo se puede comprobar que existe (`test -f .env.e2e`).
 - Preparación (una sola vez): `npx playwright install chromium` (lo instala el autor).
-- Cómo se corren: backend levantado y `npm start` (frontend en :4200); en otra terminal, `npm run e2e:lectura` o `npm run e2e` (todos). `npm run e2e:tipos` solo compila los e2e (no necesita backend ni credenciales). Si falta una variable, el test falla diciendo cuál. `E2E_BASE_URL` (opcional) cambia la dirección del frontend. El grupo `flujo` (carpeta `e2e/flujo`) y su script llegan con el primer test que modifica datos.
+- Cómo se corren: backend levantado y `npm start` (frontend en :4200); en otra terminal, `npm run e2e:lectura` o `npm run e2e` (los dos grupos; solo el autor). `npm run e2e:tipos` solo compila los e2e (no necesita backend ni credenciales). Si falta una variable, el test falla diciendo cuál. `E2E_BASE_URL` (opcional) cambia la dirección del frontend. El grupo `flujo` vive en `e2e/flujo`.
 - Al informar una corrida, mostrar el resumen y el error de cada test que falle; nunca credenciales.

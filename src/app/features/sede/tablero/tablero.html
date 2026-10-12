@@ -1,0 +1,84 @@
+<header class="encabezado">
+  <h1>Tablero</h1>
+  <button mat-stroked-button type="button" (click)="datos.recargar()">Actualizar</button>
+</header>
+
+<section aria-labelledby="titulo-resumen">
+  <h2 id="titulo-resumen" class="solo-lectores">Resumen</h2>
+  <ul class="mosaicos">
+    @for (mosaico of datos.mosaicos(); track mosaico.clave) {
+      <li>
+        <mc-mosaico [etiqueta]="mosaico.etiqueta" [valor]="mosaico.valor" [estado]="mosaico.estado" [tono]="mosaico.tono" />
+      </li>
+    }
+  </ul>
+</section>
+
+<div class="listas">
+  <mc-tarjeta titulo="Solicitudes de habilitación sin inspector" detalle="Provincias sin inspector activo">
+    @let lista = datos.empresasSinInspector;
+    @if (lista.status() === 'error') {
+      <p class="falla" role="alert">{{ datos.mensajeDeError(lista.error()) }}</p>
+      <div><button mat-stroked-button type="button" (click)="lista.reload()">Reintentar</button></div>
+    } @else if (!lista.hasValue()) {
+      <p role="status">Cargando…</p>
+    } @else if (lista.value().elementos.length === 0) {
+      <p class="vacio">No hay solicitudes sin inspector.</p>
+    } @else {
+      <ul class="pendientes">
+        @for (empresa of lista.value().elementos; track empresa.id) {
+          <li>
+            <div class="datos">
+              <strong>{{ empresa.razonSocial }}</strong>
+              <span class="secundario">
+                {{ rotuloTipo[empresa.tipo] }} · {{ empresa.localidad }}, {{ rotuloProvincia[empresa.provincia] }}
+              </span>
+              <span class="secundario">CUIT {{ empresa.cuit }} · solicitada el {{ empresa.fechaSolicitud | fechaHora }}</span>
+            </div>
+            <button mat-flat-button type="button" (click)="asignarEmpresa(empresa)">
+              <mc-icono nombre="person" />Asignar<span class="solo-lectores"> {{ empresa.razonSocial }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+      @if (lista.value().total > lista.value().elementos.length) {
+        <p class="secundario">Mostrando {{ lista.value().elementos.length }} de {{ lista.value().total }}. Al asignar, aparecen las siguientes.</p>
+      }
+    }
+  </mc-tarjeta>
+
+  <mc-tarjeta titulo="Circuitos sin inspector" detalle="Farmacias de provincias sin inspector activo">
+    @let circuitos = datos.circuitosSinInspector;
+    @if (circuitos.status() === 'error') {
+      <p class="falla" role="alert">{{ datos.mensajeDeError(circuitos.error()) }}</p>
+      <div><button mat-stroked-button type="button" (click)="circuitos.reload()">Reintentar</button></div>
+    } @else if (!circuitos.hasValue()) {
+      <p role="status">Cargando…</p>
+    } @else if (circuitos.value().elementos.length === 0) {
+      <p class="vacio">No hay circuitos sin inspector.</p>
+    } @else {
+      <ul class="pendientes">
+        @for (pendiente of circuitos.value().elementos; track pendiente.circuito.id) {
+          <li>
+            <div class="datos">
+              <strong>{{ pendiente.circuito.codigo }}</strong>
+              <span>{{ pendiente.laboratorio }} → {{ pendiente.distribuidor }} → {{ pendiente.farmacia }}</span>
+              <span class="secundario">
+                @if (pendiente.provinciaFarmacia) {
+                  Farmacia en {{ rotuloProvincia[pendiente.provinciaFarmacia] }} ·
+                }
+                propuesto el {{ pendiente.circuito.fechaPropuesta | fechaHora }}
+              </span>
+            </div>
+            <button mat-flat-button type="button" (click)="asignarCircuito(pendiente)">
+              <mc-icono nombre="person" />Asignar<span class="solo-lectores"> {{ pendiente.circuito.codigo }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+      @if (circuitos.value().total > circuitos.value().elementos.length) {
+        <p class="secundario">Mostrando {{ circuitos.value().elementos.length }} de {{ circuitos.value().total }}. Al asignar, aparecen los siguientes.</p>
+      }
+    }
+  </mc-tarjeta>
+</div>

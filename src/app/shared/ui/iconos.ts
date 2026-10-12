@@ -6,6 +6,7 @@ import cancel from '@material-symbols/svg-400/outlined/cancel.svg';
 import checkCircle from '@material-symbols/svg-400/outlined/check_circle.svg';
 import contentPaste from '@material-symbols/svg-400/outlined/content_paste.svg';
 import darkMode from '@material-symbols/svg-400/outlined/dark_mode.svg';
+import dashboard from '@material-symbols/svg-400/outlined/dashboard.svg';
 import error from '@material-symbols/svg-400/outlined/error.svg';
 import help from '@material-symbols/svg-400/outlined/help.svg';
 import home from '@material-symbols/svg-400/outlined/home.svg';
@@ -15,6 +16,7 @@ import localShipping from '@material-symbols/svg-400/outlined/local_shipping.svg
 import logout from '@material-symbols/svg-400/outlined/logout.svg';
 import openInNew from '@material-symbols/svg-400/outlined/open_in_new.svg';
 import pauseCircle from '@material-symbols/svg-400/outlined/pause_circle.svg';
+import person from '@material-symbols/svg-400/outlined/person.svg';
 import personCheck from '@material-symbols/svg-400/outlined/person_check.svg';
 import report from '@material-symbols/svg-400/outlined/report.svg';
 import schedule from '@material-symbols/svg-400/outlined/schedule.svg';
@@ -29,6 +31,7 @@ export type NombreIcono =
   | 'check_circle'
   | 'content_paste'
   | 'dark_mode'
+  | 'dashboard'
   | 'error'
   | 'help'
   | 'home'
@@ -38,6 +41,7 @@ export type NombreIcono =
   | 'logout'
   | 'open_in_new'
   | 'pause_circle'
+  | 'person'
   | 'person_check'
   | 'report'
   | 'schedule'
@@ -52,6 +56,7 @@ export const ICONOS: Record<NombreIcono, string> = {
   check_circle: checkCircle,
   content_paste: contentPaste,
   dark_mode: darkMode,
+  dashboard,
   error,
   help,
   home,
@@ -61,6 +66,7 @@ export const ICONOS: Record<NombreIcono, string> = {
   logout,
   open_in_new: openInNew,
   pause_circle: pauseCircle,
+  person,
   person_check: personCheck,
   report,
   schedule,

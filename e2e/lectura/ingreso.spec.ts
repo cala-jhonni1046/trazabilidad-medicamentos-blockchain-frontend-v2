@@ -34,8 +34,8 @@ test.describe('ingreso', () => {
       await ingresar(page, cuenta);
 
       await expect(page.locator('.lateral .rol')).toHaveText(cuenta.rotulo);
-      await expect(page.getByRole('navigation', { name: 'Secciones' })).toContainText('Inicio');
-      await expect(page.getByRole('heading', { level: 1 })).toContainText('Hola,');
+      await expect(page.getByRole('navigation', { name: 'Secciones' })).toContainText(cuenta.entradaMenu);
+      await expect(page.getByRole('heading', { level: 1 })).toContainText(cuenta.tituloInicio);
     });
   }
 

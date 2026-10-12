@@ -14,4 +14,12 @@ describe('AvisosService', () => {
       expect.objectContaining({ politeness: 'assertive' }),
     );
   });
+
+  it('mostrarExito abre un aviso con "Cerrar" y anuncio sin interrupción', () => {
+    const abrir = vi.spyOn(TestBed.inject(MatSnackBar), 'open');
+
+    TestBed.inject(AvisosService).mostrarExito('Listo.');
+
+    expect(abrir).toHaveBeenCalledWith('Listo.', 'Cerrar', expect.objectContaining({ politeness: 'polite' }));
+  });
 });

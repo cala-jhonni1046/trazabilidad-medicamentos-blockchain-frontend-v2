@@ -16,6 +16,10 @@ export interface Cuenta {
   readonly rotulo: string;
   /** Ruta de inicio del rol. */
   readonly inicio: string;
+  /** Texto de la entrada de menú del inicio ("Tablero" para la Sede, "Inicio" para el resto). */
+  readonly entradaMenu: string;
+  /** Texto con el que empieza el título de la pantalla de inicio ("Tablero" / "Hola,"). */
+  readonly tituloInicio: string;
 }
 
 /** Lee una variable de entorno obligatoria; si falta, el test falla explicando cuál. */
@@ -31,7 +35,15 @@ function variableObligatoria(nombre: string): string {
 
 /** Cuenta de la demo para un rol de empresa, inspector o paciente. */
 function cuentaDemo(rol: RolUsuario, email: string, rotulo: string, inicio: string): Cuenta {
-  return { rol, email, password: variableObligatoria('E2E_DEMO_PASSWORD'), rotulo, inicio };
+  return {
+    rol,
+    email,
+    password: variableObligatoria('E2E_DEMO_PASSWORD'),
+    rotulo,
+    inicio,
+    entradaMenu: 'Inicio',
+    tituloInicio: 'Hola,',
+  };
 }
 
 /** La cuenta de la Sede Central (sus credenciales no son de la demo). */
@@ -42,6 +54,8 @@ export function cuentaSede(): Cuenta {
     password: variableObligatoria('E2E_ADMIN_PASSWORD'),
     rotulo: 'Sede Central ANMAT',
     inicio: '/sede',
+    entradaMenu: 'Tablero',
+    tituloInicio: 'Tablero',
   };
 }
 

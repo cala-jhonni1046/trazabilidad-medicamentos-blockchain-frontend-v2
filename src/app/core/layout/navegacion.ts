@@ -25,7 +25,7 @@ export const ROTULO_ROL: Record<RolUsuario, string> = {
  * acá. Ocultar una entrada es comodidad: el permiso real lo decide la API.
  */
 export const MENU_POR_ROL: Record<RolUsuario, readonly ElementoMenu[]> = {
-  SEDE_CENTRAL: [{ texto: 'Inicio', ruta: RUTA_INICIO_POR_ROL.SEDE_CENTRAL, icono: 'home' }],
+  SEDE_CENTRAL: [{ texto: 'Tablero', ruta: RUTA_INICIO_POR_ROL.SEDE_CENTRAL, icono: 'dashboard' }],
   INSPECTOR: [{ texto: 'Inicio', ruta: RUTA_INICIO_POR_ROL.INSPECTOR, icono: 'home' }],
   LABORATORIO: [{ texto: 'Inicio', ruta: RUTA_INICIO_POR_ROL.LABORATORIO, icono: 'home' }],
   DISTRIBUIDOR: [{ texto: 'Inicio', ruta: RUTA_INICIO_POR_ROL.DISTRIBUIDOR, icono: 'home' }],

@@ -51,7 +51,8 @@ describe('rutas de la aplicación', () => {
     await navegacion.navigateByUrl('/');
 
     expect(urlActual()).toBe(RUTA_INICIO_POR_ROL[rol]);
-    expect(navegacion.routeNativeElement?.textContent).toContain('Hola, Ana Prueba');
+    // La Sede aterriza en su tablero; los demás roles, en el inicio provisorio.
+    expect(navegacion.routeNativeElement?.textContent).toContain(rol === 'SEDE_CENTRAL' ? 'Resumen' : 'Hola, Ana Prueba');
   });
 
   it('una farmacia que pide la ruta de la Sede termina en su propio inicio', async () => {

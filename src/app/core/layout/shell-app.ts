@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ROTULO_PROVINCIA } from '../../shared/formato/etiquetas';
 import { Icono } from '../../shared/ui/icono';
 import { SesionService } from '../auth/sesion.service';
 import { SelectorTema } from '../tema/selector-tema';
@@ -32,6 +33,8 @@ export class ShellApp {
     const sesion = this.sesion();
     return sesion === null ? '' : ROTULO_ROL[sesion.rol];
   });
+
+  protected readonly rotuloProvincia = (provincia: keyof typeof ROTULO_PROVINCIA): string => ROTULO_PROVINCIA[provincia];
 
   /** Cierra la sesión y vuelve a la pantalla de ingreso. */
   protected salir(): void {

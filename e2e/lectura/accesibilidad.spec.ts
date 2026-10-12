@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { Page, expect, test } from '@playwright/test';
-import { cuentaFarmacia } from '../soporte/cuentas';
+import { cuentaFarmacia, cuentaSede } from '../soporte/cuentas';
 import { ingresar } from '../soporte/ingreso';
 import { GTIN_DEMO, SERIE_DEMO, verificarCaja } from '../soporte/verificacion';
 
@@ -49,6 +49,13 @@ for (const modo of MODOS) {
 
     test('verificación pública: caja de la demo con recorrido', async ({ page }) => {
       await verificarCaja(page, GTIN_DEMO, SERIE_DEMO);
+      await sinViolaciones(page);
+    });
+
+    test('tablero de la Sede con mosaicos y listas', async ({ page }) => {
+      await ingresar(page, cuentaSede());
+      await expect(page.locator('mc-mosaico .valor').first()).toHaveText(/^\s*\d[\d.]*\s*$/);
+      await expect(page.locator('mc-tarjeta').first()).toBeVisible();
       await sinViolaciones(page);
     });
 

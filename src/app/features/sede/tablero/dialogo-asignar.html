@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>{{ datos.titulo }}</h2>
+
+<form novalidate (submit)="confirmar($event)">
+  <mat-dialog-content>
+    <p class="detalle">{{ datos.detalle }}</p>
+
+    @if (cargando()) {
+      <p role="status">Buscando inspectores…</p>
+    } @else if (errorCarga(); as error) {
+      <mc-error-api [error]="error" />
+    } @else if (inspectores().length === 0) {
+      <p role="status">No hay inspectores activos para asignar.</p>
+    } @else {
+      <mc-error-api [error]="errorAsignacion()" />
+      <mat-form-field>
+        <mat-label>Inspector</mat-label>
+        <mat-select [formField]="formulario.inspectorId">
+          @for (inspector of inspectores(); track inspector.id) {
+            <mat-option [value]="inspector.id">{{ etiqueta(inspector) }}</mat-option>
+          }
+        </mat-select>
+        @for (error of formulario.inspectorId().errors(); track $index) {
+          <mat-error>{{ error.message }}</mat-error>
+        }
+      </mat-form-field>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancelar</button>
+    <button
+      mat-flat-button
+      type="submit"
+      [disabled]="cargando() || inspectores().length === 0 || formulario().submitting()"
+    >
+      {{ formulario().submitting() ? 'Asignando…' : 'Asignar' }}
+    </button>
+  </mat-dialog-actions>
+</form>

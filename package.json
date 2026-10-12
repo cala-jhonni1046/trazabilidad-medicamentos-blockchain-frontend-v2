@@ -18,7 +18,8 @@
     "pretest": "npm run api:generar",
     "e2e": "playwright test",
     "e2e:lectura": "playwright test e2e/lectura",
-    "e2e:tipos": "tsc -p e2e/tsconfig.json"
+    "e2e:tipos": "tsc -p e2e/tsconfig.json",
+    "e2e:flujo": "playwright test e2e/flujo"
   },
   "private": true,
   "packageManager": "npm@10.9.8",
