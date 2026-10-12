@@ -1,0 +1,4 @@
+# Contrato con el backend: lo escribe `npm run api:descargar` con formato fijo (diffs estables).
+api/openapi.json
+# Cliente generado por ng-openapi-gen: no se edita.
+src/app/core/api/generado/
