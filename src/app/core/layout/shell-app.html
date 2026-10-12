@@ -1,0 +1,38 @@
+<div class="app">
+  <aside class="lateral">
+    <a class="marca" routerLink="/" aria-label="MediChain, ir al inicio">Medi<span>Chain</span></a>
+
+    @if (sesion(); as actual) {
+      <div class="yo">
+        <span class="rol">{{ rotuloRol() }}</span>
+        <span class="nombre">{{ actual.nombre }}</span>
+        @if (datosEmpresa.empresa(); as empresa) {
+          <span class="detalle">{{ empresa.razonSocial }}</span>
+        }
+        @if (actual.provincia) {
+          <span class="detalle">Provincia: {{ actual.provincia }}</span>
+        }
+      </div>
+    }
+
+    <nav class="menu" aria-label="Secciones">
+      @for (elemento of menu(); track elemento.ruta) {
+        <a [routerLink]="elemento.ruta" routerLinkActive="activo" ariaCurrentWhenActive="page">
+          <mc-icono [nombre]="elemento.icono" />{{ elemento.texto }}
+        </a>
+      }
+    </nav>
+
+    <button class="salir" type="button" (click)="salir()">
+      <mc-icono nombre="logout" />Salir
+    </button>
+  </aside>
+
+  <div class="principal">
+    <div class="barra"><mc-selector-tema /></div>
+    <mc-aviso-empresa [empresa]="datosEmpresa.empresa()" />
+    <main class="contenido">
+      <router-outlet />
+    </main>
+  </div>
+</div>

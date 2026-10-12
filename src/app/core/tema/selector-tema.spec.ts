@@ -38,6 +38,20 @@ describe('SelectorTema', () => {
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
   });
 
+  it('es un grupo de selección única: radiogroup con tres radios y el elegido marcado', async () => {
+    const fixture = TestBed.createComponent(SelectorTema);
+    await fixture.whenStable();
+    const raiz = fixture.nativeElement as HTMLElement;
+
+    expect(raiz.querySelector('[role="radiogroup"]')).not.toBeNull();
+    const radios = Array.from(raiz.querySelectorAll('button[role="radio"]'));
+    expect(radios.map((r) => r.getAttribute('aria-checked'))).toEqual(['false', 'false', 'true']);
+
+    (radios[1] as HTMLButtonElement).click();
+    await fixture.whenStable();
+    expect(radios.map((r) => r.getAttribute('aria-checked'))).toEqual(['false', 'true', 'false']);
+  });
+
   it('el grupo tiene un nombre accesible', async () => {
     const fixture = TestBed.createComponent(SelectorTema);
     await fixture.whenStable();

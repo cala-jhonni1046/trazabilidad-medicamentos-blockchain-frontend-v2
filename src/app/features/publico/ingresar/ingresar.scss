@@ -1,0 +1,28 @@
+.ingresar {
+  display: grid;
+  gap: 16px;
+  max-width: 440px;
+  margin: 24px auto 0;
+}
+
+.secundario {
+  color: var(--mc-texto-secundario);
+}
+
+.tarjeta {
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+  background: var(--mc-superficie);
+  border: 1px solid var(--mc-borde);
+  border-radius: var(--mc-radio-tarjeta);
+}
+
+.aviso {
+  padding: 10px 14px;
+  background: var(--mc-atencion-suave);
+  color: var(--mc-atencion);
+  border: 1px solid var(--mc-atencion);
+  border-radius: var(--mc-radio-control);
+  font-weight: 600;
+}

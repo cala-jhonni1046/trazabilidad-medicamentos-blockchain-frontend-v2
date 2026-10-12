@@ -6,7 +6,6 @@ import { proveerClienteApi } from './core/api/api.providers';
 import { authInterceptor } from './core/auth/auth.interceptor';
 import { proveerSesion } from './core/auth/sesion.providers';
 import { erroresInterceptor } from './core/errores/errores.interceptor';
-import { proveerOpcionesMaterial } from './core/tema/opciones-material';
 import { proveerTema } from './core/tema/tema.providers';
 
 /** Configuración raíz de la aplicación (proveedores globales). */
@@ -24,7 +23,5 @@ export const appConfig: ApplicationConfig = {
     proveerSesion(),
     // Tema claro / oscuro / sistema guardado, aplicado al arrancar.
     proveerTema(),
-    // Valores por defecto de Angular Material (campos con contorno).
-    ...proveerOpcionesMaterial(),
   ],
 };

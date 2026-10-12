@@ -49,6 +49,9 @@ Thumbs.db
 .env.*
 # La plantilla con valores falsos sí va a Git
 !.env.example
+# Variables locales de los e2e (contraseñas): nunca a Git. La plantilla vacía sí va.
+.env.e2e
+!.env.e2e.ejemplo
 # Cliente generado desde api/openapi.json (npm run api:generar)
 /src/app/core/api/generado/
 # Reportes y resultados de Playwright

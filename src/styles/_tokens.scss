@@ -22,6 +22,12 @@ $fuente-mono: ('JetBrains Mono Variable', ui-monospace, Menlo, Consolas, monospa
   --mc-texto: #0F1B2A;
   --mc-texto-secundario: #526070;
   --mc-lateral: #0F1B2A;
+  // Barra lateral: es oscura en los dos modos, así que su texto es siempre claro.
+  --mc-sobre-lateral: #E4EAF1;
+  --mc-sobre-lateral-secundario: #9AA8B8;
+  --mc-lateral-borde: #2B3B4E;
+  --mc-lateral-hover: #1A2B3D;
+  --mc-acento-lateral: #6FB6E6;
   --mc-borde: #D8DEE5;
   --mc-borde-fuerte: #8A96A3;
   // Primario: solo para acciones.
@@ -55,6 +61,11 @@ $fuente-mono: ('JetBrains Mono Variable', ui-monospace, Menlo, Consolas, monospa
   --mc-texto: #E4EAF1;
   --mc-texto-secundario: #9AA8B8;
   --mc-lateral: #070E16;
+  --mc-sobre-lateral: #E4EAF1;
+  --mc-sobre-lateral-secundario: #9AA8B8;
+  --mc-lateral-borde: #233244;
+  --mc-lateral-hover: #101C2A;
+  --mc-acento-lateral: #6FB6E6;
   --mc-borde: #233244;
   --mc-borde-fuerte: #64748A;
   --mc-primario: #6AA6E0;

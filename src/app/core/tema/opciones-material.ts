@@ -11,7 +11,13 @@ const OPCIONES_CAMPOS: MatFormFieldDefaultOptions = {
   subscriptSizing: 'dynamic',
 };
 
-/** Opciones globales de Angular Material. */
+/**
+ * Opciones de Angular Material para las pantallas con formularios.
+ *
+ * NO se registran en app.config.ts: importar el token de form-field ahí metería Material
+ * Forms y @angular/forms en el bundle inicial. Cada componente con formularios las suma a
+ * sus `providers` (cargan diferidos junto con el componente).
+ */
 export function proveerOpcionesMaterial(): Provider[] {
   return [{ provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: OPCIONES_CAMPOS }];
 }

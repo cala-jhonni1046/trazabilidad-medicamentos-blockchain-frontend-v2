@@ -30,14 +30,16 @@ Frontend Angular 22 de MediChain: trazabilidad de medicamentos (ANMAT), cadena d
 
 ## Estilo de código (obligatorio)
 - Standalone, zoneless, signals (`signal`, `computed`, `input()`, `output()`), `ChangeDetectionStrategy.OnPush` en todo componente, control flow `@if/@for/@switch`.
-- Formularios con Signal Forms. Guards `canMatch` por rol, rutas diferidas por rol, interceptores funcionales.
+- Formularios con Signal Forms. Todo componente con campos de Material suma `...proveerOpcionesMaterial()` a sus `providers` (campos con contorno); nunca en `app.config.ts` (arrastraría `@angular/forms` al bundle inicial). Guards `canMatch` por rol, rutas diferidas por rol, interceptores funcionales.
 - Prefijo `mc-`. Archivos en kebab-case, en español.
 - Nunca `innerHTML` con datos de la API.
 
 ## Diseño visual
 - Colores SOLO con `var(--mc-*)` (`src/styles/_tokens.scss`); nunca hex en componentes. Primario solo para acciones.
 - Modo claro, oscuro y sistema: atributo `data-theme` en `<html>`.
-- Cada estado = color + ícono + texto, únicamente desde `shared/estados/catalogo-estados.ts` (un Record exhaustivo por enum). Nunca solo color.
+- Cada estado = color + ícono + texto, únicamente desde `shared/estados/catalogo-estados.ts` (un Record exhaustivo por enum) y mostrado con `<mc-estado>`. Nunca solo color.
+- Íconos: Material Symbols registrados de a uno en `shared/ui/iconos.ts` (SVG importados como texto) y mostrados con `<mc-icono nombre="…" />`. Para uno nuevo: importar su SVG y sumarlo a `ICONOS`.
+- Menú lateral de cada rol: solo en `core/layout/navegacion.ts` (un Record por rol). Cada pantalla nueva suma su entrada ahí.
 - Archivo (títulos), Source Sans 3 (texto), JetBrains Mono (hashes y códigos), con @fontsource.
 - Fechas: la API manda UTC con `Z`; se muestran en America/Argentina/Buenos_Aires con `shared/formato/fechas.ts`. Las de solo día (`YYYY-MM-DD`) nunca pasan por `new Date()`. Fecha con hora hacia la API: siempre con offset (`2026-10-08T15:00:00-03:00`); sin offset da 400.
 - Accesibilidad AA: foco visible, contraste, etiqueta en cada campo.
@@ -46,7 +48,7 @@ Frontend Angular 22 de MediChain: trazabilidad de medicamentos (ANMAT), cadena d
 - Nada de secretos en el código ni en `environment*.ts`: todo el bundle es público.
 - JWT solo en `sessionStorage` (`mc.sesion`); la sesión se cierra al llegar a `expiraEn`. El token va solo a URLs relativas `/api/`.
 - Nunca loguear el token ni datos de pacientes (R13).
-- Credenciales de prueba solo por variables de entorno (`E2E_DEMO_PASSWORD`, `E2E_ADMIN_EMAIL`, `E2E_ADMIN_PASSWORD`). `.env*` nunca a Git.
+- Credenciales de prueba solo por variables de entorno o en `.env.e2e` (`E2E_DEMO_PASSWORD`, `E2E_ADMIN_EMAIL`, `E2E_ADMIN_PASSWORD`). `.env*` nunca a Git (salvo las plantillas con valores vacíos). El agente nunca lee `.env.e2e` (ver sección e2e).
 
 ## Git
 - Trabajo en `develop`; nunca commits directos en `main`.
@@ -63,9 +65,10 @@ Frontend Angular 22 de MediChain: trazabilidad de medicamentos (ANMAT), cadena d
 - Unitarios (Vitest): helpers puros (GS1, fechas, errores), catálogo de estados contra los arrays generados, servicios, interceptores (`provideHttpClientTesting`), guards y componentes compartidos.
 - e2e (Playwright) contra el backend real con los usuarios de la demo. Los estados difíciles de provocar (ALTERADA, 503) se prueban con `page.route`. Accesibilidad con axe en los dos modos.
 
-### e2e: los corre solo el autor
-- El agente escribe los e2e y NUNCA los corre: no tiene ni necesita las credenciales. Tampoco corre `reset-demo.sh`.
-- El autor los corre a mano, en su terminal, con estas variables de entorno (valores del `.env` del backend; nunca en el código ni en Git):
+### e2e: quién los corre
+- `lectura` (no modifica datos): los puede correr el agente SOLO si existe `.env.e2e` en la raíz del frontend; si no existe, los corre el autor.
+- `flujo` (modifica datos y necesita `~/con-blockchain/reset-demo.sh`): los corre SOLO el autor, a mano. El agente los escribe pero nunca los corre, y nunca corre `reset-demo.sh`.
+- Credenciales: variables de entorno (valores del `.env` del backend; nunca en el código ni en Git):
 
   | Variable | Qué es |
   |---|---|
@@ -73,7 +76,8 @@ Frontend Angular 22 de MediChain: trazabilidad de medicamentos (ANMAT), cadena d
   | `E2E_ADMIN_EMAIL` | Email de la cuenta de la Sede Central: `ADMIN_EMAIL` del backend |
   | `E2E_ADMIN_PASSWORD` | Contraseña de esa cuenta: `ADMIN_PASSWORD` del backend |
 
-- Dos grupos:
-  - `lectura`: no modifica datos; se puede correr en cualquier momento.
-  - `flujo`: modifica datos. Antes: `~/con-blockchain/reset-demo.sh` y reiniciar el backend. Si la base no está recién reseteada, el test aborta.
-- Cómo se corren: backend levantado (`SWAGGER_HABILITADO` no hace falta) y `npm start`; en otra terminal, con las variables exportadas, `npm run e2e:lectura` o `npm run e2e` (los dos grupos). Los scripts los agrega el paso F6, junto con Playwright.
+- `.env.e2e` (lo crea el autor a partir de `.env.e2e.ejemplo`): `playwright.config.ts` lo carga con `process.loadEnvFile` si existe; una variable ya exportada en la terminal gana. Está en `.gitignore`.
+- **`.env.e2e` es intocable para el agente:** nunca leerlo, imprimirlo, copiarlo, moverlo ni commitearlo. Prohibido `cat`, `head`, `grep`, `Read` o cualquier herramienta sobre su contenido, y prohibido mostrar variables de entorno con sus valores (`env`, `printenv`, `echo $E2E_…`). Solo se puede comprobar que existe (`test -f .env.e2e`).
+- Preparación (una sola vez): `npx playwright install chromium` (lo instala el autor).
+- Cómo se corren: backend levantado y `npm start` (frontend en :4200); en otra terminal, `npm run e2e:lectura` o `npm run e2e` (todos). `npm run e2e:tipos` solo compila los e2e (no necesita backend ni credenciales). Si falta una variable, el test falla diciendo cuál. `E2E_BASE_URL` (opcional) cambia la dirección del frontend. El grupo `flujo` (carpeta `e2e/flujo`) y su script llegan con el primer test que modifica datos.
+- Al informar una corrida, mostrar el resumen y el error de cada test que falle; nunca credenciales.

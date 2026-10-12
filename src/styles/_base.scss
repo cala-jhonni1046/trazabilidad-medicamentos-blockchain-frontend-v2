@@ -82,3 +82,8 @@ pre,
     scroll-behavior: auto !important;
   }
 }
+
+// Los íconos (mat-icon) toman el color del texto que los rodea.
+.mat-icon svg {
+  fill: currentColor;
+}

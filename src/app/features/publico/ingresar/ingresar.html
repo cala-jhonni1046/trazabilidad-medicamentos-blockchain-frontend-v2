@@ -1,0 +1,34 @@
+<section class="ingresar">
+  <header>
+    <h1>Ingresar</h1>
+    <p class="secundario">Trazabilidad de medicamentos del laboratorio al paciente.</p>
+  </header>
+
+  @if (avisoMotivo) {
+    <div class="aviso" role="status">{{ avisoMotivo }}</div>
+  }
+
+  <form class="tarjeta" novalidate (submit)="enviar($event)">
+    <mc-error-api [error]="errorGeneral()" />
+
+    <mat-form-field>
+      <mat-label>Correo electrónico</mat-label>
+      <input matInput type="email" autocomplete="username" [formField]="formulario.email" />
+      @for (error of formulario.email().errors(); track $index) {
+        <mat-error>{{ error.message }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Contraseña</mat-label>
+      <input matInput type="password" autocomplete="current-password" [formField]="formulario.password" />
+      @for (error of formulario.password().errors(); track $index) {
+        <mat-error>{{ error.message }}</mat-error>
+      }
+    </mat-form-field>
+
+    <button mat-flat-button type="submit" [disabled]="formulario().submitting()">
+      {{ formulario().submitting() ? 'Ingresando…' : 'Ingresar' }}
+    </button>
+  </form>
+</section>

@@ -8,7 +8,11 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ESTADO_HABILITACION } from '../../core/api/modelos';
+import { proveerOpcionesMaterial } from '../../core/tema/opciones-material';
 import { SelectorTema } from '../../core/tema/selector-tema';
+import { PRESENTACION_ESTADO_HABILITACION } from '../../shared/estados/catalogo-estados';
+import { Estado } from '../../shared/estados/estado';
 import { TemaService } from '../../core/tema/tema.service';
 
 /** Un token de color: nombre sin el prefijo --mc- y para qué se usa. */
@@ -39,8 +43,10 @@ interface MuestraTono {
     MatProgressSpinnerModule,
     MatSelectModule,
     MatSlideToggleModule,
+    Estado,
     SelectorTema,
   ],
+  providers: [...proveerOpcionesMaterial()],
   templateUrl: './muestrario.html',
   styleUrl: './muestrario.scss',
 })
@@ -71,6 +77,9 @@ export class Muestrario {
     { clave: 'blockchain', nombre: 'Blockchain' },
     { clave: 'neutro', nombre: 'Neutro' },
   ];
+
+  /** Estados de empresa, tal como los muestra el catálogo (color + ícono + texto). */
+  protected readonly estadosEmpresa = ESTADO_HABILITACION.map((valor) => PRESENTACION_ESTADO_HABILITACION[valor]);
 
   /** Hash de ejemplo (64 hex), para ver JetBrains Mono. */
   protected readonly hashEjemplo = '3f9a1c0e7b2d4e6f8a1b3c5d7e9f0a2b4c6d8e0f1a3b5c7d9e1f2a4b6c8d0e2f';

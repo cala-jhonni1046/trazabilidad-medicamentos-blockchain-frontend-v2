@@ -46,6 +46,16 @@
     </ul>
   </section>
 
+  <section class="tarjeta" aria-labelledby="titulo-estados">
+    <h2 id="titulo-estados">Estados (catálogo)</h2>
+    <p class="secundario">Estado de una empresa: siempre color + ícono + texto.</p>
+    <div class="fila">
+      @for (estado of estadosEmpresa; track estado.texto) {
+        <mc-estado [presentacion]="estado" />
+      }
+    </div>
+  </section>
+
   <section class="tarjeta" aria-labelledby="titulo-tipografia">
     <h2 id="titulo-tipografia">Tipografía</h2>
     <h1>Título 1 · Archivo</h1>
