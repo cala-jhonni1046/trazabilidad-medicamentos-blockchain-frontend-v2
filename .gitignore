@@ -42,3 +42,17 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# MediChain
+# Variables de entorno locales (credenciales de e2e, etc.): nunca a Git
+.env
+.env.*
+# La plantilla con valores falsos sí va a Git
+!.env.example
+# Cliente generado desde api/openapi.json (npm run api:generar)
+/src/app/core/api/generado/
+# Reportes y resultados de Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

@@ -1,0 +1,1624 @@
+<title>MediChain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#EEF2F1; --surface:#FFFFFF; --surface-2:#F5F8F7; --line:#D5DEDC;
+  --text:#15232B; --muted:#56666E;
+  --accent:#1F6FA8; --accent-ink:#FFFFFF; --accent-soft:#E1EEF7;
+  --side:#10202A; --side-text:#D3DEE3; --side-muted:#869AA3; --side-hover:#1A2F3B;
+  --ok:#1C7A4E; --ok-soft:#E0F2E8; --warn:#9A5800; --warn-soft:#FBEFD9;
+  --crit:#B3261E; --crit-soft:#FBE3E1; --band:rgba(31,111,168,.13);
+  --f-display:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body:"Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0C151B; --surface:#131F27; --surface-2:#18262F; --line:#27373F;
+    --text:#E2EAEE; --muted:#95A6AE; --accent:#5AA7DB; --accent-ink:#0C151B; --accent-soft:#16324A;
+    --side:#081016; --side-text:#D3DEE3; --side-muted:#7C8F98; --side-hover:#13222C;
+    --ok:#4CC08A; --ok-soft:#123326; --warn:#E3A546; --warn-soft:#3A2A10;
+    --crit:#F0746B; --crit-soft:#3D1715; --band:rgba(90,167,219,.16);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0C151B; --surface:#131F27; --surface-2:#18262F; --line:#27373F;
+  --text:#E2EAEE; --muted:#95A6AE; --accent:#5AA7DB; --accent-ink:#0C151B; --accent-soft:#16324A;
+  --side:#081016; --side-text:#D3DEE3; --side-muted:#7C8F98; --side-hover:#13222C;
+  --ok:#4CC08A; --ok-soft:#123326; --warn:#E3A546; --warn-soft:#3A2A10;
+  --crit:#F0746B; --crit-soft:#3D1715; --band:rgba(90,167,219,.16);
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--f-body);font-size:15px;line-height:1.5}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:1.5rem;font-weight:700}
+h2{font-size:1.12rem;font-weight:600}
+h3{font-size:.98rem;font-weight:600}
+p{margin:0}
+.mono{font-family:var(--f-mono);font-size:.82em;letter-spacing:0}
+.muted{color:var(--muted)}
+.eyebrow{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.num{font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ---------- login ---------- */
+.login{max-width:1040px;margin:0 auto;padding-block:40px 56px;padding-inline:16px;display:grid;gap:24px}
+.brand{font-family:var(--f-display);font-weight:700;font-size:2rem;letter-spacing:-.01em}
+.brand span{color:var(--accent)}
+.login-head{display:grid;gap:6px}
+.login-head p{color:var(--muted);max-width:62ch}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tab{background:none;border:0;padding:10px 14px;cursor:pointer;color:var(--muted);font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab[aria-selected="true"]{color:var(--text);border-bottom-color:var(--accent)}
+.group{display:grid;gap:10px}
+.users{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.ucard{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;cursor:pointer;display:grid;gap:4px;align-content:start;transition:border-color .15s, transform .15s}
+.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
+.ucard .who{font-weight:700}
+.ucard .org{color:var(--muted);font-size:.88rem}
+.rolechip{font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:var(--accent)}
+.rules{display:grid;gap:10px;max-width:820px}
+.rule{display:grid;grid-template-columns:52px 1fr;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+.rule b{font-family:var(--f-mono);color:var(--accent);font-size:.9rem}
+.steps{display:grid;gap:8px;max-width:820px;padding:0;margin:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:34px 1fr;gap:10px;padding:10px 14px;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+.steps li::before{content:counter(s);font-family:var(--f-display);font-weight:700;color:var(--accent);font-size:1.05rem}
+.note{font-size:.88rem;color:var(--muted);max-width:75ch}
+
+/* ---------- app ---------- */
+.app{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
+.side{background:var(--side);color:var(--side-text);padding:20px 14px;display:flex;flex-direction:column;gap:18px;position:sticky;top:0;height:100vh;overflow:auto}
+.side .brand{font-size:1.35rem;color:#fff;padding-inline:8px}
+.side .brand span{color:#6FB6E6}
+.me{padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:8px;display:grid;gap:2px}
+.me .n{font-weight:700;color:#fff}
+.me .r{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:#6FB6E6;font-weight:700}
+.me .o{font-size:.84rem;color:var(--side-muted)}
+.nav{display:grid;gap:2px}
+.nav button{display:flex;justify-content:space-between;align-items:center;gap:8px;background:none;border:0;color:var(--side-text);padding:9px 10px;border-radius:6px;cursor:pointer;text-align:left;font-weight:600}
+.nav button:hover{background:var(--side-hover)}
+.nav button[aria-current="page"]{background:#1F6FA8;color:#fff}
+.nav .count{font-size:.75rem;background:rgba(255,255,255,.14);border-radius:10px;padding:0 7px;font-variant-numeric:tabular-nums}
+.nav .count.hot{background:#C8453C;color:#fff}
+.side-foot{margin-top:auto;display:grid;gap:6px}
+.side-foot button{background:none;border:1px solid rgba(255,255,255,.16);color:var(--side-text);padding:8px 10px;border-radius:6px;cursor:pointer;font-weight:600}
+.side-foot button:hover{background:var(--side-hover)}
+.main{padding-block:22px 48px;padding-inline:28px;display:grid;gap:18px;align-content:start;min-width:0}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.content{display:grid;gap:18px;min-width:0}
+
+/* ---------- blocks ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:grid;gap:12px;min-width:0;align-content:start}
+.itrow{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.itrow > div{flex:1;min-width:0}
+.itrow > .btn{flex:none}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:2px}
+.tile .v{font-family:var(--f-display);font-size:1.7rem;font-weight:700;font-variant-numeric:tabular-nums}
+.tile.crit .v{color:var(--crit)} .tile.warn .v{color:var(--warn)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.party{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--surface-2);display:grid;gap:3px;align-content:start}
+.party .nm{font-weight:700}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:.92rem}
+.kv dt{color:var(--muted)} .kv dd{margin:0}
+
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:.76rem;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap;border:1px solid transparent}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.crit{background:var(--crit-soft);color:var(--crit)}
+.pill.info{background:var(--accent-soft);color:var(--accent)}
+.pill.neutral{background:var(--surface-2);color:var(--muted);border-color:var(--line)}
+.integrity{font-size:.82rem;padding:5px 12px}
+
+.flash{border-radius:8px;padding:12px 14px;border:1px solid;display:grid;gap:2px}
+.flash.ok{background:var(--ok-soft);border-color:color-mix(in srgb,var(--ok) 35%,transparent);color:var(--text)}
+.flash.warn{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 35%,transparent)}
+.flash.crit{background:var(--crit-soft);border-color:color-mix(in srgb,var(--crit) 40%,transparent)}
+.flash.info{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 35%,transparent)}
+.flash b{font-weight:700}
+
+.item{display:grid;grid-template-columns:4px 1fr;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.item .stripe{border-radius:2px;background:var(--line)}
+.item.crit .stripe{background:var(--crit)} .item.warn .stripe{background:var(--warn)} .item.info .stripe{background:var(--accent)} .item.ok .stripe{background:var(--ok)}
+
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);text-align:left;font-weight:700;padding:9px 12px;background:var(--surface-2);border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+tr.bad td{background:var(--crit-soft)}
+tr.after td{opacity:.55}
+
+form.stack{display:grid;gap:12px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+label.f{display:grid;gap:4px;font-size:.85rem;font-weight:600;color:var(--muted)}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--text);font-weight:400;font-size:.95rem}
+textarea{min-height:70px;resize:vertical}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row > input{flex:1 1 160px;width:auto}
+.btn{background:var(--accent);color:var(--accent-ink);border:1px solid var(--accent);padding:8px 14px;border-radius:7px;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.danger{background:var(--crit);border-color:var(--crit);color:#fff}
+.btn.warn{background:var(--warn);border-color:var(--warn);color:#fff}
+.btn.sm{padding:5px 10px;font-size:.85rem}
+.btn[disabled]{opacity:.45;cursor:not-allowed;filter:none}
+.chip{background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-family:var(--f-mono);font-size:.8rem;cursor:pointer;color:var(--text)}
+.chip:hover{border-color:var(--accent)}
+.checks{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.checks li{display:grid;grid-template-columns:26px 1fr;gap:8px;align-items:start}
+.mark{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:.8rem}
+.mark.ok{background:var(--ok-soft);color:var(--ok)} .mark.crit{background:var(--crit-soft);color:var(--crit)} .mark.warn{background:var(--warn-soft);color:var(--warn)}
+.verdict{font-family:var(--f-display);font-size:1.3rem;font-weight:700}
+.verdict.ok{color:var(--ok)} .verdict.crit{color:var(--crit)} .verdict.warn{color:var(--warn)}
+.gs1{font-family:var(--f-mono);font-size:.8rem;background:var(--surface-2);border:1px dashed var(--line);border-radius:6px;padding:6px 9px;word-break:break-all}
+.spark{width:100%;max-width:300px;height:auto;display:block}
+.spark .band{fill:var(--band)}
+.spark .line{fill:none;stroke:var(--accent);stroke-width:2}
+.spark .pt{fill:var(--accent)} .spark .pt-bad{fill:var(--crit)}
+.spark text{fill:var(--muted);font-size:9px;font-family:var(--f-body)}
+.hash{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.empty{color:var(--muted);padding:6px 0}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--text);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.2);max-width:calc(100% - 32px);z-index:10}
+.loading{padding:40px 16px;text-align:center;color:var(--muted)}
+
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  .side{position:static;height:auto;padding:14px 16px;gap:12px}
+  .nav{display:flex;overflow-x:auto;gap:4px;padding-bottom:4px}
+  .nav button{flex:0 0 auto}
+  .side-foot{flex-direction:row;display:flex;margin-top:0}
+  .main{padding-inline:16px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.route{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-weight:600}
+.route .arr{color:var(--muted);font-weight:400}
+.code{font-family:var(--f-mono);font-size:.84rem;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:1px 7px;white-space:nowrap}
+.bopts{display:grid;gap:6px}
+.bopt{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);font-size:.92rem;color:var(--text);font-weight:400}
+.bopt input{width:auto;margin-top:4px}
+.bopt.off{opacity:.55}
+label.inline{display:flex;gap:8px;align-items:center;font-weight:600;font-size:.9rem;color:var(--text)}
+label.inline input{width:auto}
+.acc{display:grid;gap:4px;font-size:.88rem}
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.cd{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.sub{font-size:.85rem}
+.hl td{background:var(--accent-soft)}
+details.more summary{cursor:pointer;color:var(--accent);font-weight:600}
+.stack{display:grid;gap:8px}
+.wide table{min-width:1080px}
+.wide td{font-size:.86rem}
+</style>
+
+<div id="app"><div class="loading">Calculando la cadena de hashes…</div></div>
+<div id="toast" class="toast" hidden></div>
+<script>
+/* =====================================================================
+   MediChain · prototipo v3 (datos ficticios)
+   Sigue el documento "MediChain: requerimientos del backend".
+   Cada colección de S equivale a una tabla del backend Java.
+   ===================================================================== */
+const GENESIS = 'GENESIS';
+const HOY = new Date();
+const MIN = 60e3, HORA = 3600e3;
+const TANDA_MS = 5 * MIN;          // anclaje por tandas cada 5 minutos (R15)
+const CONF_MS = 12e3;              // un bloque de Sepolia cada ~12 s; 3 confirmaciones
+
+const PROVINCIAS = ['Buenos Aires','CABA','Catamarca','Chaco','Chubut','Córdoba','Corrientes','Entre Ríos','Formosa','Jujuy','La Pampa','La Rioja','Mendoza','Misiones','Neuquén','Río Negro','Salta','San Juan','San Luis','Santa Cruz','Santa Fe','Santiago del Estero','Tierra del Fuego','Tucumán'];
+
+const ROL_LBL = {SEDE_CENTRAL:'Sede Central ANMAT', INSPECTOR:'Inspector ANMAT', LABORATORIO:'Laboratorio', DISTRIBUIDOR:'Distribuidora', FARMACIA:'Farmacia', PACIENTE:'Paciente'};
+const TIPO_EMP = {LABORATORIO:'Laboratorio', DISTRIBUIDOR:'Distribuidora', FARMACIA:'Farmacia'};
+const EMP_EST = {PENDIENTE:['Pendiente','warn'], HABILITADA:['Habilitada','ok'], RECHAZADA:['Rechazada','crit'], SUSPENDIDA:['Suspendida','crit']};
+const CIR_EST = {PENDIENTE_EMPRESAS:['Esperando a las empresas','warn'], PENDIENTE_INSPECTOR:['Esperando al inspector','warn'], APROBADO:['Aprobado','ok'], RECHAZADO:['Rechazado','crit'], SUSPENDIDO:['Suspendido','crit']};
+const LOTE_EST = {PENDIENTE_LIBERACION:['Pendiente de liberación','warn'], LIBERADO:['Liberado','ok'], CUARENTENA:['Cuarentena','crit'], RECALL:['Recall','crit']};
+const BUL_EST = {ARMADO:['Armado','neutral'], EN_TRANSITO:['En tránsito','info'], EN_DEPOSITO:['En depósito','info'], RECIBIDO:['Recibido','ok'], RECHAZADO:['Rechazado','crit'], ROBADO:['Robado','crit']};
+const VIA_EST = {PROGRAMADO:['Programado','neutral'], EN_TRANSITO:['En tránsito','info'], FINALIZADO:['Finalizado','ok'], ROBADO:['Robado','crit']};
+const UNI_EST = {EN_LABORATORIO:['En laboratorio','neutral'], EN_TRANSITO:['En tránsito','info'], EN_DEPOSITO:['En depósito','info'], EN_STOCK:['En stock','ok'], DISPENSADA:['Dispensada','neutral'], DEVUELTA:['Devuelta','warn'], ROBADA:['Robada','crit']};
+const CUA_EST = {ACTIVA:['Activa','crit'], LEVANTADA:['Levantada','ok'], CONVERTIDA_EN_RECALL:['Recall','crit']};
+const ALCANCE = {LOTE:'Lote', DESPACHO:'Viaje', BULTO:'Bulto'};
+const MOTIVO = {RUPTURA_FRIO:'Ruptura de cadena de frío', ROBO:'Robo o extravío', RECHAZO_RECEPCION:'Recepción rechazada', DEFECTO_CALIDAD:'Defecto de calidad', PREVENTIVA:'Preventiva'};
+const REP_EST = {ABIERTO:['Nuevo','crit'], EN_INVESTIGACION:['En investigación','warn'], CERRADO:['Cerrado','ok']};
+const ANC_EST = {ENVIADO:['Esperando confirmaciones','warn'], CONFIRMADO:['Confirmado','ok']};
+
+/* Lista única de tipos de evento: la misma que el enum TipoEvento del backend */
+const TIPO_EVT = {
+  ALTA_INSPECTOR:'Alta de inspector', BAJA_INSPECTOR:'Baja de inspector', REACTIVACION_INSPECTOR:'Reactivación de inspector',
+  SOLICITUD_HABILITACION:'Solicitud de habilitación', SOLICITUD_TOMADA:'Solicitud tomada', SOLICITUD_ASIGNADA:'Solicitud asignada por la Sede',
+  HABILITACION_APROBADA:'Empresa habilitada', HABILITACION_RECHAZADA:'Habilitación rechazada', EMPRESA_SUSPENDIDA:'Empresa suspendida', EMPRESA_REHABILITADA:'Empresa rehabilitada',
+  CIRCUITO_PROPUESTO:'Circuito propuesto', CIRCUITO_ACEPTADO:'Circuito aceptado', CIRCUITO_RECHAZADO:'Circuito rechazado', CIRCUITO_TOMADO:'Circuito tomado',
+  CIRCUITO_APROBADO:'Circuito aprobado', CIRCUITO_SUSPENDIDO:'Circuito suspendido', CIRCUITO_REHABILITADO:'Circuito rehabilitado',
+  LOTE_REGISTRADO:'Lote registrado', LOTE_LIBERADO:'Lote liberado', BULTO_ARMADO:'Bultos armados',
+  VIAJE_CREADO:'Viaje creado', VIAJE_SALIDA:'Salida del camión', LECTURA_TEMPERATURA:'Lectura de temperatura', RUPTURA_FRIO:'Ruptura de cadena de frío',
+  BULTO_RECIBIDO:'Bulto recibido', BULTO_RECHAZADO:'Bulto rechazado', BULTO_INEXISTENTE:'Bulto inexistente escaneado', BULTO_DUPLICADO:'Bulto ya recibido escaneado',
+  VIAJE_FINALIZADO:'Viaje finalizado', ROBO_EXTRAVIO:'Robo o extravío',
+  CUARENTENA:'Cuarentena', CUARENTENA_LEVANTADA:'Cuarentena levantada', RECALL:'Recall',
+  DISPENSACION:'Dispensación', ANULACION_DISPENSA:'Dispensa anulada', DEVOLUCION:'Devolución',
+  INTENTO_DUPLICADO:'Serie ya dispensada presentada', SERIE_INEXISTENTE:'Serie inexistente', SERIE_ROBADA:'Serie robada presentada',
+  REPORTE_CIUDADANO:'Reporte ciudadano', REPORTE_TOMADO:'Reporte tomado', REPORTE_CERRADO:'Reporte cerrado',
+};
+
+const RULES = [
+  ['R1','Solo la Sede Central da de alta y de baja a los inspectores.'],
+  ['R2','Solo operan empresas habilitadas. Las habilita un inspector de su provincia; si la provincia no tiene inspectores, la Sede asigna uno.'],
+  ['R3','Cada caja lleva GTIN + número de serie único (alfanumérico, hasta 20 caracteres, sin empezar con 779).'],
+  ['R4','Un lote común lo libera el director técnico del laboratorio; un biológico, un inspector de la provincia del laboratorio.'],
+  ['R5','Un circuito une laboratorio, distribuidora y farmacia habilitados. Lo propone el DT del laboratorio, aceptan las otras dos y aprueba el inspector de la provincia de la farmacia.'],
+  ['R6','Un bulto tiene cajas de un solo lote liberado y un circuito aprobado. Una vez que sale, no cambia su contenido ni su destino.'],
+  ['R7','Tramo 1: el laboratorio despacha a la distribuidora del circuito. Tramo 2: la distribuidora despacha a las farmacias. Un viaje puede tener varias paradas.'],
+  ['R8','Solo recibe la empresa destino del bulto. Precinto roto, cantidad distinta o temperatura fuera de rango obligan a rechazar, y el bulto queda en cuarentena.'],
+  ['R9','Una lectura fuera de rango pone en cuarentena automática todos los bultos del camión. Tras una ruptura de frío solo cabe el recall.'],
+  ['R10','Una caja está bloqueada si su lote, su viaje o su bulto tienen cuarentena o recall, o si el lote venció. Bloqueada no viaja, no se recibe y no se dispensa.'],
+  ['R11','Cada caja se dispensa una sola vez. La misma farmacia puede anular dentro de las 2 horas.'],
+  ['R12','Solo un inspector dictamina: levanta, hace recall o cierra reportes. Nada se edita hacia atrás.'],
+  ['R13','Se pide obra social y afiliado; el DNI es opcional y va enmascarado. Ningún dato del paciente va a la blockchain (Ley 25.326).'],
+  ['R14','Un robo marca el viaje, sus bultos y sus cajas como robados. Una caja devuelta no vuelve a dispensarse.'],
+  ['R15','Cada acción es un evento encadenado por hash. Cada 5 minutos el último hash se ancla en Sepolia.'],
+];
+
+const COMO = [
+  ['Cada empresa se registra sola','Carga CUIT, provincia y el PDF de su habilitación. Queda pendiente en la bandeja de los inspectores de su provincia.'],
+  ['Un inspector de esa provincia la habilita','La toma de la bandeja, revisa el PDF (su hash queda en la cadena) y la aprueba.'],
+  ['El laboratorio arma circuitos','Busca por CUIT a la distribuidora y a la farmacia. Las dos aceptan y el inspector de la provincia de la farmacia aprueba. Un circuito por farmacia, permanente.'],
+  ['Lote, liberación y bultos','El laboratorio registra el lote (una serie por caja), lo libera y arma bultos cerrados, cada uno con su farmacia de destino.'],
+  ['Tramo 1: al depósito','El laboratorio despacha un camión a la distribuidora, que escanea cada bulto al recibirlo.'],
+  ['Tramo 2: a las farmacias','La distribuidora arma viajes con varias paradas. Cada farmacia escanea solo sus bultos. Si el camión pierde el frío, se bloquean solo sus bultos.'],
+  ['Dispensación y verificación','La farmacia dispensa caja por caja. El paciente escanea la serie y ve el recorrido y el anclaje en Sepolia.'],
+];
+
+const GUION = [
+  ['Pantalla de inicio → Registrar empresa','Registrá “Farmacia Las Heras” (Mendoza). Entra en la bandeja de los inspectores de Mendoza.'],
+  ['Inspectora Laura Gómez → Bandeja','Tomá la solicitud, verificá el PDF y habilitala. Hacé lo mismo con Cuyo Bio S.A.'],
+  ['Sede Central → Bandeja','Farmacia Libertador es de San Juan, que no tiene inspectores: asignásela a un inspector.'],
+  ['Farmacia del Sur (Carla Moyano) → Circuitos','Aceptá CIR-0003. Como la distribuidora ya aceptó, pasa a la bandeja del inspector.'],
+  ['Inspectora Laura Gómez → Bandeja','Tomá y aprobá CIR-0003. Liberá también el lote de vacunas L2026-0520 (biológico, R4).'],
+  ['Laboratorio (Elena Paz) → Lotes y bultos','Liberá L2026-0602 como directora técnica y armá bultos para CIR-0001 y CIR-0003. Después, en Viajes, despachalos a la distribuidora (tramo 1).'],
+  ['Distribuidora (Ana Quiroga) → Viajes','Armá un viaje con BUL-0003 (Farmacia Centro) y BUL-0005 (Godoy Cruz) y registrá la salida: un camión, dos paradas.'],
+  ['Farmacia Centro (Paula Díaz) → Por recibir','Escaneá BUL-0003: las 200 cajas pasan a tu stock. Probá también escanear BUL-0005, que no es tuyo.'],
+  ['Distribuidora → Viajes → VJ-0005','Tocá “Falla de equipo”. Quedan en cuarentena solo BUL-0008 y BUL-0009; el resto del depósito sigue normal (R9).'],
+  ['Farmacia Centro → Dispensar','Dispensá una caja; después probá 0398S000001, que ya se dispensó: alerta de posible copia (R11).'],
+  ['Paciente Juan Pérez → Verificar','Escaneá 0398S000001: recorrido y anclaje en Sepolia. Reportá que el líquido estaba turbio.'],
+  ['Inspectora → Cadena y Sepolia','Alterá un evento: la cadena lo detecta. Después probá “Reescribir la base”: la cadena parece coherente, pero no coincide con Sepolia.'],
+];
+
+/* ---------------- utilidades ---------------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const p4 = n => String(n).padStart(4,'0');
+const p6 = n => String(n).padStart(6,'0');
+function iso(d){ const z=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}:${z(d.getSeconds())}`; }
+const nowISO = () => iso(new Date());
+const ago = ms => iso(new Date(Date.now()-ms));
+const fmt = s => { if(!s) return '—'; const d=new Date(s); return d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}); };
+const fmtD = s => s ? new Date(s.length<=10 ? s+'T12:00' : s).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
+const fmtT = t => t.toFixed(1).replace('.',',')+' °C';
+const fmtN = n => n.toLocaleString('es-AR');
+const fmtDni = d => String(d).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const maskDni = d => { const s=fmtDni(d).split('.'); return s.length===3 ? `${s[0]}.***.${s[2]}` : '***'; };
+const short = h => h ? (h.length>18 ? h.slice(0,10)+'…'+h.slice(-6) : h) : '—';
+const pill = (t,k) => `<span class="pill ${k}">${esc(t)}</span>`;
+const estPill = (map,e) => { const [t,k]=map[e]||[e,'neutral']; return pill(t,k); };
+const code = c => `<span class="code">${esc(c)}</span>`;
+const parseT = s => { const n=parseFloat(String(s).replace(',','.')); return isNaN(n)?null:n; };
+
+/* Dígitos verificadores reales: GS1 (GTIN, GLN) y CUIT (módulo 11) */
+function gs1DV(d){ let s=0; for(let i=0;i<d.length;i++){ const x=+d[d.length-1-i]; s+=x*(i%2===0?3:1); } return String((10-(s%10))%10); }
+const conDV = d => d+gs1DV(d);
+const gs1Valido = c => /^\d{8,14}$/.test(c) && gs1DV(c.slice(0,-1))===c.slice(-1);
+function cuitDV(p){ const w=[5,4,3,2,7,6,5,4,3,2]; let s=0; for(let i=0;i<10;i++) s+=+p[i]*w[i]; let r=11-(s%11); if(r===11) r=0; return r===10?null:String(r); }
+function mkCuit(p){ let n=+p; while(cuitDV(String(n))===null) n++; const q=String(n); return `${q.slice(0,2)}-${q.slice(2)}-${cuitDV(q)}`; }
+const soloDig = s => String(s||'').replace(/\D/g,'');
+const cuitValido = c => { const d=soloDig(c); return d.length===11 && cuitDV(d.slice(0,10))===d[10]; };
+
+let S; // estado global
+
+const user  = () => S.usuarios.find(u=>u.id===S.sesion);
+const emp   = id => S.empresas.find(e=>e.id===id);
+const empCuit = c => S.empresas.find(e=>soloDig(e.cuit)===soloDig(c));
+const ins   = id => S.inspectores.find(i=>i.id===id);
+const med   = id => S.medicamentos.find(m=>m.id===id);
+const lote  = id => S.lotes.find(l=>l.id===id);
+const loteCod = c => S.lotes.find(l=>l.codigo.toUpperCase()===String(c).toUpperCase());
+const uni   = s  => S.unidades.find(u=>u.serie===s);
+const bul   = id => S.bultos.find(b=>b.id===id);
+const bulCod = c => S.bultos.find(b=>b.codigo.toUpperCase()===String(c).toUpperCase());
+const cir   = id => S.circuitos.find(c=>c.id===id);
+const via   = id => S.viajes.find(v=>v.id===id);
+const insDe = u => u && u.inspectorId ? ins(u.inspectorId) : null;
+const vencido = l => new Date(l.venc+'T23:59') < HOY;
+const nombreEmp = id => { const e=emp(id); return e?e.razon:'—'; };
+const inspectoresActivos = prov => S.inspectores.filter(i=>i.estado==='ACTIVO' && (!prov || i.provincia===prov));
+const destinoEnViaje = b => { const v=via(b.despachoId), c=cir(b.circuitoId); return v && v.tramo===1 ? c.distId : c.farmId; };
+const paradas = v => [...new Set(v.bultoIds.map(id=>{ const b=bul(id), c=cir(b.circuitoId); return v.tramo===1?c.distId:c.farmId; }))];
+function unidadesDe(b){ return S.unidades.filter(u=>u.bultoId===b.id); }
+
+/* ---------------- bloqueos (R10): se calculan, no se guardan ---------------- */
+const cuaVigentes = () => S.cuarentenas.filter(c=>c.estado==='ACTIVA'||c.estado==='CONVERTIDA_EN_RECALL');
+function descCua(c){ return `${c.estado==='ACTIVA'?'cuarentena':'recall'} por ${MOTIVO[c.motivo].toLowerCase()} (alcance: ${ALCANCE[c.alcance].toLowerCase()})`; }
+function bloqueoLote(l){
+  if(vencido(l)) return 'el lote venció';
+  const c=cuaVigentes().find(c=>c.alcance==='LOTE'&&c.loteId===l.id);
+  return c ? 'el lote está en '+descCua(c) : null;
+}
+function bloqueoBulto(b){
+  const bl=bloqueoLote(lote(b.loteId)); if(bl) return bl;
+  const c=cuaVigentes().find(c=>c.alcance!=='LOTE'&&c.bultoIds.includes(b.id));
+  return c ? `el bulto está en ${descCua(c)}` : null;
+}
+function bloqueoUnidad(u){ return u.bultoId ? bloqueoBulto(bul(u.bultoId)) : bloqueoLote(lote(u.loteId)); }
+function cuaDeBulto(b){ return cuaVigentes().find(c=>(c.alcance==='LOTE'&&c.loteId===b.loteId)||(c.alcance!=='LOTE'&&c.bultoIds.includes(b.id))); }
+
+/* ---------------- cadena de hashes (R15) ---------------- */
+async function sha(str){
+  if(window.crypto && crypto.subtle){
+    const b = await crypto.subtle.digest('SHA-256', typeof str==='string' ? new TextEncoder().encode(str) : str);
+    return '0x'+[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+  }
+  let s = typeof str==='string' ? str : [...new Uint8Array(str)].join(','), out='';
+  for(let k=0;k<4;k++){ let h1=0xdeadbeef^k, h2=0x41c6ce57^k;
+    for(let i=0;i<s.length;i++){const c=s.charCodeAt(i); h1=Math.imul(h1^c,2654435761); h2=Math.imul(h2^c,1597334677);}
+    h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);
+    h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);
+    out+=(h2>>>0).toString(16).padStart(8,'0')+(h1>>>0).toString(16).padStart(8,'0'); }
+  return '0x'+out;
+}
+const cuerpo = b => JSON.stringify({n:b.n,ts:b.ts,tipo:b.tipo,actor:b.actor,ref:b.ref,data:b.data,prev:b.prev});
+let cola = Promise.resolve();
+function registrar(tipo, actor, ref, txt, extra, ts){
+  cola = cola.then(async ()=>{
+    const prev = S.ledger.length ? S.ledger[S.ledger.length-1].hash : GENESIS;
+    const b = {n:S.ledger.length+1, ts: ts || nowISO(), tipo, actor, ref:ref||{}, data:{txt, ...(extra||{})}, prev};
+    b.hash = await sha(cuerpo(b));
+    S.ledger.push(b);
+  });
+  return cola;
+}
+/* Verificación: (1) coherencia interna de la base; (2) comparación contra lo anclado en Sepolia */
+async function verificar(){
+  let prevStored=GENESIS, prevRecalc=GENESIS, interna=null, sep=null;
+  const recalc={};
+  for(const b of S.ledger){
+    const hStored = await sha(cuerpo(b));
+    if(interna===null && (b.prev!==prevStored || hStored!==b.hash)) interna=b.n;
+    prevStored=b.hash;
+    const hR = await sha(cuerpo({...b, prev:prevRecalc}));
+    recalc[b.n]=hR; prevRecalc=hR;
+  }
+  for(const a of S.sepolia){ if(recalc[a.numero]!==a.hash){ sep=a; break; } }
+  S.integridad = {ok: interna===null && !sep, interna, sepolia: sep, verificado: nowISO()};
+}
+function anclajeDe(n){ return S.anclajes.find(a=>n>=a.desde && n<=a.hasta) || null; }
+async function anclar(){
+  const ult = S.anclajes.length ? S.anclajes[S.anclajes.length-1].hasta : 0;
+  S.proximaTanda = Date.now() + TANDA_MS;
+  if(S.ledger.length<=ult) return null;
+  const last = S.ledger[S.ledger.length-1];
+  const tx = await sha('tx|'+last.hash+'|'+Date.now());
+  S.bloque += 3 + (S.anclajes.length % 7);
+  const a = {id:'ANC-'+p4(S.anclajes.length+1), desde:ult+1, hasta:last.n, hash:last.hash, tx, bloque:S.bloque, ts:nowISO(), estado:'ENVIADO', conf:0};
+  S.anclajes.push(a);
+  S.sepolia.push({numero:last.n, hash:last.hash, tx, bloque:a.bloque, ts:a.ts}); // lo que queda en la blockchain: nadie lo puede editar
+  return a;
+}
+
+/* ---------------- cuarentenas ---------------- */
+function abrirCuarentena(alcance, obj, motivo, texto, automatica, actor){
+  const c = {id:'CUA-'+p4(S.cuarentenas.length+1), alcance, motivo, texto, automatica, estado:'ACTIVA', inicio:nowISO(), fin:null, dictamen:null, inspectorId:null,
+    loteId: obj.loteId||null, despachoId: obj.despachoId||null, bultoIds: obj.bultoIds||[], provincia: obj.provincia};
+  S.cuarentenas.push(c);
+  if(alcance==='LOTE'){ const l=lote(c.loteId); l.estadoPrevio=l.estado; l.estado='CUARENTENA'; }
+  const que = alcance==='LOTE' ? `lote ${lote(c.loteId).codigo}` : alcance==='DESPACHO' ? `viaje ${via(c.despachoId).codigo} (${c.bultoIds.map(id=>bul(id).codigo).join(', ')})` : `bulto ${bul(c.bultoIds[0]).codigo}`;
+  registrar('CUARENTENA', actor, {cuarentena:c.id, lote:c.loteId||undefined, viaje:c.despachoId||undefined, bultos:c.bultoIds}, `${c.id} · ${ALCANCE[alcance]}: ${que} · ${MOTIVO[motivo]}${texto?' · '+texto:''}`);
+  return c;
+}
+
+/* ---------------- datos de arranque ---------------- */
+function seed(){
+  const E=[]; // eventos de arranque: [ts, tipo, actor, ref, txt, extra]
+  const ev=(ts,tipo,actor,ref,txt,extra)=>E.push([ts,tipo,actor,ref,txt,extra]);
+  const glnN = i => conDV('779000100'+String(i).padStart(3,'0'));
+  const s = {
+    usuarios:[
+      {id:'u-sede', rol:'SEDE_CENTRAL', nombre:'Dra. Beatriz Ferreyra', org:'Sede Central · Legajo SC-001'},
+      {id:'u-gomez', rol:'INSPECTOR', nombre:'Laura Gómez', inspectorId:'ins-1'},
+      {id:'u-ibanez', rol:'INSPECTOR', nombre:'Martín Ibáñez', inspectorId:'ins-2'},
+      {id:'u-andes', rol:'LABORATORIO', nombre:'Farm. Elena Paz', empresaId:'emp-andes', admin:true, dt:true},
+      {id:'u-cuyo', rol:'DISTRIBUIDOR', nombre:'Ana Quiroga', empresaId:'emp-cuyo', admin:true, dt:false},
+      {id:'u-centro', rol:'FARMACIA', nombre:'Farm. Paula Díaz', empresaId:'emp-centro', admin:true, dt:true},
+      {id:'u-godoy', rol:'FARMACIA', nombre:'Farm. Diego Ruiz', empresaId:'emp-godoy', admin:true, dt:true},
+      {id:'u-sur', rol:'FARMACIA', nombre:'Farm. Carla Moyano', empresaId:'emp-sur', admin:true, dt:true},
+      {id:'u-biocuyo', rol:'LABORATORIO', nombre:'Farm. Martín Ledesma', empresaId:'emp-biocuyo', admin:true, dt:true},
+      {id:'u-libertador', rol:'FARMACIA', nombre:'Farm. Sergio Páez', empresaId:'emp-libertador', admin:true, dt:true},
+      {id:'u-pac', rol:'PACIENTE', nombre:'Juan Pérez', dni:'30456789'},
+    ],
+    inspectores:[
+      {id:'ins-1', nombre:'Laura Gómez', dni:'28991002', legajo:'ANMAT-4402', provincia:'Mendoza', estado:'ACTIVO', altaPor:'u-sede', fechaAlta:'2026-03-01T09:00:00'},
+      {id:'ins-2', nombre:'Martín Ibáñez', dni:'31450881', legajo:'ANMAT-5110', provincia:'Mendoza', estado:'ACTIVO', altaPor:'u-sede', fechaAlta:'2026-04-15T11:30:00'},
+    ],
+    empresas:[
+      {id:'emp-andes', tipo:'LABORATORIO', razon:'Andes Pharma S.A.', cuit:mkCuit('3071234567'), gln:glnN(1), provincia:'Mendoza', localidad:'Godoy Cruz', habilitacion:'Disp. ANMAT 4471/2025', dt:'Farm. Elena Paz (M.P. 1893)', solicitud:'2026-03-05T12:00:00', estado:'HABILITADA', inspectorId:'ins-1', habilitadaPor:'ins-1', fechaHab:'2026-03-10T10:20:00'},
+      {id:'emp-cuyo', tipo:'DISTRIBUIDOR', razon:'Distribuidora Cuyo S.A.', cuit:mkCuit('3070654321'), gln:glnN(2), provincia:'Mendoza', localidad:'Maipú', habilitacion:'Disp. ANMAT 2210/2025 · Buenas Prácticas de Distribución', dt:'Farm. Hugo Bravo (M.P. 2044)', solicitud:'2026-04-28T09:00:00', estado:'HABILITADA', inspectorId:'ins-2', habilitadaPor:'ins-2', fechaHab:'2026-05-02T12:00:00'},
+      {id:'emp-centro', tipo:'FARMACIA', razon:'Farmacia Centro', cuit:mkCuit('3071122334'), gln:glnN(3), provincia:'Mendoza', localidad:'Ciudad de Mendoza', habilitacion:'Min. Salud Mendoza · Hab. 0977', dt:'Farm. Paula Díaz (M.P. 2231)', solicitud:'2026-04-16T09:00:00', estado:'HABILITADA', inspectorId:'ins-1', habilitadaPor:'ins-1', fechaHab:'2026-04-20T15:00:00'},
+      {id:'emp-godoy', tipo:'FARMACIA', razon:'Farmacia Godoy Cruz', cuit:mkCuit('3071555443'), gln:glnN(4), provincia:'Mendoza', localidad:'Godoy Cruz', habilitacion:'Min. Salud Mendoza · Hab. 1102', dt:'Farm. Diego Ruiz (M.P. 2310)', solicitud:'2026-05-10T09:30:00', estado:'HABILITADA', inspectorId:'ins-2', habilitadaPor:'ins-2', fechaHab:'2026-05-14T11:00:00'},
+      {id:'emp-sur', tipo:'FARMACIA', razon:'Farmacia del Sur', cuit:mkCuit('3071888990'), gln:glnN(5), provincia:'Mendoza', localidad:'San Rafael', habilitacion:'Min. Salud Mendoza · Hab. 1215', dt:'Farm. Carla Moyano (M.P. 2398)', solicitud:'2026-08-01T10:00:00', estado:'HABILITADA', inspectorId:'ins-1', habilitadaPor:'ins-1', fechaHab:'2026-08-05T12:40:00'},
+      {id:'emp-biocuyo', tipo:'LABORATORIO', razon:'Cuyo Bio S.A.', cuit:mkCuit('3071888222'), gln:glnN(6), provincia:'Mendoza', localidad:'Luján de Cuyo', habilitacion:'Disp. ANMAT 5120/2026', dt:'Farm. Martín Ledesma (M.P. 2502)', solicitud:'2026-09-25T10:00:00', estado:'PENDIENTE', inspectorId:null, habilitadaPor:null, fechaHab:null},
+      {id:'emp-libertador', tipo:'FARMACIA', razon:'Farmacia Libertador', cuit:mkCuit('3071444556'), gln:glnN(7), provincia:'San Juan', localidad:'Rivadavia', habilitacion:'Min. Salud San Juan · Hab. 0341', dt:'Farm. Sergio Páez (M.P. 881)', solicitud:'2026-09-26T16:30:00', estado:'PENDIENTE', inspectorId:null, habilitadaPor:null, fechaHab:null},
+    ],
+    medicamentos:[
+      {id:'med-ins', labId:'emp-andes', nombre:'Insulina glargina 100 UI/ml', presentacion:'Lapicera prellenada 3 ml', gtin:conDV('0779123450001'), tMin:2, tMax:8, biologico:true},
+      {id:'med-vac', labId:'emp-andes', nombre:'Vacuna antigripal trivalente', presentacion:'Jeringa prellenada 0,5 ml', gtin:conDV('0779123450002'), tMin:2, tMax:8, biologico:true},
+      {id:'med-amx', labId:'emp-andes', nombre:'Amoxicilina 500 mg', presentacion:'Caja x 21 comprimidos', gtin:conDV('0779123450003'), tMin:15, tMax:30, biologico:false},
+    ],
+    circuitos:[
+      {id:'cir-1', codigo:'CIR-0001', labId:'emp-andes', distId:'emp-cuyo', farmId:'emp-centro', estado:'APROBADO', creado:'2026-05-19T11:00:00', aceptDist:'2026-05-20T10:00:00', aceptFarm:'2026-05-20T15:00:00', inspectorId:'ins-1', fechaAprob:'2026-05-21T09:30:00', motivo:null},
+      {id:'cir-2', codigo:'CIR-0002', labId:'emp-andes', distId:'emp-cuyo', farmId:'emp-godoy', estado:'APROBADO', creado:'2026-05-19T11:05:00', aceptDist:'2026-05-20T10:02:00', aceptFarm:'2026-05-21T12:00:00', inspectorId:'ins-2', fechaAprob:'2026-05-22T10:00:00', motivo:null},
+      {id:'cir-3', codigo:'CIR-0003', labId:'emp-andes', distId:'emp-cuyo', farmId:'emp-sur', estado:'PENDIENTE_EMPRESAS', creado:'2026-09-24T09:00:00', aceptDist:'2026-09-24T14:00:00', aceptFarm:null, inspectorId:null, fechaAprob:null, motivo:null},
+    ],
+    lotes:[], unidades:[], bultos:[], viajes:[], lecturas:[], recepciones:[], dispensaciones:[], cuarentenas:[], reportes:[],
+    ledger:[], anclajes:[], sepolia:[], docs:{},
+  };
+  // documentos de habilitación (contenido ficticio; se guarda su hash)
+  for(const e of s.empresas) s.docs[e.id] = `%PDF-1.4 · ${e.habilitacion} · ${e.razon} · CUIT ${e.cuit}`;
+
+  // alta de inspectores, solicitudes y habilitaciones
+  ev('2026-03-01T09:00:00','ALTA_INSPECTOR','u-sede',{inspector:'ins-1'},'Laura Gómez (ANMAT-4402) · Mendoza');
+  ev('2026-04-15T11:30:00','ALTA_INSPECTOR','u-sede',{inspector:'ins-2'},'Martín Ibáñez (ANMAT-5110) · Mendoza');
+  const insUser = {'ins-1':'u-gomez','ins-2':'u-ibanez'};
+  const admin = {'emp-andes':'u-andes','emp-cuyo':'u-cuyo','emp-centro':'u-centro','emp-godoy':'u-godoy','emp-sur':'u-sur','emp-biocuyo':'u-biocuyo','emp-libertador':'u-libertador'};
+  for(const e of s.empresas){
+    ev(e.solicitud,'SOLICITUD_HABILITACION',admin[e.id],{empresa:e.id},`${e.razon} · ${TIPO_EMP[e.tipo]} · CUIT ${e.cuit} · ${e.provincia}`,{docHash:'(se calcula al iniciar)'});
+    if(e.estado==='HABILITADA') ev(e.fechaHab,'HABILITACION_APROBADA',insUser[e.habilitadaPor],{empresa:e.id},`${e.razon} habilitada como ${TIPO_EMP[e.tipo].toLowerCase()}`);
+  }
+  // circuitos
+  for(const c of s.circuitos){
+    ev(c.creado,'CIRCUITO_PROPUESTO','u-andes',{circuito:c.id},`${c.codigo}: Andes Pharma → Distribuidora Cuyo → ${s.empresas.find(e=>e.id===c.farmId).razon}`);
+    if(c.aceptDist) ev(c.aceptDist,'CIRCUITO_ACEPTADO','u-cuyo',{circuito:c.id},`${c.codigo} aceptado por Distribuidora Cuyo S.A.`);
+    if(c.aceptFarm) ev(c.aceptFarm,'CIRCUITO_ACEPTADO',admin[c.farmId],{circuito:c.id},`${c.codigo} aceptado por ${s.empresas.find(e=>e.id===c.farmId).razon} · pasa al inspector`);
+    if(c.fechaAprob) ev(c.fechaAprob,'CIRCUITO_APROBADO',insUser[c.inspectorId],{circuito:c.id},`${c.codigo} aprobado`);
+  }
+  // lotes, bultos, viajes
+  let nb=0, nv=0;
+  const mkLote=(id,cod,medId,cant,fab,venc,creado,lib,libTs)=>{
+    const l={id,codigo:cod,medId,labId:'emp-andes',cantidad:cant,fab,venc,estado:lib?'LIBERADO':'PENDIENTE_LIBERACION',estadoPrevio:null,liberadoPor:lib||null,fechaLib:libTs||null,creado};
+    s.lotes.push(l); const num=cod.slice(-4);
+    for(let i=1;i<=cant;i++) s.unidades.push({serie:num+'S'+p6(i),loteId:id,bultoId:null,empresaId:'emp-andes',estado:'EN_LABORATORIO'});
+    const m=s.medicamentos.find(x=>x.id===medId);
+    ev(creado,'LOTE_REGISTRADO','u-andes',{lote:id},`${cod} · ${m.nombre} · ${fmtN(cant)} cajas · series ${num}S000001 a ${num}S${p6(cant)}`);
+    if(lib) ev(libTs,'LOTE_LIBERADO',lib.startsWith('ins')?insUser[lib]:'u-andes',{lote:id},`${cod} liberado ${lib.startsWith('ins')?'por ANMAT (biológico)':'por la directora técnica'}`);
+    return l;
+  };
+  const mkBultos=(l,circs,cajas,ts)=>{
+    const out=[];
+    for(const cid of circs){
+      nb++; const b={id:'b-'+nb,codigo:'BUL-'+p4(nb),loteId:l.id,circuitoId:cid,cantidad:cajas,precinto:'PR-'+(48210+nb),estado:'ARMADO',ubicacionId:'emp-andes',despachoId:null,viajes:[],armado:ts};
+      s.unidades.filter(u=>u.loteId===l.id&&!u.bultoId).slice(0,cajas).forEach(u=>u.bultoId=b.id);
+      s.bultos.push(b); out.push(b);
+    }
+    ev(ts,'BULTO_ARMADO','u-andes',{lote:l.id,bultos:out.map(b=>b.id)},`${out.length} bultos de ${cajas} cajas del lote ${l.codigo}: ${out.map(b=>`${b.codigo} → ${s.empresas.find(e=>e.id===s.circuitos.find(c=>c.id===b.circuitoId).farmId).razon}`).join(' · ')}`);
+    return out;
+  };
+  const RUTA1=['Planta Godoy Cruz','Acceso Sur','Ruta 7 · Maipú','Depósito Maipú'];
+  const mkViaje=(tramo,bs,patente,chofer,creado,salida,estimada,lecturas,recs)=>{
+    nv++; const origen=tramo===1?'emp-andes':'emp-cuyo', autor=tramo===1?'u-andes':'u-cuyo';
+    const v={id:'v-'+nv,codigo:'VJ-'+p4(nv),tramo,origenId:origen,creadoPor:autor,patente,chofer,creado,salida,estimada,estado:'EN_TRANSITO',bultoIds:bs.map(b=>b.id)};
+    s.viajes.push(v);
+    bs.forEach(b=>{ b.despachoId=v.id; b.viajes.push(v.id); b.estado='EN_TRANSITO'; s.unidades.filter(u=>u.bultoId===b.id).forEach(u=>u.estado='EN_TRANSITO'); });
+    const dest=[...new Set(bs.map(b=>{const c=s.circuitos.find(x=>x.id===b.circuitoId); return tramo===1?c.distId:c.farmId;}))].map(id=>s.empresas.find(e=>e.id===id).razon);
+    ev(creado,'VIAJE_CREADO',autor,{viaje:v.id,bultos:v.bultoIds},`${v.codigo} · tramo ${tramo} · camión ${patente} · chofer ${chofer} · ${bs.map(b=>b.codigo).join(', ')} · paradas: ${dest.join(', ')}`);
+    ev(salida,'VIAJE_SALIDA',autor,{viaje:v.id,bultos:v.bultoIds},`${v.codigo} salió de ${s.empresas.find(e=>e.id===origen).razon}`);
+    const m=s.medicamentos.find(x=>x.id===s.lotes.find(l=>l.id===bs[0].loteId).medId);
+    for(const [ts,t,lugar] of lecturas){ s.lecturas.push({despachoId:v.id,ts,temp:t,lugar}); ev(ts,'LECTURA_TEMPERATURA',autor,{viaje:v.id,bultos:v.bultoIds},`${v.codigo} · ${fmtT(t)} en ${lugar} (rango ${m.tMin}–${m.tMax} °C)`,{temp:t}); }
+    for(const [b,ts,t,empId,userId] of recs){
+      const fin = tramo===1?'EN_DEPOSITO':'RECIBIDO';
+      b.estado=fin; b.ubicacionId=empId; b.despachoId=null;
+      s.unidades.filter(u=>u.bultoId===b.id).forEach(u=>{u.estado=tramo===1?'EN_DEPOSITO':'EN_STOCK'; u.empresaId=empId;});
+      s.recepciones.push({bultoId:b.id,despachoId:v.id,empresaId:empId,ts,temp:t,precinto:true,cantidad:b.cantidad,conforme:true,motivo:null,por:userId});
+      ev(ts,'BULTO_RECIBIDO',userId,{viaje:v.id,bultos:[b.id],lote:b.loteId},`${b.codigo} recibido en ${s.empresas.find(e=>e.id===empId).razon} a ${fmtT(t)} · precinto ${b.precinto} intacto · ${b.cantidad} cajas`,{temp:t});
+    }
+    if(recs.length && recs.length===bs.length){ v.estado='FINALIZADO'; ev(recs[recs.length-1][1].replace(/:(\d\d)$/,':30'),'VIAJE_FINALIZADO','sistema',{viaje:v.id},`${v.codigo} finalizado: todos los bultos entregados`); }
+    return v;
+  };
+
+  // Lote 1: insulina ya distribuida y en las farmacias
+  const l1=mkLote('lot-1','L2026-0398','med-ins',400,'2026-08-10','2027-08-10','2026-08-10T15:00:00','ins-1','2026-08-14T11:05:00');
+  const [b1,b2]=mkBultos(l1,['cir-1','cir-2'],200,'2026-08-15T09:00:00');
+  mkViaje(1,[b1,b2],'AB 123 CD','Jorge Lucero','2026-08-18T07:00:00','2026-08-18T07:30:00','2026-08-18T12:00:00',
+    [['2026-08-18T08:30:00',4.8,RUTA1[1]],['2026-08-18T10:00:00',5.2,RUTA1[2]]],
+    [[b1,'2026-08-18T11:40:00',5.1,'emp-cuyo','u-cuyo'],[b2,'2026-08-18T11:42:00',5.1,'emp-cuyo','u-cuyo']]);
+  mkViaje(2,[b1,b2],'AF 992 XK','Raúl Ortiz','2026-08-19T06:40:00','2026-08-19T07:00:00','2026-08-19T11:00:00',
+    [['2026-08-19T08:00:00',4.9,'Acceso Sur · Luján de Cuyo'],['2026-08-19T09:40:00',5.4,'Av. San Martín · Godoy Cruz']],
+    [[b1,'2026-08-19T09:10:00',5.3,'emp-centro','u-centro'],[b2,'2026-08-19T10:05:00',5.0,'emp-godoy','u-godoy']]);
+  // Lote 3 y 2: insulina (en viaje hoy) y amoxicilina (en depósito)
+  const l3=mkLote('lot-3','L2026-0412','med-ins',400,'2026-09-05','2027-09-05','2026-09-05T16:00:00','ins-2','2026-09-09T12:00:00');
+  const l2=mkLote('lot-2','L2026-0415','med-amx',1000,'2026-09-10','2028-09-10','2026-09-10T15:30:00','u-andes','2026-09-12T10:00:00');
+  const bs2=mkBultos(l2,['cir-1','cir-1','cir-2','cir-2','cir-2'],200,'2026-09-13T09:00:00');
+  const bs3=mkBultos(l3,['cir-1','cir-2'],200,'2026-09-14T09:00:00');
+  mkViaje(1,bs2,'AB 123 CD','Jorge Lucero','2026-09-15T07:40:00','2026-09-15T08:00:00','2026-09-15T12:00:00',
+    [['2026-09-15T09:00:00',22.5,RUTA1[1]],['2026-09-15T10:30:00',23.1,RUTA1[2]]],
+    bs2.map((b,i)=>[b,`2026-09-15T11:${String(30+i).padStart(2,'0')}:00`,23.0,'emp-cuyo','u-cuyo']));
+  mkViaje(1,bs3,'AB 123 CD','Jorge Lucero','2026-09-20T07:40:00','2026-09-20T08:00:00','2026-09-20T12:00:00',
+    [['2026-09-20T09:00:00',4.6,RUTA1[1]]],
+    bs3.map((b,i)=>[b,`2026-09-20T11:0${i}:00`,4.9,'emp-cuyo','u-cuyo']));
+  // Lotes pendientes de liberación
+  mkLote('lot-4','L2026-0520','med-vac',600,'2026-09-20','2027-03-20','2026-09-22T10:00:00',null,null);
+  mkLote('lot-5','L2026-0602','med-amx',400,'2026-09-24','2028-09-24','2026-09-26T10:00:00',null,null);
+
+  // Dispensaciones y reporte
+  const d1u='0398S000001', d2u='0398S000002';
+  s.unidades.find(u=>u.serie===d1u).estado='DISPENSADA';
+  s.dispensaciones.push({id:'dis-1',serie:d1u,farmId:'emp-centro',dni:'30456789',obraSocial:'OSEP Mendoza',afiliado:'100-448120-02',receta:'RX-MZA-448120',ts:'2026-09-02T18:12:00',anulada:false});
+  ev('2026-09-02T18:12:00','DISPENSACION','u-centro',{lote:'lot-1',serie:d1u},`Serie ${d1u} · OSEP Mendoza · DNI ${maskDni('30456789')}`);
+  s.reportes.push({id:'REP-1041',serie:d1u,dni:'30456789',motivo:'Envase dañado o adulterado',desc:'La lapicera tenía el líquido turbio y me dio mareos.',ts:'2026-09-27T08:00:00',estado:'ABIERTO',inspectorId:null,loteId:'lot-1',provincia:'Mendoza',conclusion:null});
+  ev('2026-09-27T08:00:00','REPORTE_CIUDADANO','u-pac',{lote:'lot-1',serie:d1u,reporte:'REP-1041'},`REP-1041 · Envase dañado o adulterado · serie ${d1u}`);
+
+  // Hoy: un viaje del tramo 2 en curso y una dispensación anulable
+  const v5=mkViaje(2,bs3,'AE 441 ZZ','Mónica Ríos',ago(3*HORA+20*MIN),ago(3*HORA),iso(new Date(Date.now()+2*HORA)),
+    [[ago(2.5*HORA),4.4,'Acceso Sur · Luján de Cuyo'],[ago(1.5*HORA),5.2,'Av. San Martín · Godoy Cruz'],[ago(30*MIN),5.8,'Av. Las Heras · Ciudad']],[]);
+  s.unidades.find(u=>u.serie===d2u).estado='DISPENSADA';
+  s.dispensaciones.push({id:'dis-2',serie:d2u,farmId:'emp-centro',dni:'27881345',obraSocial:'PAMI',afiliado:'150-221907-00',receta:'RX-MZA-451007',ts:ago(40*MIN),anulada:false});
+  ev(ago(40*MIN),'DISPENSACION','u-centro',{lote:'lot-1',serie:d2u},`Serie ${d2u} · PAMI · DNI ${maskDni('27881345')}`);
+
+  E.sort((a,b)=>a[0]<b[0]?-1:a[0]>b[0]?1:0);
+  return {s,E};
+}
+
+/* ---------------- navegación ---------------- */
+const NAV = {
+  SEDE_CENTRAL:[['bandeja','Bandeja'],['inspectores','Inspectores'],['empresas','Empresas'],['circuitos','Circuitos'],['traza','Trazabilidad'],['registro','Cadena y Sepolia']],
+  INSPECTOR:[['bandeja','Bandeja'],['empresas','Empresas'],['circuitos','Circuitos'],['lotes','Lotes y cuarentenas'],['traza','Trazabilidad'],['reportes','Reportes'],['registro','Cadena y Sepolia']],
+  LABORATORIO:[['circuitos','Circuitos'],['lotes','Lotes y bultos'],['viajes','Viajes · tramo 1'],['traza','Trazabilidad']],
+  DISTRIBUIDOR:[['circuitos','Circuitos'],['recepcion','Recibir bultos'],['deposito','Depósito'],['viajes','Viajes · tramo 2'],['traza','Trazabilidad']],
+  FARMACIA:[['circuitos','Circuitos'],['recepcion','Por recibir'],['stock','Stock'],['dispensar','Dispensar'],['traza','Trazabilidad']],
+  PACIENTE:[['verificar','Verificar un medicamento'],['mismeds','Mis medicamentos']],
+};
+const TITULOS = {bandeja:'Pendientes de tu acción', inspectores:'Inspectores', empresas:'Empresas', circuitos:'Circuitos', lotes:'Lotes', traza:'Trazabilidad',
+  reportes:'Reportes ciudadanos', registro:'Cadena de eventos y anclaje en Sepolia', viajes:'Viajes', recepcion:'Recepción de bultos', deposito:'Depósito',
+  stock:'Stock', dispensar:'Dispensar', verificar:'Verificar un medicamento', mismeds:'Mis medicamentos'};
+
+/* ---- bandejas (RF-BAN-01) ---- */
+function bandejaInspector(u){
+  const i=insDe(u), prov=i.provincia;
+  return {
+    empresas: S.empresas.filter(e=>e.estado==='PENDIENTE' && ((e.provincia===prov && !e.inspectorId) || e.inspectorId===i.id)),
+    circuitos: S.circuitos.filter(c=>c.estado==='PENDIENTE_INSPECTOR' && ((emp(c.farmId).provincia===prov && !c.inspectorId) || c.inspectorId===i.id)),
+    liberar: S.lotes.filter(l=>l.estado==='PENDIENTE_LIBERACION' && med(l.medId).biologico && emp(l.labId).provincia===prov),
+    cuarentenas: S.cuarentenas.filter(c=>c.estado==='ACTIVA' && c.provincia===prov),
+    reportes: S.reportes.filter(r=>r.estado!=='CERRADO' && r.provincia===prov && (!r.inspectorId || r.inspectorId===i.id)),
+  };
+}
+const provSinInspector = p => inspectoresActivos(p).length===0;
+function bandejaSede(){
+  return {
+    empresas: S.empresas.filter(e=>e.estado==='PENDIENTE' && !e.inspectorId && provSinInspector(e.provincia)),
+    circuitos: S.circuitos.filter(c=>c.estado==='PENDIENTE_INSPECTOR' && !c.inspectorId && provSinInspector(emp(c.farmId).provincia)),
+  };
+}
+const circuitosPorAceptar = u => S.circuitos.filter(c=>c.estado==='PENDIENTE_EMPRESAS' && ((c.distId===u.empresaId && !c.aceptDist) || (c.farmId===u.empresaId && !c.aceptFarm)));
+const bultosEntrantes = u => S.bultos.filter(b=>b.estado==='EN_TRANSITO' && via(b.despachoId) && via(b.despachoId).estado==='EN_TRANSITO' && destinoEnViaje(b)===u.empresaId);
+
+function navCount(v,u){
+  if(v==='bandeja'){
+    if(u.rol==='INSPECTOR'){ const b=bandejaInspector(u); return b.empresas.length+b.circuitos.length+b.liberar.length+b.cuarentenas.length+b.reportes.length; }
+    if(u.rol==='SEDE_CENTRAL'){ const b=bandejaSede(); return b.empresas.length+b.circuitos.length; }
+  }
+  if(v==='circuitos' && u.empresaId) return circuitosPorAceptar(u).length;
+  if(v==='recepcion') return bultosEntrantes(u).length;
+  if(v==='reportes' && u.rol==='INSPECTOR') return bandejaInspector(u).reportes.length;
+  return 0;
+}
+
+function toast(t){ const el=$('#toast'); el.textContent=t; el.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>{el.hidden=true},2800); }
+function flash(kind,title,body){ S.ui.flash={kind,title,body}; }
+function flashHTML(){ const f=S.ui.flash; if(!f) return ''; return `<div class="flash ${f.kind}" role="status"><b>${esc(f.title)}</b>${f.body?`<span>${esc(f.body)}</span>`:''}</div>`; }
+
+function integHTML(){
+  const ig=S.integridad, pend=S.ledger.length-(S.anclajes.length?S.anclajes[S.anclajes.length-1].hasta:0);
+  if(!ig.ok) return `<span class="pill crit integrity" id="integ">Cadena alterada · revisar</span>`;
+  return `<span class="pill ok integrity" id="integ">Cadena íntegra · ${S.ledger.length} eventos · ${pend?pend+' por anclar':'todo anclado'}</span>`;
+}
+function render(){ $('#app').innerHTML = S.sesion ? renderApp() : renderLogin(); }
+
+/* ---------------- inicio ---------------- */
+function userCard(u){
+  let org='', st='';
+  if(u.rol==='SEDE_CENTRAL') org=u.org;
+  if(u.rol==='INSPECTOR'){ const i=insDe(u); org=`${i.legajo} · ${i.provincia}`; if(i.estado!=='ACTIVO') st=pill('Dado de baja','crit'); }
+  if(u.empresaId){ const e=emp(u.empresaId); org=`${e.razon} · ${e.localidad}, ${e.provincia}`; if(e.estado!=='HABILITADA') st=estPill(EMP_EST,e.estado); }
+  if(u.rol==='PACIENTE') org=`DNI ${fmtDni(u.dni)} · portal del paciente`;
+  const extra = u.empresaId ? [u.admin?'admin':'', u.dt?'director técnico':''].filter(Boolean).join(' · ') : '';
+  return `<button class="ucard" data-act="login" data-uid="${u.id}"><span class="rolechip">${ROL_LBL[u.rol]}</span><span class="who">${esc(u.nombre)}</span><span class="org">${esc(org)}</span>${extra?`<span class="org">${esc(extra)}</span>`:''}${st?`<span>${st}</span>`:''}</button>`;
+}
+function renderLogin(){
+  const t=S.ui.loginTab;
+  const hab = u => !u.empresaId || emp(u.empresaId).estado==='HABILITADA';
+  const g = (titulo, f) => { const us=S.usuarios.filter(f); return us.length?`<div class="group"><div class="eyebrow">${titulo}</div><div class="users">${us.map(userCard).join('')}</div></div>`:''; };
+  const tabs=[['ingresar','Ingresar'],['registrar','Registrar empresa'],['verificar','Verificar una caja'],['como','Cómo funciona'],['guion','Guion de demo']]
+    .map(([k,l])=>`<button class="tab" role="tab" aria-selected="${t===k}" data-act="loginTab" data-tab="${k}">${l}</button>`).join('');
+  let body='';
+  if(t==='ingresar') body = g('Autoridad sanitaria', u=>u.rol==='SEDE_CENTRAL'||u.rol==='INSPECTOR')
+    + g('Laboratorios', u=>u.rol==='LABORATORIO'&&hab(u)) + g('Distribuidoras', u=>u.rol==='DISTRIBUIDOR'&&hab(u)) + g('Farmacias', u=>u.rol==='FARMACIA'&&hab(u))
+    + g('Empresas en trámite', u=>u.empresaId&&!hab(u)) + g('Pacientes', u=>u.rol==='PACIENTE')
+    + `<p class="note">Cada usuario ve solo lo de su empresa o su provincia. Las reglas se aplican de verdad: si una acción no corresponde, la pantalla la rechaza y cita la regla.</p>`;
+  if(t==='registrar') body = vRegistrarEmpresa();
+  if(t==='verificar') body = vVerificar(null);
+  if(t==='como') body = `<ol class="steps">${COMO.map(([a,b])=>`<li><span><b>${esc(a)}</b><br><span class="muted">${esc(b)}</span></span></li>`).join('')}</ol>
+    <h2>Reglas de negocio</h2><div class="rules">${RULES.map(([k,v])=>`<div class="rule"><b>${k}</b><span>${esc(v)}</span></div>`).join('')}</div>
+    <p class="note">En el backend Java estas reglas viven en la capa de servicio. En este prototipo la cadena de hashes SHA-256 se calcula de verdad en el navegador; el anclaje en Sepolia se simula (la transacción no sale a la red).</p>`;
+  if(t==='guion') body = `<ol class="steps">${GUION.map(([a,b])=>`<li><span><b>${esc(a)}</b><br><span class="muted">${esc(b)}</span></span></li>`).join('')}</ol>
+    <div class="row"><button class="btn ghost" data-act="reset">Reiniciar datos de la demo</button></div>`;
+  return `<div class="login"><header class="login-head"><div class="brand">Medi<span>Chain</span></div>
+    <p>Trazabilidad de medicamentos del laboratorio al paciente, con registro encadenado por hash y anclado en Ethereum Sepolia. Prototipo con datos ficticios de Mendoza.</p></header>
+    <div class="tabs" role="tablist">${tabs}</div>${flashHTML()}${body}</div>`;
+}
+function vRegistrarEmpresa(){
+  const ej = S.ui.ejemplo || 0;
+  const EJ = [
+    {tipo:'FARMACIA', razon:'Farmacia Las Heras', cuit:mkCuit('3071666777'), gln:conDV('779000100008'), provincia:'Mendoza', localidad:'Las Heras', hab:'Min. Salud Mendoza · Hab. 1320', dt:'Farm. Lucía Torres (M.P. 2611)', admin:'Farm. Lucía Torres'},
+    {tipo:'DISTRIBUIDOR', razon:'Logística Puntana S.R.L.', cuit:mkCuit('3071777888'), gln:conDV('779000100009'), provincia:'San Luis', localidad:'Villa Mercedes', hab:'Disp. ANMAT 3321/2026 · BPD', dt:'Farm. Pablo Funes (M.P. 455)', admin:'Pablo Funes'},
+  ][ej];
+  const opt = (arr,sel) => arr.map(([v,l])=>`<option value="${esc(v)}" ${v===sel?'selected':''}>${esc(l)}</option>`).join('');
+  return `<div class="card"><div class="card-head"><div><h2>Registrar una empresa</h2><p class="muted">Queda pendiente hasta que un inspector de su provincia la habilite (R2). Si la provincia no tiene inspectores, la recibe la Sede Central.</p></div>
+      <button class="btn sm ghost" data-act="ejemplo">Cargar otro ejemplo</button></div>
+    <form class="stack" data-act="registrarEmpresa"><div class="fields">
+      <label class="f">Tipo<select name="tipo">${opt(Object.entries(TIPO_EMP),EJ.tipo)}</select></label>
+      <label class="f">Razón social<input name="razon" required value="${esc(EJ.razon)}"></label>
+      <label class="f">CUIT<input name="cuit" required value="${esc(EJ.cuit)}" inputmode="numeric"></label>
+      <label class="f">GLN (13 dígitos)<input name="gln" required value="${esc(EJ.gln)}" inputmode="numeric"></label>
+      <label class="f">Provincia<select name="provincia">${opt(PROVINCIAS.map(p=>[p,p]),EJ.provincia)}</select></label>
+      <label class="f">Localidad<input name="localidad" required value="${esc(EJ.localidad)}"></label>
+      <label class="f">N.º de habilitación sanitaria<input name="hab" required value="${esc(EJ.hab)}"></label>
+      <label class="f">Director técnico y matrícula<input name="dt" required value="${esc(EJ.dt)}"></label>
+      <label class="f">Administrador (usuario)<input name="admin" required value="${esc(EJ.admin)}"></label>
+      <label class="f">PDF de la habilitación (opcional, hasta 5 MB)<input name="pdf" type="file" accept="application/pdf"></label>
+    </div><div class="row"><button class="btn" type="submit">Enviar solicitud</button><span class="muted">Se valida el dígito verificador del CUIT y del GLN. Si no subís un PDF, se usa uno de ejemplo; su hash SHA-256 queda en la cadena.</span></div></form></div>`;
+}
+
+/* ---------------- estructura ---------------- */
+function renderApp(){
+  const u=user();
+  let org='';
+  if(u.rol==='SEDE_CENTRAL') org=u.org;
+  if(u.rol==='INSPECTOR'){ const i=insDe(u); org=`${i.legajo} · Provincia: ${i.provincia}`; }
+  if(u.empresaId){ const e=emp(u.empresaId); org=`${e.razon} · ${e.localidad}`; }
+  if(u.rol==='PACIENTE') org='DNI '+fmtDni(u.dni);
+  const bloq=bloqueoSesion(u);
+  const nav = bloq ? '' : NAV[u.rol].map(([v,l])=>{ const c=navCount(v,u); return `<button data-act="nav" data-view="${v}" ${S.ui.view===v?'aria-current="page"':''}>${l}${c?`<span class="count hot">${c}</span>`:''}</button>`; }).join('');
+  const roles = u.empresaId ? [u.admin?'Admin':'', u.dt?'Director técnico':''].filter(Boolean).join(' · ') : '';
+  return `<div class="app"><aside class="side"><div class="brand">Medi<span>Chain</span></div>
+      <div class="me"><span class="r">${ROL_LBL[u.rol]}</span><span class="n">${esc(u.nombre)}</span><span class="o">${esc(org)}</span>${roles?`<span class="o">${roles}</span>`:''}</div>
+      <nav class="nav" aria-label="Secciones">${nav}</nav>
+      <div class="side-foot"><button data-act="reset">Reiniciar demo</button><button data-act="logout">Cambiar de usuario</button></div></aside>
+    <main class="main"><div class="topbar"><h1>${bloq?'Acceso restringido':esc(TITULOS[S.ui.view]||'')}</h1>${integHTML()}</div>
+      ${S.tamper?`<div class="flash crit"><b>Modo demostración: la base de datos fue alterada.</b><span>Restaurá la cadena en “Cadena y Sepolia” antes de seguir operando.</span></div>`:''}
+      ${flashHTML()}<div class="content">${bloq||renderVista(u)}</div></main></div>`;
+}
+function bloqueoSesion(u){
+  if(u.rol==='INSPECTOR' && insDe(u).estado!=='ACTIVO') return `<div class="card"><h2>Tu usuario de inspector está dado de baja</h2><p class="muted">La Sede Central lo desactivó (R1). Tus acciones pasadas siguen en la cadena.</p></div>`;
+  if(u.empresaId){ const e=emp(u.empresaId);
+    if(e.estado!=='HABILITADA'){
+      const i=e.inspectorId?ins(e.inspectorId):null;
+      const donde = e.estado==='PENDIENTE' ? (i?`La está revisando ${i.nombre} (${i.legajo}).`:provSinInspector(e.provincia)?`${e.provincia} no tiene inspectores: la solicitud está en la bandeja de la Sede Central.`:`Está en la bandeja de los inspectores de ${e.provincia}.`) : '';
+      const msg = e.estado==='PENDIENTE' ? `Tu solicitud de habilitación está en revisión. ${donde} Hasta que la aprueben no podés operar (R2).`
+        : e.estado==='SUSPENDIDA' ? 'Tu empresa está suspendida. Sus circuitos quedaron suspendidos y no podés operar.' : 'Tu habilitación fue rechazada. Motivo: '+(e.motivoRechazo||'—');
+      return `<div class="card"><div class="card-head"><h2>${esc(e.razon)}</h2>${estPill(EMP_EST,e.estado)}</div><p>${esc(msg)}</p>${fichaEmpresa(e)}</div>`;
+    } }
+  return '';
+}
+function fichaEmpresa(e){
+  return `<dl class="kv"><dt>Tipo</dt><dd>${TIPO_EMP[e.tipo]}</dd><dt>CUIT</dt><dd class="num">${e.cuit}</dd><dt>GLN</dt><dd class="num">${e.gln}</dd><dt>Ubicación</dt><dd>${esc(e.localidad)}, ${esc(e.provincia)}</dd>
+    <dt>Habilitación</dt><dd>${esc(e.habilitacion)}</dd><dt>Director técnico</dt><dd>${esc(e.dt)}</dd><dt>PDF</dt><dd>${esc(e.docNombre||'habilitacion.pdf')} · <span class="hash">${short(e.docHash)}</span></dd><dt>Solicitud</dt><dd>${fmt(e.solicitud)}</dd></dl>`;
+}
+function renderVista(u){
+  const v=S.ui.view;
+  const m={bandeja:vBandeja, inspectores:vInspectores, empresas:vEmpresas, circuitos:vCircuitos, lotes:u.rol==='LABORATORIO'?vLotesLab:vLotesIns, traza:vTraza,
+    reportes:vReportes, registro:vRegistro, viajes:vViajes, recepcion:vRecepcion, deposito:vDeposito, stock:vStock, dispensar:vDispensar, verificar:vVerificar, mismeds:vMisMeds};
+  return (m[v]||(()=>''))(u);
+}
+
+/* ---------------- piezas comunes ---------------- */
+const ruta = c => `<span class="route">${esc(nombreEmp(c.labId))}<span class="arr">→</span>${esc(nombreEmp(c.distId))}<span class="arr">→</span>${esc(nombreEmp(c.farmId))}</span>`;
+function spark(vals,tMin,tMax){
+  if(!vals.length) return '<p class="empty">Sin lecturas todavía.</p>';
+  const W=300,Hh=96,pad=20, lo=Math.min(tMin-2,...vals), hi=Math.max(tMax+2,...vals);
+  const x=i=>pad+(vals.length===1?(W-2*pad)/2:i*(W-2*pad)/(vals.length-1)), y=v=>Hh-12-(v-lo)/(hi-lo)*(Hh-24);
+  return `<svg class="spark" viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Temperaturas del viaje"><rect class="band" x="${pad}" y="${y(tMax)}" width="${W-2*pad}" height="${y(tMin)-y(tMax)}"/>
+    <text x="0" y="${y(tMax)+3}">${tMax}°</text><text x="0" y="${y(tMin)+3}">${tMin}°</text><polyline class="line" points="${vals.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')}"/>
+    ${vals.map((v,i)=>`<circle class="${v<tMin||v>tMax?'pt-bad':'pt'}" cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="3.2"/>`).join('')}</svg>`;
+}
+function actorLbl(a){
+  if(a==='sistema') return 'Sistema (regla automática)';
+  const u=S.usuarios.find(x=>x.id===a); if(!u) return a;
+  if(u.inspectorId) return `${u.nombre} · ${insDe(u).legajo}`;
+  if(u.empresaId) return `${u.nombre} · ${nombreEmp(u.empresaId)}`;
+  return u.rol==='PACIENTE' ? 'Paciente (DNI enmascarado)' : u.nombre;
+}
+function ancLbl(n){
+  const a=anclajeDe(n);
+  if(!a) return pill('Pendiente de anclaje','warn');
+  return a.estado==='CONFIRMADO' ? pill(a.id,'ok') : pill(`${a.id} · ${a.conf}/3`,'warn');
+}
+function tablaEventos(evs){
+  if(!evs.length) return '<p class="empty">Sin eventos.</p>';
+  return `<div class="tbl"><table><thead><tr><th>#</th><th>Fecha</th><th>Evento</th><th>Firmado por</th><th>Detalle</th><th>Hash</th><th>Anclaje</th></tr></thead><tbody>
+    ${evs.map(b=>`<tr><td class="num">${b.n}</td><td class="num">${fmt(b.ts)}</td><td>${esc(TIPO_EVT[b.tipo]||b.tipo)}</td><td>${esc(actorLbl(b.actor))}</td><td>${esc(b.data.txt)}</td><td class="hash">${short(b.hash)}</td><td>${ancLbl(b.n)}</td></tr>`).join('')}</tbody></table></div>`;
+}
+function bloqPill(x){ return x ? pill('Bloqueado','crit') : ''; }
+
+/* ---------------- SEDE CENTRAL ---------------- */
+function vInspectores(){
+  const rows=S.inspectores.map(i=>{
+    const n=S.ledger.filter(b=>b.actor===S.usuarios.find(u=>u.inspectorId===i.id)?.id).length;
+    return `<tr><td><b>${esc(i.nombre)}</b><br><span class="muted num">DNI ${fmtDni(i.dni)}</span></td><td class="num">${esc(i.legajo)}</td><td>${esc(i.provincia)}</td><td class="num">${fmt(i.fechaAlta)}</td><td class="num">${n}</td>
+      <td>${i.estado==='ACTIVO'?pill('Activo','ok'):pill('Baja','crit')}</td><td><button class="btn sm ${i.estado==='ACTIVO'?'danger':'ghost'}" data-act="toggleIns" data-id="${i.id}">${i.estado==='ACTIVO'?'Dar de baja':'Reactivar'}</button></td></tr>`;
+  }).join('');
+  const provs=[...new Set(S.inspectores.filter(i=>i.estado==='ACTIVO').map(i=>i.provincia))];
+  return `<div class="card"><div class="card-head"><h2>Inspectores</h2><span class="muted">Solo la Sede los da de alta y de baja (R1)</span></div>
+    <div class="tbl"><table><thead><tr><th>Inspector</th><th>Legajo</th><th>Provincia</th><th>Alta</th><th>Eventos firmados</th><th>Estado</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+    <p class="muted sub">Provincias con inspectores activos: ${provs.join(', ')||'ninguna'}. Las solicitudes de las demás provincias llegan a la bandeja de la Sede.</p></div>
+    <div class="card"><h2>Dar de alta un inspector</h2><form class="stack" data-act="altaIns"><div class="fields">
+      <label class="f">Nombre y apellido<input name="nombre" required value="Sofía Álvarez"></label>
+      <label class="f">DNI<input name="dni" required inputmode="numeric" value="33120456"></label>
+      <label class="f">Legajo ANMAT<input name="legajo" required value="ANMAT-6031"></label>
+      <label class="f">Provincia<select name="provincia">${PROVINCIAS.map(p=>`<option ${p==='San Juan'?'selected':''}>${p}</option>`).join('')}</select></label>
+    </div><div class="row"><button class="btn" type="submit">Dar de alta</button><span class="muted">Queda firmado por vos en la cadena.</span></div></form></div>`;
+}
+
+/* ---------------- BANDEJA ---------------- */
+function vBandeja(u){
+  if(u.rol==='SEDE_CENTRAL'){
+    const b=bandejaSede(), activos=inspectoresActivos();
+    const sel = id => `<select id="asig-${id}">${activos.map(i=>`<option value="${i.id}">${esc(i.nombre)} · ${esc(i.provincia)}</option>`).join('')}</select>`;
+    const tiles=[['Empresas',S.empresas.length],['Inspectores activos',activos.length],['Circuitos aprobados',S.circuitos.filter(c=>c.estado==='APROBADO').length],['Eventos en la cadena',S.ledger.length],['Anclajes en Sepolia',S.anclajes.length]];
+    return `<div class="tiles">${tiles.map(([t,v])=>`<div class="tile"><span class="eyebrow">${t}</span><span class="v">${v}</span></div>`).join('')}</div>
+      <div class="card"><div class="card-head"><h2>Solicitudes de provincias sin inspector</h2><span class="muted">R2 · la Sede las asigna a mano</span></div>
+      ${b.empresas.length?b.empresas.map(e=>`<div class="item warn"><span class="stripe"></span><div class="stack"><div><b>${esc(e.razon)}</b> · ${TIPO_EMP[e.tipo]} · ${esc(e.localidad)}, ${esc(e.provincia)}<br><span class="muted">CUIT ${e.cuit} · solicitada ${fmt(e.solicitud)}</span></div>
+        <div class="row">${sel(e.id)}<button class="btn sm" data-act="asignarEmp" data-id="${e.id}">Asignar</button></div></div></div>`).join(''):'<p class="empty">No hay solicitudes sin inspector.</p>'}
+      ${b.circuitos.map(c=>`<div class="item warn"><span class="stripe"></span><div class="stack"><div><b>${c.codigo}</b> ${ruta(c)}<span class="muted">Farmacia en ${esc(emp(c.farmId).provincia)}, sin inspectores</span></div>
+        <div class="row">${sel(c.id)}<button class="btn sm" data-act="asignarCir" data-id="${c.id}">Asignar</button></div></div></div>`).join('')}</div>`;
+  }
+  const i=insDe(u), b=bandejaInspector(u);
+  const item=(k,titulo,sub,acciones)=>`<div class="item ${k}"><span class="stripe"></span><div class="stack"><div><b>${titulo}</b><br><span class="muted">${sub}</span></div>${acciones?`<div class="row">${acciones}</div>`:''}</div></div>`;
+  const empItem=e=>{
+    const mio=e.inspectorId===i.id;
+    const acc = mio ? `<button class="btn sm ghost" data-act="verDoc" data-id="${e.id}">Verificar PDF</button><button class="btn sm" data-act="habilitarEmp" data-id="${e.id}">Habilitar</button><input id="rech-${e.id}" placeholder="Motivo si la rechazás"><button class="btn sm ghost" data-act="rechazarEmp" data-id="${e.id}">Rechazar</button>`
+      : `<button class="btn sm" data-act="tomarEmp" data-id="${e.id}">Tomar</button>`;
+    return `<div class="item warn"><span class="stripe"></span><div class="stack"><div><b>${esc(e.razon)}</b> · ${TIPO_EMP[e.tipo]} ${mio?pill('Tomada por vos','info'):pill('Sin asignar','warn')}${e.provincia!==i.provincia?' '+pill('Asignada por la Sede · '+e.provincia,'neutral'):''}</div>
+      ${mio?fichaEmpresa(e):`<span class="muted">CUIT ${e.cuit} · ${esc(e.localidad)}, ${esc(e.provincia)} · solicitada ${fmt(e.solicitud)}</span>`}<div class="row">${acc}</div></div></div>`;
+  };
+  const cirItem=c=>{
+    const mio=c.inspectorId===i.id;
+    const acc = mio ? `<button class="btn sm" data-act="aprobarCir" data-id="${c.id}">Aprobar</button><input id="rcir-${c.id}" placeholder="Motivo si lo rechazás"><button class="btn sm ghost" data-act="rechazarCirIns" data-id="${c.id}">Rechazar</button>` : `<button class="btn sm" data-act="tomarCir" data-id="${c.id}">Tomar</button>`;
+    return item('warn',`${c.codigo} · circuito aceptado por las empresas ${mio?pill('Tomado por vos','info'):''}`,
+      `${[c.labId,c.distId,c.farmId].map(nombreEmp).join(' → ')} · distribuidora aceptó ${fmt(c.aceptDist)} · farmacia aceptó ${fmt(c.aceptFarm)}`, acc);
+  };
+  const tiles=[['Empresas',b.empresas.length],['Circuitos',b.circuitos.length],['Biológicos por liberar',b.liberar.length],['Cuarentenas activas',b.cuarentenas.length],['Reportes abiertos',b.reportes.length]];
+  return `<p class="muted">Bandeja compartida de <b>${esc(i.provincia)}</b>: la ven todos los inspectores de la provincia. El primero que toma un caso queda asignado.</p>
+    <div class="tiles">${tiles.map(([t,v])=>`<div class="tile ${v?'warn':''}"><span class="eyebrow">${t}</span><span class="v">${v}</span></div>`).join('')}</div>
+    <div class="card"><h2>Empresas por habilitar</h2>${b.empresas.length?b.empresas.map(empItem).join(''):'<p class="empty">No hay solicitudes pendientes.</p>'}</div>
+    <div class="card"><h2>Circuitos por aprobar</h2>${b.circuitos.length?b.circuitos.map(cirItem).join(''):'<p class="empty">No hay circuitos esperando aprobación.</p>'}</div>
+    <div class="card"><h2>Biológicos por liberar</h2>${b.liberar.length?b.liberar.map(l=>item('warn',`${l.codigo} · ${esc(med(l.medId).nombre)}`,`${esc(nombreEmp(l.labId))} · ${fmtN(l.cantidad)} cajas · vence ${fmtD(l.venc)} · R4: los biológicos los libera ANMAT`,`<button class="btn sm" data-act="liberar" data-id="${l.id}">Liberar lote</button>`)).join(''):'<p class="empty">No hay biológicos esperando liberación.</p>'}</div>
+    <div class="card"><h2>Cuarentenas activas</h2>${b.cuarentenas.length?b.cuarentenas.map(c=>item('crit',`${c.id} · ${ALCANCE[c.alcance]} · ${MOTIVO[c.motivo]}${c.automatica?' · automática':''}`,esc(objetoCua(c))+' · desde '+fmt(c.inicio),`<button class="btn sm ghost" data-act="nav" data-view="lotes">Resolver en Lotes y cuarentenas</button>`)).join(''):'<p class="empty">Sin cuarentenas activas.</p>'}</div>
+    <div class="card"><h2>Reportes ciudadanos</h2>${b.reportes.length?b.reportes.map(r=>item('crit',`${r.id} · ${esc(r.motivo)}`,`Serie ${r.serie} · ${fmt(r.ts)}`,`<button class="btn sm ghost" data-act="nav" data-view="reportes">Abrir reportes</button>`)).join(''):'<p class="empty">Sin reportes abiertos.</p>'}</div>`;
+}
+function objetoCua(c){
+  if(c.alcance==='LOTE'){ const l=lote(c.loteId); return `Lote ${l.codigo} · ${med(l.medId).nombre} · todas sus cajas`; }
+  const bs=c.bultoIds.map(id=>bul(id).codigo).join(', ');
+  return c.alcance==='DESPACHO' ? `Viaje ${via(c.despachoId).codigo} · bultos ${bs}` : `Bulto ${bs}`;
+}
+
+/* ---------------- EMPRESAS ---------------- */
+function vEmpresas(u){
+  const i=insDe(u), puede=e=>u.rol==='SEDE_CENTRAL'||(i&&i.provincia===e.provincia);
+  const lista=S.empresas.slice().sort((a,b)=>a.provincia.localeCompare(b.provincia)||a.razon.localeCompare(b.razon));
+  return `<div class="card"><div class="card-head"><h2>Empresas registradas</h2><span class="muted">Suspender una empresa suspende sus circuitos</span></div>
+    <div class="tbl"><table><thead><tr><th>Empresa</th><th>Tipo</th><th>CUIT / GLN</th><th>Provincia</th><th>Estado</th><th>Habilitada por</th><th></th></tr></thead><tbody>
+    ${lista.map(e=>{const h=e.habilitadaPor?ins(e.habilitadaPor):null, tom=e.inspectorId&&e.estado==='PENDIENTE'?ins(e.inspectorId):null;
+      return `<tr><td><b>${esc(e.razon)}</b><br><span class="muted">${esc(e.localidad)}</span></td><td>${TIPO_EMP[e.tipo]}</td><td class="num">${e.cuit}<br><span class="muted">${e.gln}</span></td><td>${esc(e.provincia)}</td>
+      <td>${estPill(EMP_EST,e.estado)}${tom?`<br><span class="muted">revisa ${esc(tom.nombre)}</span>`:''}</td><td>${h?`${esc(h.nombre)}<br><span class="muted num">${fmt(e.fechaHab)}</span>`:'—'}</td>
+      <td>${puede(e)?(e.estado==='HABILITADA'?`<button class="btn sm danger" data-act="suspenderEmp" data-id="${e.id}">Suspender</button>`:e.estado==='SUSPENDIDA'?`<button class="btn sm ghost" data-act="rehabilitarEmp" data-id="${e.id}">Rehabilitar</button>`:''):''}</td></tr>`}).join('')}
+    </tbody></table></div></div>`;
+}
+
+/* ---------------- CIRCUITOS ---------------- */
+function aceptTxt(f){ return f ? `✓ ${fmt(f)}` : 'pendiente'; }
+function vCircuitos(u){
+  const i=insDe(u);
+  let lista=S.circuitos;
+  if(u.empresaId) lista=lista.filter(c=>[c.labId,c.distId,c.farmId].includes(u.empresaId));
+  if(i) lista=lista.filter(c=>emp(c.farmId).provincia===i.provincia||c.inspectorId===i.id);
+  const acciones=c=>{
+    if(u.empresaId && c.estado==='PENDIENTE_EMPRESAS'){
+      const soy = c.distId===u.empresaId ? 'dist' : c.farmId===u.empresaId ? 'farm' : null;
+      if(soy && !(soy==='dist'?c.aceptDist:c.aceptFarm)){
+        if(!u.admin) return '<span class="muted">Lo acepta el admin de tu empresa</span>';
+        return `<div class="row"><button class="btn sm" data-act="aceptarCir" data-id="${c.id}">Aceptar</button><input id="rce-${c.id}" placeholder="Motivo si lo rechazás"><button class="btn sm ghost" data-act="rechazarCir" data-id="${c.id}">Rechazar</button></div>`;
+      }
+    }
+    if(i && i.provincia===emp(c.farmId).provincia){
+      if(c.estado==='APROBADO') return `<button class="btn sm danger" data-act="suspenderCir" data-id="${c.id}">Suspender</button>`;
+      if(c.estado==='SUSPENDIDO') return `<button class="btn sm ghost" data-act="rehabilitarCir" data-id="${c.id}">Rehabilitar</button>`;
+      if(c.estado==='PENDIENTE_INSPECTOR') return `<button class="btn sm ghost" data-act="nav" data-view="bandeja">Ir a la bandeja</button>`;
+    }
+    return '';
+  };
+  const tabla = `<div class="tbl"><table><thead><tr><th>Circuito</th><th>Laboratorio → Distribuidora → Farmacia</th><th>Aceptaciones</th><th>Estado</th><th>Aprobó</th><th></th></tr></thead><tbody>
+    ${lista.map(c=>{const ai=c.inspectorId?ins(c.inspectorId):null; return `<tr><td class="num"><b>${c.codigo}</b><br><span class="muted">${fmtD(c.creado)}</span></td><td>${ruta(c)}</td>
+      <td class="acc"><span>Distribuidora: ${aceptTxt(c.aceptDist)}</span><span>Farmacia: ${aceptTxt(c.aceptFarm)}</span></td><td>${estPill(CIR_EST,c.estado)}${c.motivo?`<br><span class="muted">${esc(c.motivo)}</span>`:''}</td>
+      <td>${ai&&c.fechaAprob?`${esc(ai.nombre)}<br><span class="muted num">${fmt(c.fechaAprob)}</span>`:ai?`<span class="muted">Revisa ${esc(ai.nombre)}</span>`:'—'}</td><td>${acciones(c)}</td></tr>`}).join('')}</tbody></table></div>`;
+  let form='';
+  if(u.rol==='LABORATORIO'){
+    const ej=(t)=>S.empresas.filter(e=>e.tipo===t&&e.estado==='HABILITADA').map(e=>`<button type="button" class="chip" data-act="setCuit" data-campo="${t==='DISTRIBUIDOR'?'pc-dist':'pc-farm'}" data-q="${e.cuit}" title="${esc(e.razon)}">${e.cuit}</button>`).join('');
+    form = `<div class="card"><h2>Proponer un circuito</h2>
+      <p class="muted">Buscá por CUIT a la distribuidora y a la farmacia. Solo se aceptan empresas habilitadas del tipo correcto. Después tienen que aceptar las dos y aprobar el inspector de la provincia de la farmacia (R5).</p>
+      ${u.dt?`<form class="stack" data-act="proponerCir"><div class="fields">
+        <label class="f">CUIT de la distribuidora<input id="pc-dist" name="dist" required placeholder="30-…" value="${esc(S.ui.pcDist||'')}"></label>
+        <label class="f">CUIT de la farmacia<input id="pc-farm" name="farm" required placeholder="30-…" value="${esc(S.ui.pcFarm||'')}"></label></div>
+        <div class="row"><span class="muted">Distribuidoras:</span>${ej('DISTRIBUIDOR')}</div><div class="row"><span class="muted">Farmacias:</span>${ej('FARMACIA')}</div>
+        <div class="row"><button class="btn" type="submit">Proponer circuito</button></div></form>`:'<p class="flash warn"><b>Solo el director técnico propone circuitos.</b></p>'}</div>`;
+  }
+  const pend = u.empresaId ? circuitosPorAceptar(u) : [];
+  return `${pend.length?`<div class="flash warn"><b>Tenés ${pend.length} circuito${pend.length>1?'s':''} para aceptar.</b><span>Un circuito es un acuerdo permanente: se usa para todos los lotes que vengan.</span></div>`:''}
+    <div class="card"><div class="card-head"><h2>${u.empresaId?'Circuitos de tu empresa':'Circuitos'}</h2><span class="muted">Un circuito por farmacia · permanente y reutilizable</span></div>${lista.length?tabla:'<p class="empty">Todavía no hay circuitos.</p>'}</div>${form}`;
+}
+
+/* ---------------- LABORATORIO: lotes y bultos ---------------- */
+function vLotesLab(u){
+  const e=emp(u.empresaId), mios=S.lotes.filter(l=>l.labId===u.empresaId).slice().reverse(), meds=S.medicamentos.filter(m=>m.labId===u.empresaId);
+  const sinBulto=l=>S.unidades.filter(x=>x.loteId===l.id&&!x.bultoId).length;
+  const circs=S.circuitos.filter(c=>c.labId===u.empresaId&&c.estado==='APROBADO');
+  const acc=l=>{
+    if(l.estado==='PENDIENTE_LIBERACION') return med(l.medId).biologico ? '<span class="muted">Lo libera un inspector de ANMAT (R4)</span>'
+      : u.dt ? `<button class="btn sm" data-act="liberarDT" data-id="${l.id}">Liberar como DT</button>` : '<span class="muted">Lo libera el director técnico</span>';
+    if(l.estado==='LIBERADO' && sinBulto(l)>0) return `<button class="btn sm ghost" data-act="elegirLote" data-id="${l.id}">Armar bultos</button>`;
+    return '';
+  };
+  const sel = S.ui.loteSel && lote(S.ui.loteSel) && lote(S.ui.loteSel).estado==='LIBERADO' ? lote(S.ui.loteSel) : mios.find(l=>l.estado==='LIBERADO'&&sinBulto(l)>0);
+  const bultos=S.bultos.filter(b=>lote(b.loteId).labId===u.empresaId).slice().reverse();
+  const hoy=nowISO().slice(0,10), venc=(new Date().getFullYear()+2)+hoy.slice(4);
+  return `<div class="card"><div class="card-head"><h2>Lotes de ${esc(e.razon)}</h2><span class="muted">Estado de calidad del lote; dónde está cada caja lo dicen sus bultos</span></div>
+    <div class="tbl"><table><thead><tr><th>Lote</th><th>Medicamento</th><th>Cajas</th><th>Vence</th><th>Estado</th><th>Liberado por</th><th>Sin bulto</th><th></th></tr></thead><tbody>
+    ${mios.map(l=>{const m=med(l.medId); return `<tr><td><b class="num">${l.codigo}</b><br><button class="chip" data-act="verTraza" data-q="${l.codigo}">Ver trazabilidad</button></td><td>${esc(m.nombre)}${m.biologico?'<br><span class="muted">biológico</span>':''}</td>
+      <td class="num">${fmtN(l.cantidad)}</td><td class="num">${fmtD(l.venc)}</td><td>${estPill(LOTE_EST,l.estado)}</td><td>${liberadoTxt(l)}</td><td class="num">${fmtN(sinBulto(l))}</td><td>${acc(l)}</td></tr>`}).join('')}</tbody></table></div></div>
+    ${sel?`<div class="card"><h2>Armar bultos del lote ${sel.codigo}</h2>
+      <p class="muted">Cada bulto sale cerrado, con precinto y con su farmacia de destino. Solo podés usar circuitos aprobados (R6). Quedan ${fmtN(sinBulto(sel))} cajas sin bulto.</p>
+      ${circs.length?`<form class="stack" data-act="armarBultos" data-lote="${sel.id}"><div class="fields">
+        <label class="f">Circuito (farmacia de destino)<select name="circuito">${circs.map(c=>`<option value="${c.id}">${c.codigo} · ${esc(nombreEmp(c.farmId))} vía ${esc(nombreEmp(c.distId))}</option>`).join('')}</select></label>
+        <label class="f">Cantidad de bultos<input name="n" type="number" min="1" max="10" value="1"></label>
+        <label class="f">Cajas por bulto<input name="k" type="number" min="1" max="1000" value="${Math.min(200,sinBulto(sel))}"></label>
+      </div><div class="row"><button class="btn" type="submit">Armar bultos</button></div></form>`:'<p class="flash warn"><b>No tenés circuitos aprobados.</b><span>Proponé uno en Circuitos.</span></p>'}</div>`:''}
+    <div class="card"><div class="card-head"><h2>Bultos armados</h2><span class="muted">Se despachan en Viajes · tramo 1</span></div>
+      ${bultos.length?`<div class="tbl"><table><thead><tr><th>Bulto</th><th>Lote</th><th>Cajas</th><th>Destino</th><th>Estado</th><th>Dónde está</th></tr></thead><tbody>
+      ${bultos.map(b=>{const c=cir(b.circuitoId), bl=bloqueoBulto(b); return `<tr><td>${code(b.codigo)}<br><span class="muted">${b.precinto}</span></td><td class="num">${lote(b.loteId).codigo}</td><td class="num">${b.cantidad}</td><td>${esc(nombreEmp(c.farmId))}<br><span class="muted">${c.codigo} · vía ${esc(nombreEmp(c.distId))}</span></td>
+        <td>${estPill(BUL_EST,b.estado)} ${bloqPill(bl)}${bl?`<br><span class="muted">${esc(bl)}</span>`:''}</td><td>${b.despachoId?`En ${via(b.despachoId).codigo}`:esc(nombreEmp(b.ubicacionId))}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="empty">Todavía no armaste bultos.</p>'}</div>
+    <div class="card"><h2>Registrar un lote</h2><p class="muted">Se genera una serie única por caja: GTIN + serie (R3). El lote queda pendiente de liberación.</p>
+      <form class="stack" data-act="crearLote"><div class="fields">
+        <label class="f">Medicamento<select name="medId">${meds.map(m=>`<option value="${m.id}">${esc(m.nombre)} · GTIN ${m.gtin}${m.biologico?' · biológico':''}</option>`).join('')}</select></label>
+        <label class="f">Cajas (1 a 1.000)<input name="cantidad" type="number" min="1" max="1000" value="400"></label>
+        <label class="f">Fabricación<input name="fab" type="date" value="${hoy}"></label><label class="f">Vencimiento<input name="venc" type="date" value="${venc}"></label>
+      </div><div class="row"><button class="btn" type="submit">Registrar lote</button></div></form></div>`;
+}
+function liberadoTxt(l){
+  if(!l.liberadoPor) return '—';
+  if(l.liberadoPor.startsWith('ins')){ const i=ins(l.liberadoPor); return `${esc(i.nombre)}<br><span class="muted">Inspector ANMAT · ${fmt(l.fechaLib)}</span>`; }
+  return `${esc(emp(l.labId).dt.replace(/ \(.*\)/,''))}<br><span class="muted">Director técnico · ${fmt(l.fechaLib)}</span>`;
+}
+
+/* ---------------- INSPECTOR: lotes y cuarentenas ---------------- */
+function vLotesIns(u){
+  const i=insDe(u), prov=i?i.provincia:null;
+  const lotes=S.lotes.filter(l=>!prov||emp(l.labId).provincia===prov).slice().reverse();
+  const cuas=S.cuarentenas.filter(c=>!prov||c.provincia===prov).slice().sort((a,b)=>(a.estado==='ACTIVA'?0:1)-(b.estado==='ACTIVA'?0:1)||b.inicio.localeCompare(a.inicio));
+  const accLote=l=>{
+    if(l.estado==='PENDIENTE_LIBERACION') return med(l.medId).biologico?`<button class="btn sm" data-act="liberar" data-id="${l.id}">Liberar (biológico)</button>`:'<span class="muted">Lo libera el DT</span>';
+    if(l.estado==='LIBERADO') return `<div class="row"><select id="cm-${l.id}"><option value="DEFECTO_CALIDAD">Defecto de calidad</option><option value="PREVENTIVA">Preventiva</option></select><input id="ct-${l.id}" placeholder="Motivo"><button class="btn sm warn" data-act="cuarentenaLote" data-id="${l.id}">Cuarentena del lote</button></div>`;
+    return '';
+  };
+  return `<div class="card"><div class="card-head"><h2>Cuarentenas y recalls</h2><span class="muted">Tres alcances: lote, viaje o bulto · solo el inspector dictamina (R12)</span></div>
+    ${cuas.length?`<div class="tbl"><table><thead><tr><th>Cuarentena</th><th>Alcance</th><th>Qué bloquea</th><th>Motivo</th><th>Estado</th><th>Dictamen</th></tr></thead><tbody>
+    ${cuas.map(c=>{const rup=c.motivo==='RUPTURA_FRIO', di=c.inspectorId?ins(c.inspectorId):null;
+      return `<tr class="${c.estado==='ACTIVA'?'hl':''}"><td class="num"><b>${c.id}</b><br><span class="muted">${fmt(c.inicio)}${c.automatica?' · automática':''}</span></td><td>${ALCANCE[c.alcance]}</td><td>${esc(objetoCua(c))}</td><td>${MOTIVO[c.motivo]}${c.texto?`<br><span class="muted">${esc(c.texto)}</span>`:''}</td><td>${estPill(CUA_EST,c.estado)}</td>
+      <td>${c.estado==='ACTIVA'?`<div class="stack"><input id="dic-${c.id}" placeholder="Dictamen (obligatorio)"><div class="row"><button class="btn sm ghost" data-act="levantar" data-id="${c.id}" ${rup?'disabled title="R9: tras una ruptura de frío solo cabe el recall"':''}>Levantar</button><button class="btn sm danger" data-act="recall" data-id="${c.id}">Recall</button></div>${rup?'<span class="muted sub">Ruptura de frío: solo recall (R9)</span>':''}</div>`
+        :`${esc(c.dictamen||'')}<br><span class="muted">${di?esc(di.nombre):''} · ${fmt(c.fin)}</span>`}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="empty">No hay cuarentenas.</p>'}</div>
+    <div class="card"><div class="card-head"><h2>Lotes${prov?' de laboratorios de '+esc(prov):''}</h2><span class="muted">Una cuarentena de lote bloquea todas sus cajas, estén donde estén</span></div>
+    <div class="tbl"><table><thead><tr><th>Lote</th><th>Medicamento</th><th>Laboratorio</th><th>Cajas</th><th>Estado</th><th>Liberado por</th><th>Acción</th></tr></thead><tbody>
+    ${lotes.map(l=>`<tr><td><b class="num">${l.codigo}</b><br><button class="chip" data-act="verTraza" data-q="${l.codigo}">Ver trazabilidad</button></td><td>${esc(med(l.medId).nombre)}</td><td>${esc(nombreEmp(l.labId))}</td><td class="num">${fmtN(l.cantidad)}</td>
+      <td>${estPill(LOTE_EST,l.estado)}${vencido(l)?' '+pill('Vencido','crit'):''}</td><td>${liberadoTxt(l)}</td><td>${accLote(l)}</td></tr>`).join('')}</tbody></table></div></div>`;
+}
+
+/* ---------------- VIAJES (tramo 1 y 2) ---------------- */
+function estadoEnViaje(b,v){
+  const rc=S.recepciones.find(r=>r.bultoId===b.id&&r.despachoId===v.id);
+  if(rc) return rc.conforme?pill('Recibido','ok'):pill('Rechazado','crit');
+  if(v.estado==='PROGRAMADO') return pill('Por salir','neutral');
+  if(b.estado==='ROBADO') return pill('Robado','crit');
+  const bl=bloqueoBulto(b); return bl?pill('Bloqueado','crit'):pill('En camino','info');
+}
+const RUTAS = {1:['Planta Godoy Cruz','Acceso Sur','Ruta 7 · Maipú','Depósito Maipú'], 2:['Depósito Maipú','Acceso Sur · Luján de Cuyo','Av. San Martín · Godoy Cruz','Av. Las Heras · Ciudad','Ruta 40 · Tunuyán','Ruta 143 · San Rafael']};
+function vViajes(u){
+  const tramo = u.rol==='LABORATORIO'?1:2;
+  const elegibles = S.bultos.filter(b=>!b.despachoId && b.ubicacionId===u.empresaId && (tramo===1?b.estado==='ARMADO':b.estado==='EN_DEPOSITO'));
+  const mios = S.viajes.filter(v=>v.origenId===u.empresaId).slice().reverse();
+  const opts = elegibles.map(b=>{const c=cir(b.circuitoId), bl=bloqueoBulto(b), dest=tramo===1?c.distId:c.farmId, ok=!bl&&cir(b.circuitoId).estado==='APROBADO';
+    return `<label class="bopt ${ok?'':'off'}"><input type="checkbox" name="bultos" value="${b.id}" ${ok?'':'disabled'}><span>${code(b.codigo)} · ${b.cantidad} cajas de ${esc(med(lote(b.loteId).medId).nombre)} (lote ${lote(b.loteId).codigo})<br>
+      <span class="muted">Destino: <b>${esc(nombreEmp(dest))}</b>${tramo===1?` · después va a ${esc(nombreEmp(c.farmId))}`:''} · ${c.codigo}${bl?` · no puede viajar: ${esc(bl)}`:c.estado!=='APROBADO'?' · circuito '+CIR_EST[c.estado][0].toLowerCase():''}</span></span></label>`;}).join('');
+  const est = iso(new Date(Date.now()+4*HORA)).slice(0,16);
+  const form = `<div class="card"><h2>Armar un viaje · tramo ${tramo}</h2>
+    <p class="muted">${tramo===1?'Del laboratorio al depósito de la distribuidora de cada circuito.':'De tu depósito a las farmacias. Un camión puede tener varias paradas; decidís vos cómo agrupar según la distancia.'} Los bultos viajan cerrados (R7).</p>
+    ${elegibles.length?`<form class="stack" data-act="crearViaje"><div class="bopts">${opts}</div><div class="fields">
+      <label class="f">Patente<input name="patente" required value="${tramo===1?'AB 123 CD':'AF 992 XK'}"></label><label class="f">Chofer<input name="chofer" required value="${tramo===1?'Jorge Lucero':'Raúl Ortiz'}"></label>
+      <label class="f">Llegada estimada<input name="estimada" type="datetime-local" value="${est}"></label></div>
+      <div class="row"><button class="btn" type="submit">Crear viaje</button></div></form>`:`<p class="empty">No tenés bultos ${tramo===1?'armados':'en tu depósito'} para despachar.</p>`}</div>`;
+  const card = v => {
+    const bs=v.bultoIds.map(bul), ls=S.lecturas.filter(x=>x.despachoId===v.id), m=med(lote(bs[0].loteId).medId);
+    const cua=S.cuarentenas.find(c=>c.alcance==='DESPACHO'&&c.despachoId===v.id);
+    const par=paradas(v).map(id=>{const suyos=bs.filter(b=>(v.tramo===1?cir(b.circuitoId).distId:cir(b.circuitoId).farmId)===id);
+      return `<div class="party"><span class="nm">${esc(nombreEmp(id))}</span>${suyos.map(b=>`<span>${code(b.codigo)} ${estadoEnViaje(b,v)}</span>`).join('')}</div>`;}).join('');
+    const tr=v.estado==='EN_TRANSITO';
+    return `<div class="card"><div class="card-head"><div><span class="eyebrow num">${v.codigo} · tramo ${v.tramo} · camión ${esc(v.patente)} · chofer ${esc(v.chofer)}</span><h2>${bs.length} bulto${bs.length>1?'s':''} · ${paradas(v).length} parada${paradas(v).length>1?'s':''}</h2></div>
+        <div class="row">${estPill(VIA_EST,v.estado)}${cua?pill('Cuarentena del viaje','crit'):''}</div></div>
+      <p class="muted">Salida ${fmt(v.salida)} · llegada estimada ${fmt(v.estimada)} · rango exigido ${m.tMin}–${m.tMax} °C</p>
+      <div class="grid4">${par}</div>
+      ${v.estado==='PROGRAMADO'?`<div class="row"><button class="btn" data-act="salida" data-id="${v.id}">Registrar salida del camión</button></div>`:''}
+      ${ls.length||tr?`<div class="grid2"><div>${spark(ls.map(x=>x.temp),m.tMin,m.tMax)}</div><div class="tbl"><table><thead><tr><th>Hora</th><th>Lugar (GPS)</th><th>Temp.</th></tr></thead><tbody>
+        ${ls.slice().reverse().map(x=>`<tr><td class="num">${fmt(x.ts)}</td><td>${esc(x.lugar)}</td><td class="num" style="color:${x.temp<m.tMin||x.temp>m.tMax?'var(--crit)':'inherit'}">${fmtT(x.temp)}</td></tr>`).join('')||'<tr><td colspan="3" class="muted">Sin lecturas</td></tr>'}</tbody></table></div></div>`:''}
+      ${tr?`<div class="row"><input id="t-${v.id}" inputmode="decimal" placeholder="Temperatura del sensor (°C)"><button class="btn" data-act="lectura" data-id="${v.id}">Registrar lectura</button>
+        <button class="btn ghost sm" data-act="lectura" data-id="${v.id}" data-temp="${(m.tMin+m.tMax)/2}">Lectura normal ${fmtT((m.tMin+m.tMax)/2)}</button>
+        <button class="btn warn sm" data-act="lectura" data-id="${v.id}" data-temp="${m.tMax+3}">Falla de equipo ${fmtT(m.tMax+3)}</button></div>
+        <div class="row"><input id="robo-${v.id}" placeholder="Si hubo robo o extravío: dónde y qué pasó"><button class="btn sm danger" data-act="robo" data-id="${v.id}">Informar robo</button></div>`:''}</div>`;
+  };
+  return form + (mios.length?mios.map(card).join(''):'<div class="card"><p class="empty">Todavía no creaste viajes.</p></div>');
+}
+
+/* ---------------- RECEPCIÓN (distribuidora y farmacia) ---------------- */
+function vRecepcion(u){
+  const ent=bultosEntrantes(u), viajes=[...new Set(ent.map(b=>b.despachoId))].map(via);
+  const hist=S.recepciones.filter(r=>r.empresaId===u.empresaId).slice().reverse();
+  const otros=S.bultos.filter(b=>b.estado==='EN_TRANSITO'&&destinoEnViaje(b)!==u.empresaId).slice(0,1);
+  const chips=[...ent.map(b=>b.codigo),...otros.map(b=>b.codigo),'BUL-9999'].map(c=>`<button type="button" class="chip" data-act="setBulto" data-q="${c}">${c}</button>`).join('');
+  const r=S.ui.recRes, b0=S.ui.recCod?bulCod(S.ui.recCod):null, m0=b0?med(lote(b0.loteId).medId):null;
+  return `<div class="card"><h2>Escanear un bulto</h2>
+    <p class="muted">Escaneá el QR del bulto: solo tiene su código; el sistema busca el resto. Controlá precinto, cantidad y temperatura al abrir el camión (R8).</p>
+    <form class="stack" data-act="recibir"><div class="fields">
+      <label class="f">Código del bulto<input id="rc-cod" name="codigo" required value="${esc(S.ui.recCod||'')}" placeholder="BUL-0003"></label>
+      <label class="f">Temperatura al abrir (°C)<input name="temp" inputmode="decimal" value="${m0?String((m0.tMin+m0.tMax)/2).replace('.',','):''}"></label>
+      <label class="f">Cajas contadas<input name="cantidad" type="number" min="0" value="${b0?b0.cantidad:''}"></label>
+      <label class="inline"><input type="checkbox" name="precinto" checked> Precinto intacto${b0?` (${b0.precinto})`:''}</label>
+    </div><div class="row"><button class="btn" type="submit">Registrar recepción</button><span class="muted">Probá:</span>${chips}</div></form>
+    ${r?`<div class="flash ${r.kind}"><b>${esc(r.title)}</b><span>${esc(r.body)}</span></div>`:''}</div>
+    <div class="card"><h2>En camino hacia vos</h2>${viajes.length?viajes.map(v=>{const ls=S.lecturas.filter(x=>x.despachoId===v.id), last=ls[ls.length-1], mios=ent.filter(b=>b.despachoId===v.id);
+      return `<div class="item info"><span class="stripe"></span><div class="stack"><div><b>${v.codigo} · camión ${esc(v.patente)} · chofer ${esc(v.chofer)}</b><br>
+        <span class="muted">Sale de ${esc(nombreEmp(v.origenId))} · ${fmt(v.salida)} · llega aprox. ${fmt(v.estimada)} · ${paradas(v).length} parada${paradas(v).length>1?'s':''}${last?` · última lectura ${fmtT(last.temp)} en ${esc(last.lugar)}`:''}</span></div>
+        <div class="tbl"><table><thead><tr><th>Bulto</th><th>Contenido</th><th>Cajas</th><th>Estado</th></tr></thead><tbody>${mios.map(b=>{const bl=bloqueoBulto(b); return `<tr><td>${code(b.codigo)}</td><td>${esc(med(lote(b.loteId).medId).nombre)} · lote ${lote(b.loteId).codigo}</td><td class="num">${b.cantidad}</td><td>${bl?pill('No recibir: bloqueado','crit')+`<br><span class="muted">${esc(bl)}</span>`:pill('Por recibir','info')}</td></tr>`}).join('')}</tbody></table></div></div></div>`;}).join(''):'<p class="empty">No hay bultos en camino hacia tu empresa.</p>'}</div>
+    <div class="card"><h2>Recepciones registradas</h2>${hist.length?`<div class="tbl"><table><thead><tr><th>Fecha</th><th>Bulto</th><th>Viaje</th><th>Temp.</th><th>Precinto</th><th>Cajas</th><th>Resultado</th></tr></thead><tbody>
+      ${hist.map(x=>`<tr><td class="num">${fmt(x.ts)}</td><td>${code(bul(x.bultoId).codigo)}</td><td class="num">${via(x.despachoId).codigo}</td><td class="num">${fmtT(x.temp)}</td><td>${x.precinto?'Intacto':'Roto'}</td><td class="num">${x.cantidad}</td><td>${x.conforme?pill('Recibido','ok'):pill('Rechazado','crit')}${x.motivo?`<br><span class="muted">${esc(x.motivo)}</span>`:''}</td></tr>`).join('')}</tbody></table></div>`:'<p class="empty">Sin recepciones.</p>'}</div>`;
+}
+
+/* ---------------- DEPÓSITO (distribuidora) ---------------- */
+function vDeposito(u){
+  const bs=S.bultos.filter(b=>b.ubicacionId===u.empresaId&&b.estado==='EN_DEPOSITO');
+  const porFarm={}; bs.forEach(b=>{const f=cir(b.circuitoId).farmId; (porFarm[f]=porFarm[f]||[]).push(b);});
+  return `<div class="card"><div class="card-head"><h2>Bultos en tu depósito</h2><span class="muted">${bs.length} bultos · ${fmtN(bs.reduce((a,b)=>a+b.cantidad,0))} cajas · agrupados por farmacia de destino</span></div>
+    ${bs.length?Object.entries(porFarm).map(([f,lst])=>`<h3>${esc(nombreEmp(f))} <span class="muted sub">· ${esc(emp(f).localidad)}</span></h3><div class="tbl"><table><thead><tr><th>Bulto</th><th>Contenido</th><th>Cajas</th><th>Circuito</th><th>Estado</th></tr></thead><tbody>
+      ${lst.map(b=>{const bl=bloqueoBulto(b); return `<tr><td>${code(b.codigo)}${b.despachoId?`<br><span class="muted">asignado a ${via(b.despachoId).codigo}</span>`:''}</td><td>${esc(med(lote(b.loteId).medId).nombre)} · lote ${lote(b.loteId).codigo}</td><td class="num">${b.cantidad}</td><td class="num">${cir(b.circuitoId).codigo}</td><td>${bl?pill('Bloqueado','crit')+`<br><span class="muted">${esc(bl)}</span>`:pill('Listo para salir','ok')}</td></tr>`}).join('')}</tbody></table></div>`).join('')
+    :'<p class="empty">El depósito está vacío.</p>'}<div class="row"><button class="btn ghost" data-act="nav" data-view="viajes">Armar un viaje · tramo 2</button></div></div>`;
+}
+
+/* ---------------- FARMACIA: stock y dispensación ---------------- */
+function vStock(u){
+  const us=S.unidades.filter(x=>x.empresaId===u.empresaId&&['EN_STOCK','DISPENSADA','DEVUELTA'].includes(x.estado));
+  const ls=[...new Set(us.map(x=>x.loteId))].map(lote);
+  return `<div class="card"><h2>Cajas en tu farmacia</h2>${ls.length?`<div class="tbl"><table><thead><tr><th>Lote</th><th>Medicamento</th><th>Vence</th><th>En stock</th><th>Dispensadas</th><th>Devueltas</th><th>Se puede dispensar</th></tr></thead><tbody>
+    ${ls.map(l=>{const mis=us.filter(x=>x.loteId===l.id), st=mis.filter(x=>x.estado==='EN_STOCK'), bl=st.length?bloqueoUnidad(st[0]):bloqueoLote(l);
+      return `<tr><td class="num"><b>${l.codigo}</b></td><td>${esc(med(l.medId).nombre)}</td><td class="num">${fmtD(l.venc)}</td><td class="num">${st.length}<br><span class="muted">${st.slice(0,3).map(x=>x.serie).join(', ')}${st.length>3?'…':''}</span></td>
+      <td class="num">${mis.filter(x=>x.estado==='DISPENSADA').length}</td><td class="num">${mis.filter(x=>x.estado==='DEVUELTA').length}</td><td>${bl?pill('No','crit')+`<br><span class="muted">${esc(bl)}</span>`:pill('Sí','ok')}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="empty">No tenés stock recibido.</p>'}</div>
+    <div class="card"><h2>Devolver una caja</h2><form class="stack" data-act="devolver"><div class="fields">
+      <label class="f">Serie<input name="serie" required placeholder="0398S000150"></label>
+      <label class="f">Motivo<select name="motivo"><option>Envase dañado</option><option>Vencimiento próximo</option><option>Pedido erróneo</option></select></label>
+    </div><div class="row"><button class="btn ghost" type="submit">Registrar devolución</button><span class="muted">La caja queda devuelta y no vuelve a dispensarse (R14).</span></div></form></div>`;
+}
+function vDispensar(u){
+  const hist=S.dispensaciones.filter(d=>d.farmId===u.empresaId).slice().reverse();
+  const disp=S.unidades.filter(x=>x.empresaId===u.empresaId&&x.estado==='EN_STOCK'&&!bloqueoUnidad(x)).slice(0,2).map(x=>x.serie);
+  const r=S.ui.dispRes, anulable=d=>!d.anulada&&(Date.now()-new Date(d.ts).getTime())<=2*HORA;
+  return `<div class="card"><h2>Dispensar una caja</h2>
+    <p class="muted">Escaneá el DataMatrix de la caja o escribí la serie. El sistema controla que esté en tu stock, sin bloqueo y sin dispensar antes (R10, R11). El DNI es opcional (R13).</p>
+    <form class="stack" data-act="dispensar"><div class="fields">
+      <label class="f">Serie<input id="d-serie" name="serie" required placeholder="0398S000010" value="${esc(S.ui.dispSerie||'')}"></label>
+      <label class="f">Obra social o prepaga<select name="obraSocial"><option>OSEP Mendoza</option><option>PAMI</option><option>OSDE</option><option>Swiss Medical</option><option>Particular (sin cobertura)</option></select></label>
+      <label class="f">N.º de afiliado<input name="afiliado" value="100-551207-01"></label>
+      <label class="f">DNI del paciente (opcional)<input name="dni" inputmode="numeric" value="30456789"></label>
+      <label class="f">N.º de receta<input name="receta" value="RX-MZA-451399"></label>
+    </div><div class="row"><button class="btn" type="submit">Verificar y dispensar</button><span class="muted">Probá:</span>${[...disp,'0398S000001','9999S000001'].map(s=>`<button type="button" class="chip" data-act="setSerie" data-q="${s}">${s}</button>`).join('')}</div></form>
+    ${r?`<div class="flash ${r.kind}"><b>${esc(r.title)}</b><span>${esc(r.body)}</span></div>`:''}</div>
+    <div class="card"><div class="card-head"><h2>Dispensaciones de tu farmacia</h2><span class="muted">Se pueden anular dentro de las 2 horas</span></div>${hist.length?`<div class="tbl"><table><thead><tr><th>Fecha</th><th>Serie</th><th>Medicamento</th><th>Cobertura</th><th>DNI</th><th></th></tr></thead><tbody>
+    ${hist.map(d=>{const l=lote(uni(d.serie).loteId); return `<tr><td class="num">${fmt(d.ts)}</td><td class="num">${d.serie}</td><td>${esc(med(l.medId).nombre)}</td><td>${esc(d.obraSocial)}${d.afiliado?`<br><span class="muted num">${esc(d.afiliado)}</span>`:''}</td><td class="num">${d.dni?maskDni(d.dni):'—'}</td>
+      <td>${d.anulada?pill('Anulada','neutral'):anulable(d)?`<button class="btn sm ghost" data-act="anular" data-id="${d.id}">Anular</button>`:''}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="empty">Sin dispensaciones.</p>'}</div>`;
+}
+
+/* ---------------- TRAZABILIDAD ---------------- */
+function puedeVerLote(u,l){
+  if(u.rol==='SEDE_CENTRAL') return true;
+  if(u.rol==='INSPECTOR') return true;
+  if(u.rol==='LABORATORIO') return l.labId===u.empresaId;
+  return S.bultos.some(b=>b.loteId===l.id && [cir(b.circuitoId).distId,cir(b.circuitoId).farmId].includes(u.empresaId));
+}
+function eventosDe(f){ return S.ledger.filter(f).slice().reverse(); }
+function vTraza(u){
+  const q=(S.ui.trazaQ||'').trim().toUpperCase();
+  const ejemplos = u.rol==='FARMACIA'||u.rol==='DISTRIBUIDOR' ? ['L2026-0398','BUL-0001','0398S000001'] : ['L2026-0415','BUL-0008','0398S000001'];
+  let res='';
+  if(q){
+    const b=bulCod(q), un=uni(q), l=loteCod(q) || (b?lote(b.loteId):un?lote(un.loteId):null);
+    if(!l) res=`<div class="card"><p class="empty">No hay ningún lote, bulto ni serie con “${esc(q)}”.</p></div>`;
+    else if(!puedeVerLote(u,l)) res=`<div class="card"><p class="empty">No encontramos “${esc(q)}” entre los datos de tu empresa. (El backend responde 404: no revela que existe.)</p></div>`;
+    else if(b) res=trazaBulto(u,b);
+    else if(un) res=trazaSerie(u,un);
+    else res=trazaLote(u,l);
+  }
+  return `<div class="card"><form class="stack" data-act="buscarTraza"><label class="f">Código de lote, de bulto o serie de una caja<div class="row"><input name="q" value="${esc(S.ui.trazaQ||'')}" placeholder="L2026-0415, BUL-0003 o 0398S000001"><button class="btn" type="submit">Buscar</button></div></label>
+    <div class="row"><span class="muted">Ejemplos:</span>${ejemplos.map(c=>`<button type="button" class="chip" data-act="verTraza" data-q="${c}">${c}</button>`).join('')}</div></form></div>${res}`;
+}
+function trazaLote(u,l){
+  const m=med(l.medId), bs=S.bultos.filter(b=>b.loteId===l.id), visibles=u.empresaId&&u.rol!=='LABORATORIO'?bs.filter(b=>[cir(b.circuitoId).distId,cir(b.circuitoId).farmId].includes(u.empresaId)):bs;
+  const ids=new Set(visibles.map(b=>b.id));
+  const evs=eventosDe(b=>b.ref.lote===l.id || (b.ref.bultos||[]).some(id=>ids.has(id)));
+  return `<div class="card"><div class="card-head"><div><span class="eyebrow">Lote</span><h2>${l.codigo} · ${esc(m.nombre)}</h2><span class="muted">${esc(nombreEmp(l.labId))} · GTIN ${m.gtin} · ${fmtN(l.cantidad)} cajas · vence ${fmtD(l.venc)}</span></div>${estPill(LOTE_EST,l.estado)}</div>
+    <dl class="kv"><dt>Liberado por</dt><dd>${liberadoTxt(l).replace('<br>',' · ')}</dd><dt>Rango térmico</dt><dd>${m.tMin}–${m.tMax} °C${m.biologico?' · biológico':''}</dd></dl>
+    ${visibles.length?`<div class="tbl"><table><thead><tr><th>Bulto</th><th>Cajas</th><th>Farmacia de destino</th><th>Estado</th><th>Dónde está</th></tr></thead><tbody>
+    ${visibles.map(b=>{const bl=bloqueoBulto(b); return `<tr><td><button class="chip" data-act="verTraza" data-q="${b.codigo}">${b.codigo}</button></td><td class="num">${b.cantidad}</td><td>${esc(nombreEmp(cir(b.circuitoId).farmId))}</td><td>${estPill(BUL_EST,b.estado)} ${bloqPill(bl)}</td><td>${b.despachoId?`En camión (${via(b.despachoId).codigo})`:esc(nombreEmp(b.ubicacionId))}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="empty">Todavía no se armaron bultos.</p>'}</div>
+    <div class="card wide"><h2>Eventos de la cadena</h2>${tablaEventos(evs)}</div>`;
+}
+function tramosBulto(b){
+  return b.viajes.map(via).map(v=>{const ls=S.lecturas.filter(x=>x.despachoId===v.id), m=med(lote(b.loteId).medId), rc=S.recepciones.find(r=>r.bultoId===b.id&&r.despachoId===v.id);
+    return `<div class="card"><div class="card-head"><div><span class="eyebrow">Tramo ${v.tramo} · ${v.codigo}</span><h3>${esc(nombreEmp(v.origenId))} → ${esc(nombreEmp(v.tramo===1?cir(b.circuitoId).distId:cir(b.circuitoId).farmId))}</h3>
+      <span class="muted">Camión ${esc(v.patente)} · chofer ${esc(v.chofer)} · salida ${fmt(v.salida)}</span></div>${estPill(VIA_EST,v.estado)}</div>
+      <div class="grid2"><div>${spark(ls.map(x=>x.temp),m.tMin,m.tMax)}</div><div>${rc?`<b>${rc.conforme?'Recibido':'Rechazado'}</b> el ${fmt(rc.ts)} a ${fmtT(rc.temp)} · precinto ${rc.precinto?'intacto':'roto'} · ${rc.cantidad} cajas${rc.motivo?`<br><span class="muted">${esc(rc.motivo)}</span>`:''}`:'<span class="muted">Todavía no llegó.</span>'}</div></div></div>`;}).join('');
+}
+function trazaBulto(u,b){
+  const l=lote(b.loteId), c=cir(b.circuitoId), bl=bloqueoBulto(b);
+  const evs=eventosDe(e=>(e.ref.bultos||[]).includes(b.id) || (e.ref.lote===l.id && ['LOTE_REGISTRADO','LOTE_LIBERADO'].includes(e.tipo)));
+  return `<div class="card"><div class="card-head"><div><span class="eyebrow">Bulto</span><h2>${b.codigo} · ${b.cantidad} cajas de ${esc(med(l.medId).nombre)}</h2><span class="muted">Lote ${l.codigo} · precinto ${b.precinto} · ${c.codigo}: ${[c.labId,c.distId,c.farmId].map(nombreEmp).join(' → ')}</span></div>${estPill(BUL_EST,b.estado)}</div>
+    ${bl?`<div class="flash crit"><b>Bloqueado</b><span>${esc(bl)}</span></div>`:''}</div>${tramosBulto(b)}<div class="card wide"><h2>Eventos de la cadena</h2>${tablaEventos(evs)}</div>`;
+}
+function trazaSerie(u,un){
+  const l=lote(un.loteId), b=un.bultoId?bul(un.bultoId):null, bl=bloqueoUnidad(un);
+  const evs=eventosDe(e=>e.ref.serie===un.serie || (b&&(e.ref.bultos||[]).includes(b.id)) || (e.ref.lote===l.id && ['LOTE_REGISTRADO','LOTE_LIBERADO','CUARENTENA','RECALL','CUARENTENA_LEVANTADA'].includes(e.tipo)));
+  return `<div class="card"><div class="card-head"><div><span class="eyebrow">Caja</span><h2>Serie ${un.serie} · ${esc(med(l.medId).nombre)}</h2><span class="muted">Lote ${l.codigo}${b?` · bulto ${b.codigo}`:''} · está en ${esc(nombreEmp(un.empresaId))}</span></div>${estPill(UNI_EST,un.estado)}</div>
+    <div class="gs1">(01)${med(l.medId).gtin}(17)${l.venc.slice(2).replace(/-/g,'')}(10)${l.codigo}(21)${un.serie}</div>${bl?`<div class="flash crit"><b>Bloqueada</b><span>${esc(bl)}</span></div>`:''}</div>
+    ${b?tramosBulto(b):''}<div class="card wide"><h2>Eventos de la cadena</h2>${tablaEventos(evs)}</div>`;
+}
+
+/* ---------------- REPORTES ---------------- */
+function vReportes(u){
+  const i=insDe(u), reps=S.reportes.filter(r=>r.provincia===i.provincia).slice().reverse();
+  if(!reps.length) return '<div class="card"><p class="empty">No hay reportes en tu provincia.</p></div>';
+  return reps.map(r=>{const abierto=S.ui.repAbierto===r.id, un=uni(r.serie), mio=r.inspectorId===i.id;
+    return `<div class="card"><div class="card-head"><div><span class="eyebrow num">${r.id} · ${fmt(r.ts)}</span><h2>${esc(r.motivo)}</h2></div>${estPill(REP_EST,r.estado)}</div>
+      <p>“${esc(r.desc)}”</p><dl class="kv"><dt>Serie</dt><dd class="num">${esc(r.serie)}</dd><dt>Paciente</dt><dd class="num">DNI ${maskDni(r.dni)} (el inspector lo ve completo para contactarlo)</dd><dt>Asignado a</dt><dd>${r.inspectorId?esc(ins(r.inspectorId).nombre):'Sin asignar'}</dd>${r.conclusion?`<dt>Conclusión</dt><dd>${esc(r.conclusion)}</dd>`:''}</dl>
+      <div class="row">${r.estado==='ABIERTO'?`<button class="btn" data-act="tomarRep" data-id="${r.id}">Tomar el caso</button>`:''}${un?`<button class="btn ghost" data-act="abrirRep" data-id="${r.id}">${abierto?'Ocultar recorrido':'Ver recorrido completo'}</button>`:''}</div>
+      ${abierto&&un?trazaSerie(u,un):''}
+      ${r.estado==='EN_INVESTIGACION'&&mio?`<div class="row"><input id="res-${r.id}" placeholder="Conclusión de la investigación"><button class="btn ghost" data-act="cerrarRep" data-id="${r.id}">Cerrar caso</button><button class="btn sm warn" data-act="nav" data-view="lotes">Tomar medidas sobre el lote</button></div>`:''}</div>`;}).join('');
+}
+
+/* ---------------- CADENA Y SEPOLIA ---------------- */
+function vRegistro(){
+  const ig=S.integridad, ult=S.anclajes.length?S.anclajes[S.anclajes.length-1].hasta:0, pend=S.ledger.length-ult;
+  let msg;
+  if(ig.ok) msg=`<div class="flash ok"><b>La cadena verifica completa.</b><span>Se recalcularon ${S.ledger.length} hashes SHA-256 y cada evento apunta al anterior. Los ${S.sepolia.length} hashes anclados en Sepolia coinciden. Última verificación: ${fmt(ig.verificado)}.</span></div>`;
+  else if(ig.interna) msg=`<div class="flash crit"><b>El evento #${ig.interna} no coincide con su hash.</b><span>Alguien cambió un dato guardado sin pasar por la aplicación. Todo lo posterior queda sin respaldo.</span></div>`;
+  else msg=`<div class="flash crit"><b>La base es coherente, pero no coincide con Sepolia.</b><span>El hash del evento #${ig.sepolia.numero} anclado el ${fmt(ig.sepolia.ts)} (bloque ${ig.sepolia.bloque}) es distinto del que resulta hoy. Alguien reescribió la base y recalculó los hashes; la blockchain lo delata. La alteración está entre los eventos #${(S.anclajes.find(a=>a.hasta===ig.sepolia.numero)||{desde:1}).desde} y #${ig.sepolia.numero}.</span></div>`;
+  const show=S.ui.verTodo?S.ledger:S.ledger.slice(-25);
+  return `<div class="card"><div class="card-head"><div><h2>Verificación</h2><p class="muted">Se hace en dos pasos: coherencia interna de la base y comparación contra lo anclado en Sepolia (R15).</p></div>
+      <div class="row"><button class="btn" data-act="verificarCadena">Verificar ahora</button></div></div>${msg}
+    <div class="row">${S.tamper?`<button class="btn ghost" data-act="restaurar">Restaurar la base original</button><span class="muted">${esc(S.tamper.desc)}</span>`
+      :`<button class="btn warn" data-act="tamper">Alterar un evento en la base</button><button class="btn danger" data-act="tamperAvanzado">Reescribir la base y recalcular hashes</button>`}</div></div>
+    <div class="split"><div class="card"><h2>Próxima tanda</h2><p class="verdict cd" id="cd">—</p><p class="muted">${pend?`${pend} evento${pend>1?'s':''} esperando anclaje.`:'Todos los eventos están anclados.'} Cada 5 minutos, si hubo eventos nuevos, el último hash va a Sepolia en una sola transacción.</p>
+      <div class="row"><button class="btn ghost" data-act="anclarAhora" ${pend?'':'disabled'}>Anclar ahora</button></div></div>
+      <div class="card"><h2>Qué va a la blockchain</h2><p class="muted">Solo el hash del último evento y su número: <span class="code">anclar(bytes32 hash, uint64 hastaNumero)</span>. Nunca datos de pacientes ni de empresas. En este prototipo la transacción se simula; en el backend la envía Web3j al contrato MediChainAnchor.</p></div></div>
+    <div class="card"><div class="card-head"><h2>Anclajes en Sepolia</h2><span class="muted">Simulados · ${S.anclajes.length} tandas</span></div>
+      <div class="tbl"><table><thead><tr><th>Anclaje</th><th>Eventos</th><th>Hash anclado</th><th>Transacción</th><th>Bloque</th><th>Fecha</th><th>Estado</th></tr></thead><tbody>
+      ${S.anclajes.slice().reverse().slice(0,12).map(a=>`<tr><td class="num"><b>${a.id}</b></td><td class="num">#${a.desde} a #${a.hasta}</td><td class="hash">${short(a.hash)}</td><td class="hash">${short(a.tx)}</td><td class="num">${fmtN(a.bloque)}</td><td class="num">${fmt(a.ts)}</td><td>${a.estado==='CONFIRMADO'?pill('Confirmado','ok'):pill(`${a.conf}/3 confirmaciones`,'warn')}</td></tr>`).join('')}</tbody></table></div></div>
+    <div class="card wide"><div class="card-head"><h2>Cadena de eventos</h2><button class="btn sm ghost" data-act="verTodo">${S.ui.verTodo?'Ver los últimos 25':'Ver los '+S.ledger.length}</button></div>
+      <div class="tbl"><table><thead><tr><th>#</th><th>Fecha</th><th>Evento</th><th>Firmado por</th><th>Detalle</th><th>Hash anterior</th><th>Hash</th><th>Anclaje</th></tr></thead><tbody>
+      ${show.slice().reverse().map(b=>{const bad=!ig.ok&&ig.interna&&b.n===ig.interna; return `<tr class="${bad?'bad':''}"><td class="num">${b.n}</td><td class="num">${fmt(b.ts)}</td><td>${esc(TIPO_EVT[b.tipo]||b.tipo)}</td><td>${esc(actorLbl(b.actor))}</td><td>${esc(b.data.txt)}</td><td class="hash">${short(b.prev)}</td><td class="hash">${short(b.hash)}</td><td>${ancLbl(b.n)}</td></tr>`}).join('')}</tbody></table></div></div>`;
+}
+
+/* ---------------- VERIFICACIÓN PÚBLICA Y PACIENTE ---------------- */
+function resultado(q,u){
+  const un=uni(q);
+  if(!un) return {kind:'crit',verdict:'No encontramos este número de serie',checks:[['crit','No figura en el registro de ningún laboratorio habilitado','Puede ser una falsificación. No lo consumas y reportalo.']],serie:q,existe:false};
+  const l=lote(un.loteId), m=med(l.medId), d=S.dispensaciones.find(x=>x.serie===un.serie&&!x.anulada), bl=bloqueoUnidad(un);
+  const checks=[['ok','Auténtico',`Registrado por ${nombreEmp(l.labId)}, laboratorio habilitado por ANMAT.`]];
+  checks.push(vencido(l)?['crit','Vencido',`Venció el ${fmtD(l.venc)}.`]:['ok','Vigente',`Vence el ${fmtD(l.venc)}.`]);
+  const c=un.bultoId?cuaDeBulto(bul(un.bultoId)):cuaVigentes().find(c=>c.alcance==='LOTE'&&c.loteId===l.id);
+  if(c&&c.estado==='CONVERTIDA_EN_RECALL') checks.push(['crit','No consumir: producto retirado del mercado','ANMAT ordenó el retiro. Devolvelo en la farmacia.']);
+  else if(c) checks.push(['crit','Bajo investigación','ANMAT puso este producto en cuarentena. No lo uses hasta nuevo aviso.']);
+  else if(!vencido(l)) checks.push(['ok','Sin alertas sanitarias','No hay cuarentena ni recall sobre esta caja.']);
+  if(un.estado==='ROBADA') checks.push(['crit','Informado como robado','Esta caja figura en un robo durante el transporte. No la uses y reportala.']);
+  else if(un.estado==='DEVUELTA') checks.push(['warn','Devuelta por la farmacia','No debería estar en manos de un paciente. Si la compraste, reportala.']);
+  else if(d) checks.push(['ok',u&&d.dni===u.dni?'Dispensada a vos':'Ya fue dispensada',`${nombreEmp(d.farmId)}, el ${fmt(d.ts)}`]);
+  else if(un.estado==='EN_STOCK') checks.push(['warn','Todavía no fue vendida',`Figura en el stock de ${nombreEmp(un.empresaId)}. Si la tenés en tu casa, reportala.`]);
+  else checks.push(['warn','Todavía no llegó a una farmacia','Si la compraste, es una irregularidad: reportala.']);
+  // recorrido mínimo (sin distribuidora, temperaturas ni datos de pacientes: R13)
+  const rec=[[`Fabricada por ${nombreEmp(l.labId)}`,l.creado],[`Lote liberado ${l.liberadoPor&&l.liberadoPor.startsWith('ins')?'por ANMAT':'por el director técnico'}`,l.fechaLib]];
+  const rc=S.recepciones.filter(r=>r.bultoId===un.bultoId&&r.conforme&&emp(r.empresaId).tipo==='FARMACIA')[0]; if(rc) rec.push([`Recibida en ${nombreEmp(rc.empresaId)}`,rc.ts]);
+  if(d) rec.push([`Dispensada en ${nombreEmp(d.farmId)}`,d.ts]);
+  const rel=S.ledger.filter(e=>e.ref.serie===un.serie||(e.ref.lote===l.id&&!e.ref.serie)||(un.bultoId&&(e.ref.bultos||[]).includes(un.bultoId)));
+  const anclados=rel.filter(e=>anclajeDe(e.n)), a=anclados.length?anclajeDe(anclados[anclados.length-1].n):null, pend=rel.length-anclados.length;
+  const extra = pend ? ` · ${pend} evento${pend>1?'s':''} más reciente${pend>1?'s':''} se ancla${pend>1?'n':''} en la próxima tanda` : '';
+  const anc = !S.integridad.ok ? ['warn','Registro en revisión','La verificación de la cadena encontró una inconsistencia.']
+    : a ? ['ok','Registro verificado',`Anclado en Sepolia el ${fmt(a.ts)} · bloque ${fmtN(a.bloque)} · tx ${short(a.tx)}${extra}`]
+    : ['warn','Registro verificado · pendiente de anclaje','Se ancla en Sepolia en la próxima tanda (cada 5 minutos).'];
+  const bad=checks.some(x=>x[0]==='crit'), warn=checks.some(x=>x[0]==='warn');
+  return {kind:bad?'crit':warn?'warn':'ok',verdict:bad?'No lo consumas':warn?'Revisá este medicamento':'Podés usarlo con tranquilidad',med:m,checks,rec:rec.filter(x=>x[1]),anc,serie:un.serie,existe:true};
+}
+function vVerificar(u){
+  const q=S.ui.pacQ||'', r=q?resultado(q,u):null;
+  return `<div class="card"><h2>¿Es original mi medicamento?</h2><p class="muted">Escaneá el DataMatrix de la caja o escribí el número de serie. No hace falta cuenta.</p>
+    <form class="stack" data-act="verificarSerie"><div class="row"><input name="q" value="${esc(q)}" placeholder="Ej.: 0398S000001"><button class="btn" type="submit">Verificar</button></div>
+    <div class="row"><span class="muted">Ejemplos:</span>${['0398S000001','0398S000150','0412S000010','9999S000001'].map(s=>`<button type="button" class="chip" data-act="pacSerie" data-q="${s}">${s}</button>`).join('')}</div></form></div>
+    ${r?`<div class="card"><div class="card-head"><div><span class="eyebrow num">Serie ${esc(r.serie)}</span>${r.med?`<h2>${esc(r.med.nombre)}</h2><span class="muted">${esc(r.med.presentacion)}</span>`:''}</div></div>
+      <div class="verdict ${r.kind}">${esc(r.verdict)}</div>
+      <ul class="checks">${r.checks.map(([k,t,d])=>`<li><span class="mark ${k}">${k==='ok'?'✓':k==='warn'?'!':'✕'}</span><span><b>${esc(t)}</b><br><span class="muted">${esc(d)}</span></span></li>`).join('')}</ul>
+      ${r.existe?`<h3>Recorrido</h3><ul class="checks">${r.rec.map(([t,f])=>`<li><span class="mark ok">✓</span><span>${esc(t)}<br><span class="muted">${fmt(f)}</span></span></li>`).join('')}</ul>
+      <div class="flash ${r.anc[0]}"><b>${esc(r.anc[1])}</b><span>${esc(r.anc[2])}</span></div>`:''}
+      <p class="muted">No mostramos distribuidora, temperaturas ni datos de pacientes (R13).</p></div>
+      ${u&&u.rol==='PACIENTE'?`<div class="card"><h2>Reportar un problema con esta caja</h2><form class="stack" data-act="reportar" data-serie="${esc(r.serie)}"><div class="fields">
+        <label class="f">Motivo<select name="motivo"><option>Malestar o efecto adverso</option><option>Envase dañado o adulterado</option><option>Sospecha de falsificación</option><option>Otro</option></select></label></div>
+        <label class="f">Qué pasó<textarea name="desc" required>El envase tenía el precinto abierto.</textarea></label>
+        <div class="row"><button class="btn" type="submit">Enviar a ANMAT</button><span class="muted">Lo recibe un inspector de la provincia.</span></div></form></div>`:''}`:''}`;
+}
+function vMisMeds(u){
+  const mis=S.dispensaciones.filter(d=>d.dni===u.dni&&!d.anulada).slice().reverse(), reps=S.reportes.filter(r=>r.dni===u.dni).slice().reverse();
+  return `<div class="card"><h2>Medicamentos dispensados a tu DNI</h2>${mis.length?`<div class="tbl"><table><thead><tr><th>Fecha</th><th>Medicamento</th><th>Serie</th><th>Farmacia</th><th>Estado</th><th></th></tr></thead><tbody>
+    ${mis.map(d=>{const un=uni(d.serie), l=lote(un.loteId), bl=bloqueoUnidad(un); return `<tr><td class="num">${fmt(d.ts)}</td><td>${esc(med(l.medId).nombre)}</td><td class="num">${d.serie}</td><td>${esc(nombreEmp(d.farmId))}</td><td>${bl?pill('No usar','crit'):pill('Sin alertas','ok')}</td><td><button class="btn sm ghost" data-act="pacSerie" data-q="${d.serie}">Verificar</button></td></tr>`}).join('')}</tbody></table></div>`:'<p class="empty">No hay dispensaciones a tu nombre.</p>'}</div>
+    <div class="card"><h2>Tus reportes</h2>${reps.length?reps.map(r=>`<div class="item ${r.estado==='CERRADO'?'ok':'warn'}"><span class="stripe"></span><div><b class="num">${r.id} · ${esc(r.motivo)}</b><br><span class="muted">Serie ${esc(r.serie)} · ${fmt(r.ts)} · ${r.estado==='CERRADO'?'Cerrado: '+esc(r.conclusion):r.estado==='EN_INVESTIGACION'?'Un inspector lo está investigando':'Recibido por ANMAT'}</span></div></div>`).join(''):'<p class="empty">No enviaste reportes.</p>'}</div>`;
+}
+
+/* ---------------- acciones (capa de servicio) ---------------- */
+const val = id => { const el=document.getElementById(id); return el?el.value.trim():''; };
+async function commit(){ await cola; await verificar(); render(); }
+const err = (t,b) => { flash('crit',t,b); render(); };
+const aviso = (t,b) => { flash('warn',t,b); render(); };
+const PERMITIDAS_CON_TAMPER = ['login','logout','loginTab','nav','reset','restaurar','verificarCadena','verTodo','verTraza','buscarTraza','pacSerie','verificarSerie','abrirRep','ejemplo'];
+
+const A = {
+  login(d){ S.sesion=d.uid; const u=user(); S.ui.view=NAV[u.rol][0][0]; S.ui.flash=null; S.ui.dispRes=null; S.ui.recRes=null; S.ui.pacQ=''; S.ui.trazaQ=''; render(); window.scrollTo(0,0); },
+  logout(){ S.sesion=null; S.ui.flash=null; render(); },
+  loginTab(d){ S.ui.loginTab=d.tab; S.ui.flash=null; render(); },
+  nav(d){ S.ui.view=d.view; S.ui.flash=null; S.ui.dispRes=null; S.ui.recRes=null; render(); window.scrollTo(0,0); },
+  async reset(){ const ses=S.sesion, v=S.ui.view; await boot(); if(ses){S.sesion=ses; S.ui.view=v;} render(); toast('Datos de la demo reiniciados'); },
+  ejemplo(){ S.ui.ejemplo=((S.ui.ejemplo||0)+1)%2; render(); },
+
+  /* Registro de empresa (RF-AUT-02) */
+  async registrarEmpresa(d,f){
+    const tipo=f.get('tipo'), razon=f.get('razon').trim(), cuit=f.get('cuit').trim(), gln=soloDig(f.get('gln')), provincia=f.get('provincia');
+    if(!cuitValido(cuit)) return err('CUIT inválido','El dígito verificador no coincide (módulo 11). Revisá el número.');
+    if(empCuit(cuit)) return err('Ya existe una empresa con ese CUIT','');
+    if(gln.length!==13||!gs1Valido(gln)) return err('GLN inválido','Tiene que tener 13 dígitos y un dígito verificador GS1 válido.');
+    const file=f.get('pdf'); let bytes, nombre;
+    if(file && file.size){
+      if(file.type!=='application/pdf') return err('El archivo tiene que ser un PDF','');
+      if(file.size>5*1024*1024) return err('El PDF supera los 5 MB','');
+      bytes=await file.arrayBuffer(); nombre=file.name;
+    } else { bytes=`%PDF-1.4 · ${f.get('hab')} · ${razon} · CUIT ${cuit}`; nombre='habilitacion-ejemplo.pdf'; }
+    const id='emp-'+(S.empresas.length+1), uid='u-'+id, d10=soloDig(cuit);
+    const e={id,tipo,razon,cuit:`${d10.slice(0,2)}-${d10.slice(2,10)}-${d10[10]}`,gln,provincia,localidad:f.get('localidad').trim(),habilitacion:f.get('hab').trim(),dt:f.get('dt').trim(),solicitud:nowISO(),estado:'PENDIENTE',inspectorId:null,habilitadaPor:null,fechaHab:null,docNombre:nombre};
+    e.docHash=await sha(bytes); S.docs[id]=bytes;
+    S.empresas.push(e);
+    S.usuarios.push({id:uid,rol:tipo,nombre:f.get('admin').trim(),empresaId:id,admin:true,dt:f.get('admin').trim()===e.dt.replace(/ \(.*\)/,'')});
+    registrar('SOLICITUD_HABILITACION',uid,{empresa:id},`${razon} · ${TIPO_EMP[tipo]} · CUIT ${e.cuit} · ${provincia}`,{docHash:e.docHash});
+    const n=inspectoresActivos(provincia).length;
+    flash('ok',`Solicitud de ${razon} enviada`, n ? `Quedó en la bandeja de los ${n} inspector${n>1?'es':''} de ${provincia}. El hash del PDF (${short(e.docHash)}) quedó en la cadena. Ya podés ingresar con su usuario: verás que está en revisión.`
+      : `${provincia} no tiene inspectores: la solicitud llegó a la bandeja de la Sede Central, que la va a asignar.`);
+    S.ui.loginTab='ingresar'; await commit();
+  },
+
+  /* Sede Central */
+  async altaIns(d,f){
+    const nombre=f.get('nombre').trim(), dni=soloDig(f.get('dni')), legajo=f.get('legajo').trim().toUpperCase(), provincia=f.get('provincia');
+    if(dni.length<7||dni.length>8) return err('DNI inválido','Tiene que tener 7 u 8 dígitos.');
+    if(S.inspectores.some(i=>i.dni===dni||i.legajo===legajo)) return err('Ya existe un inspector con ese DNI o legajo','');
+    const id='ins-'+(S.inspectores.length+1);
+    S.inspectores.push({id,nombre,dni,legajo,provincia,estado:'ACTIVO',altaPor:user().id,fechaAlta:nowISO()});
+    S.usuarios.push({id:'u-'+id,rol:'INSPECTOR',nombre,inspectorId:id});
+    registrar('ALTA_INSPECTOR',user().id,{inspector:id},`${nombre} (${legajo}) · ${provincia}`);
+    flash('ok',`${nombre} quedó dado de alta como inspector de ${provincia}`,'Desde ahora ve la bandeja de su provincia.'); await commit();
+  },
+  async toggleIns(d){
+    const i=ins(d.id), baja=i.estado==='ACTIVO'; i.estado=baja?'BAJA':'ACTIVO';
+    registrar(baja?'BAJA_INSPECTOR':'REACTIVACION_INSPECTOR',user().id,{inspector:i.id},`${i.nombre} (${i.legajo})`);
+    flash(baja?'warn':'ok',baja?`${i.nombre} quedó dado de baja`:`${i.nombre} fue reactivado`,baja?'Sus acciones pasadas siguen en la cadena. No puede operar.':''); await commit();
+  },
+  async asignarEmp(d){
+    const e=emp(d.id), i=ins(val('asig-'+d.id)); if(!i) return;
+    e.inspectorId=i.id;
+    registrar('SOLICITUD_ASIGNADA',user().id,{empresa:e.id,inspector:i.id},`${e.razon} (${e.provincia}) asignada a ${i.nombre}`);
+    flash('ok',`Asignaste ${e.razon} a ${i.nombre}`,'Aparece en su bandeja, marcada como asignada por la Sede.'); await commit();
+  },
+  async asignarCir(d){
+    const c=cir(d.id), i=ins(val('asig-'+d.id)); if(!i) return;
+    c.inspectorId=i.id; registrar('CIRCUITO_TOMADO',user().id,{circuito:c.id,inspector:i.id},`${c.codigo} asignado por la Sede a ${i.nombre}`);
+    flash('ok',`Asignaste ${c.codigo} a ${i.nombre}`,''); await commit();
+  },
+  async suspenderEmp(d){
+    const e=emp(d.id); if(e.estado!=='HABILITADA') return;
+    e.estado='SUSPENDIDA'; registrar('EMPRESA_SUSPENDIDA',user().id,{empresa:e.id},`${e.razon} suspendida`);
+    const cs=S.circuitos.filter(c=>[c.labId,c.distId,c.farmId].includes(e.id)&&['APROBADO','PENDIENTE_EMPRESAS','PENDIENTE_INSPECTOR'].includes(c.estado));
+    cs.forEach(c=>{ c.estado='SUSPENDIDO'; registrar('CIRCUITO_SUSPENDIDO','sistema',{circuito:c.id},`${c.codigo} suspendido automáticamente: ${e.razon} fue suspendida`); });
+    flash('warn',`${e.razon} quedó suspendida`,`${cs.length} circuito${cs.length===1?'':'s'} suspendido${cs.length===1?'':'s'} automáticamente. Los bultos que ya viajan siguen su camino.`); await commit();
+  },
+  async rehabilitarEmp(d){
+    const e=emp(d.id); e.estado='HABILITADA'; registrar('EMPRESA_REHABILITADA',user().id,{empresa:e.id},`${e.razon} rehabilitada`);
+    flash('ok',`${e.razon} vuelve a operar`,'Sus circuitos siguen suspendidos hasta que un inspector los rehabilite.'); await commit();
+  },
+
+  /* Inspector: empresas */
+  async tomarEmp(d){
+    const e=emp(d.id), i=insDe(user()); if(e.inspectorId) return err('Otro inspector ya la tomó','');
+    e.inspectorId=i.id; registrar('SOLICITUD_TOMADA',user().id,{empresa:e.id},`${e.razon} tomada por ${i.nombre}`); await commit();
+  },
+  async verDoc(d){
+    const e=emp(d.id), h=await sha(S.docs[e.id]);
+    toast(h===e.docHash?`PDF verificado: el hash coincide con el de la solicitud (${short(h)})`:'El PDF no coincide con el hash registrado');
+  },
+  async habilitarEmp(d){
+    const e=emp(d.id), i=insDe(user()); if(e.estado!=='PENDIENTE'||e.inspectorId!==i.id) return;
+    e.estado='HABILITADA'; e.habilitadaPor=i.id; e.fechaHab=nowISO();
+    registrar('HABILITACION_APROBADA',user().id,{empresa:e.id},`${e.razon} habilitada como ${TIPO_EMP[e.tipo].toLowerCase()}`);
+    flash('ok',`${e.razon} quedó habilitada`,'La habilitación quedó firmada con tu legajo. La empresa ya puede operar.'); await commit();
+  },
+  async rechazarEmp(d){
+    const e=emp(d.id), mot=val('rech-'+d.id); if(!mot) return aviso('Escribí el motivo del rechazo','La empresa lo ve en su pantalla.');
+    e.estado='RECHAZADA'; e.motivoRechazo=mot; e.fechaHab=nowISO();
+    registrar('HABILITACION_RECHAZADA',user().id,{empresa:e.id},`${e.razon} · ${mot}`); flash('warn',`Rechazaste a ${e.razon}`,mot); await commit();
+  },
+
+  /* Circuitos (R5) */
+  setCuit(d){ if(d.campo==='pc-dist') S.ui.pcDist=d.q; else S.ui.pcFarm=d.q; const el=document.getElementById(d.campo); if(el) el.value=d.q; },
+  async proponerCir(d,f){
+    const u=user(); S.ui.pcDist=f.get('dist'); S.ui.pcFarm=f.get('farm');
+    if(!u.dt) return err('Solo el director técnico propone circuitos','R5');
+    const chk=(c,tipo)=>{ if(!cuitValido(c)) return 'el CUIT '+c+' no es válido'; const e=empCuit(c); if(!e) return 'no hay ninguna empresa con CUIT '+c;
+      if(e.tipo!==tipo) return `${e.razon} no es una ${TIPO_EMP[tipo].toLowerCase()}`; if(e.estado!=='HABILITADA') return `${e.razon} no está habilitada`; return null; };
+    const p1=chk(f.get('dist'),'DISTRIBUIDOR'), p2=chk(f.get('farm'),'FARMACIA'); if(p1||p2) return err('No se puede proponer el circuito',[p1,p2].filter(Boolean).join(' · ')+' (R5)');
+    const dist=empCuit(f.get('dist')), farm=empCuit(f.get('farm'));
+    if(S.circuitos.some(c=>c.labId===u.empresaId&&c.distId===dist.id&&c.farmId===farm.id&&c.estado!=='RECHAZADO')) return err('Ya existe un circuito vigente con estas tres empresas','R5');
+    const c={id:'cir-'+(S.circuitos.length+1),codigo:'CIR-'+p4(S.circuitos.length+1),labId:u.empresaId,distId:dist.id,farmId:farm.id,estado:'PENDIENTE_EMPRESAS',creado:nowISO(),aceptDist:null,aceptFarm:null,inspectorId:null,fechaAprob:null,motivo:null};
+    S.circuitos.push(c); S.ui.pcDist=''; S.ui.pcFarm='';
+    registrar('CIRCUITO_PROPUESTO',u.id,{circuito:c.id},`${c.codigo}: ${nombreEmp(c.labId)} → ${dist.razon} → ${farm.razon}`);
+    flash('ok',`Propusiste ${c.codigo}`,`Ahora tienen que aceptarlo ${dist.razon} y ${farm.razon}. Después lo aprueba un inspector de ${farm.provincia}.`); await commit();
+  },
+  async aceptarCir(d){
+    const u=user(), c=cir(d.id); if(!u.admin||c.estado!=='PENDIENTE_EMPRESAS') return;
+    if(c.distId===u.empresaId&&!c.aceptDist) c.aceptDist=nowISO(); else if(c.farmId===u.empresaId&&!c.aceptFarm) c.aceptFarm=nowISO(); else return;
+    const listo=c.aceptDist&&c.aceptFarm; if(listo) c.estado='PENDIENTE_INSPECTOR';
+    const prov=emp(c.farmId).provincia;
+    registrar('CIRCUITO_ACEPTADO',u.id,{circuito:c.id},`${c.codigo} aceptado por ${nombreEmp(u.empresaId)}${listo?' · pasa a la bandeja de '+prov:''}`);
+    flash('ok',`Aceptaste ${c.codigo}`, listo ? `Aceptaron las dos empresas: pasó a la bandeja de los inspectores de ${prov}${provSinInspector(prov)?' (sin inspectores: lo asigna la Sede)':''}.` : 'Falta que acepte la otra empresa.'); await commit();
+  },
+  async rechazarCir(d){
+    const u=user(), c=cir(d.id), mot=val('rce-'+d.id); if(!mot) return aviso('Escribí el motivo','El laboratorio lo va a ver.');
+    c.estado='RECHAZADO'; c.motivo=`Rechazado por ${nombreEmp(u.empresaId)}: ${mot}`;
+    registrar('CIRCUITO_RECHAZADO',u.id,{circuito:c.id},`${c.codigo} · ${c.motivo}`); flash('warn',`Rechazaste ${c.codigo}`,'No llega al inspector. El laboratorio puede proponer otro.'); await commit();
+  },
+  async tomarCir(d){
+    const c=cir(d.id), i=insDe(user()); if(c.inspectorId) return err('Otro inspector ya lo tomó','');
+    c.inspectorId=i.id; registrar('CIRCUITO_TOMADO',user().id,{circuito:c.id},`${c.codigo} tomado por ${i.nombre}`); await commit();
+  },
+  async aprobarCir(d){
+    const c=cir(d.id), i=insDe(user()); if(c.estado!=='PENDIENTE_INSPECTOR'||c.inspectorId!==i.id) return;
+    const no=[c.labId,c.distId,c.farmId].map(emp).filter(e=>e.estado!=='HABILITADA'); if(no.length) return err('No se puede aprobar',`${no.map(e=>e.razon).join(', ')} no está habilitada (R2).`);
+    c.estado='APROBADO'; c.fechaAprob=nowISO();
+    registrar('CIRCUITO_APROBADO',user().id,{circuito:c.id},`${c.codigo} aprobado`);
+    flash('ok',`Aprobaste ${c.codigo}`,'El laboratorio ya puede armar bultos para esta farmacia. El circuito se reutiliza para todos los lotes.'); await commit();
+  },
+  async rechazarCirIns(d){
+    const c=cir(d.id), mot=val('rcir-'+d.id); if(!mot) return aviso('Escribí el motivo','');
+    c.estado='RECHAZADO'; c.motivo='Rechazado por ANMAT: '+mot; registrar('CIRCUITO_RECHAZADO',user().id,{circuito:c.id},`${c.codigo} · ${c.motivo}`); flash('warn',`Rechazaste ${c.codigo}`,mot); await commit();
+  },
+  async suspenderCir(d){ const c=cir(d.id); c.estado='SUSPENDIDO'; registrar('CIRCUITO_SUSPENDIDO',user().id,{circuito:c.id},`${c.codigo} suspendido por ANMAT`); flash('warn',`${c.codigo} quedó suspendido`,'No admite bultos nuevos; lo que ya viaja sigue.'); await commit(); },
+  async rehabilitarCir(d){
+    const c=cir(d.id); if([c.labId,c.distId,c.farmId].some(id=>emp(id).estado!=='HABILITADA')) return err('No se puede rehabilitar','Alguna de sus empresas no está habilitada.');
+    c.estado='APROBADO'; registrar('CIRCUITO_REHABILITADO',user().id,{circuito:c.id},`${c.codigo} rehabilitado`); flash('ok',`${c.codigo} vuelve a estar aprobado`,''); await commit();
+  },
+
+  /* Lotes y bultos */
+  async crearLote(d,f){
+    const u=user(), m=med(f.get('medId')), cant=parseInt(f.get('cantidad'),10), fab=f.get('fab'), venc=f.get('venc');
+    if(!m||m.labId!==u.empresaId) return err('Ese medicamento no es de tu laboratorio','');
+    if(!(cant>=1&&cant<=1000)) return err('Cantidad fuera de rango','En el prototipo un lote va de 1 a 1.000 cajas.');
+    if(!fab||!venc||venc<=fab) return err('El vencimiento tiene que ser posterior a la fabricación','');
+    if(new Date(venc+'T23:59')<HOY) return err('No se puede registrar un lote vencido','R10');
+    const max=Math.max(...S.lotes.map(l=>+l.codigo.slice(-4))), num=p4(max+1), id='lot-'+(S.lotes.length+1), codigo='L'+fab.slice(0,4)+'-'+num;
+    S.lotes.push({id,codigo,medId:m.id,labId:u.empresaId,cantidad:cant,fab,venc,estado:'PENDIENTE_LIBERACION',estadoPrevio:null,liberadoPor:null,fechaLib:null,creado:nowISO()});
+    for(let i=1;i<=cant;i++) S.unidades.push({serie:num+'S'+p6(i),loteId:id,bultoId:null,empresaId:u.empresaId,estado:'EN_LABORATORIO'});
+    registrar('LOTE_REGISTRADO',u.id,{lote:id},`${codigo} · ${m.nombre} · ${fmtN(cant)} cajas · series ${num}S000001 a ${num}S${p6(cant)}`);
+    flash('ok',`Registraste el lote ${codigo}`,`Se generaron ${fmtN(cant)} series únicas. Queda pendiente de liberación ${m.biologico?'por ANMAT (biológico)':'por tu director técnico'} (R4).`); await commit();
+  },
+  async liberarDT(d){
+    const u=user(), l=lote(d.id); if(!u.dt||l.labId!==u.empresaId||l.estado!=='PENDIENTE_LIBERACION') return;
+    if(med(l.medId).biologico) return err('No podés liberar este lote','R4: los biológicos los libera un inspector de ANMAT.');
+    if(vencido(l)) return err('No se puede liberar','El lote está vencido.');
+    l.estado='LIBERADO'; l.liberadoPor=u.id; l.fechaLib=nowISO(); S.ui.loteSel=l.id;
+    registrar('LOTE_LIBERADO',u.id,{lote:l.id},`${l.codigo} liberado por el director técnico`);
+    flash('ok',`Liberaste ${l.codigo}`,'Ahora podés armar sus bultos.'); await commit();
+  },
+  async liberar(d){
+    const l=lote(d.id), i=insDe(user()); if(l.estado!=='PENDIENTE_LIBERACION') return;
+    if(!med(l.medId).biologico) return err('Este lote lo libera el laboratorio','R4');
+    if(emp(l.labId).provincia!==i.provincia) return err('No es de tu provincia','R4: lo libera un inspector de la provincia del laboratorio.');
+    l.estado='LIBERADO'; l.liberadoPor=i.id; l.fechaLib=nowISO();
+    registrar('LOTE_LIBERADO',user().id,{lote:l.id},`${l.codigo} liberado por ANMAT (biológico)`);
+    flash('ok',`Liberaste ${l.codigo}`,'Queda firmado con tu legajo. El laboratorio ya puede armar bultos.'); await commit();
+  },
+  elegirLote(d){ S.ui.loteSel=d.id; render(); },
+  async armarBultos(d,f){
+    const u=user(), l=lote(d.lote), c=cir(f.get('circuito')), n=parseInt(f.get('n'),10), k=parseInt(f.get('k'),10);
+    if(l.estado!=='LIBERADO') return err('El lote no está liberado','R6');
+    const bl=bloqueoLote(l); if(bl) return err('No se pueden armar bultos',bl);
+    if(!c||c.estado!=='APROBADO'||c.labId!==u.empresaId) return err('El circuito no está aprobado','R6');
+    const libres=S.unidades.filter(x=>x.loteId===l.id&&!x.bultoId);
+    if(!(n>=1&&k>=1)||n*k>libres.length) return err('No alcanzan las cajas',`Pediste ${n} × ${k} = ${n*k} cajas y quedan ${libres.length} sin bulto.`);
+    const out=[];
+    for(let j=0;j<n;j++){
+      const nb=S.bultos.length+1, b={id:'b-'+nb,codigo:'BUL-'+p4(nb),loteId:l.id,circuitoId:c.id,cantidad:k,precinto:'PR-'+(48210+nb),estado:'ARMADO',ubicacionId:u.empresaId,despachoId:null,viajes:[],armado:nowISO()};
+      libres.slice(j*k,(j+1)*k).forEach(x=>x.bultoId=b.id); S.bultos.push(b); out.push(b);
+    }
+    registrar('BULTO_ARMADO',u.id,{lote:l.id,bultos:out.map(b=>b.id)},`${n} bulto${n>1?'s':''} de ${k} cajas del lote ${l.codigo}: ${out.map(b=>b.codigo).join(', ')} → ${nombreEmp(c.farmId)} (${c.codigo})`);
+    flash('ok',`Armaste ${out.map(b=>b.codigo).join(', ')}`,`Ya podés despacharlos en Viajes · tramo 1. Destino: ${nombreEmp(c.farmId)}, vía ${nombreEmp(c.distId)}`); await commit();
+  },
+
+  /* Viajes (R7, R9, R14) */
+  async crearViaje(d,f){
+    const u=user(), tramo=u.rol==='LABORATORIO'?1:2, ids=f.getAll('bultos');
+    if(!ids.length) return aviso('Elegí al menos un bulto','');
+    for(const id of ids){ const b=bul(id), bl=bloqueoBulto(b); if(bl) return err(`${b.codigo} no puede viajar`,bl+' (R10)'); if(b.despachoId) return err(`${b.codigo} ya está en otro viaje`,''); }
+    const nv=S.viajes.length+1, v={id:'v-'+nv,codigo:'VJ-'+p4(nv),tramo,origenId:u.empresaId,creadoPor:u.id,patente:f.get('patente').trim().toUpperCase(),chofer:f.get('chofer').trim(),creado:nowISO(),salida:null,estimada:f.get('estimada')?f.get('estimada')+':00':null,estado:'PROGRAMADO',bultoIds:ids};
+    S.viajes.push(v); ids.forEach(id=>{const b=bul(id); b.despachoId=v.id; b.viajes.push(v.id);});
+    const par=paradas(v).map(nombreEmp);
+    registrar('VIAJE_CREADO',u.id,{viaje:v.id,bultos:ids},`${v.codigo} · tramo ${tramo} · camión ${v.patente} · chofer ${v.chofer} · ${ids.map(id=>bul(id).codigo).join(', ')} · paradas: ${par.join(', ')}`);
+    flash('ok',`Creaste ${v.codigo} con ${ids.length} bulto${ids.length>1?'s':''}`,`Registrá la salida cuando el camión arranque. ${par.length} parada${par.length>1?'s':''}: ${par.join(', ')}`); await commit();
+  },
+  async salida(d){
+    const u=user(), v=via(d.id); if(v.estado!=='PROGRAMADO'||v.origenId!==u.empresaId) return;
+    for(const id of v.bultoIds){ const bl=bloqueoBulto(bul(id)); if(bl) return err(`${bul(id).codigo} no puede salir`,bl); }
+    v.estado='EN_TRANSITO'; v.salida=nowISO();
+    v.bultoIds.forEach(id=>{const b=bul(id); b.estado='EN_TRANSITO'; b.ubicacionId=null; unidadesDe(b).forEach(x=>x.estado='EN_TRANSITO');});
+    registrar('VIAJE_SALIDA',u.id,{viaje:v.id,bultos:v.bultoIds},`${v.codigo} salió de ${nombreEmp(v.origenId)}`);
+    flash('ok',`${v.codigo} en camino`,'Los destinos ya lo ven en su pantalla de recepción.'); await commit();
+  },
+  async lectura(d){
+    const u=user(), v=via(d.id); if(v.estado!=='EN_TRANSITO'||v.origenId!==u.empresaId) return;
+    const t=parseT(d.temp!==undefined?d.temp:val('t-'+v.id)); if(t===null||t<-30||t>60) return aviso('Ingresá una temperatura válida','Por ejemplo 5,2');
+    const bs=v.bultoIds.map(bul), m=med(lote(bs[0].loteId).medId), ls=S.lecturas.filter(x=>x.despachoId===v.id), R=RUTAS[v.tramo], lugar=R[Math.min(ls.length+1,R.length-1)];
+    S.lecturas.push({despachoId:v.id,ts:nowISO(),temp:t,lugar});
+    registrar('LECTURA_TEMPERATURA',u.id,{viaje:v.id,bultos:v.bultoIds},`${v.codigo} · ${fmtT(t)} en ${lugar} (rango ${m.tMin}–${m.tMax} °C)`,{temp:t});
+    if(t<m.tMin||t>m.tMax){
+      const enCamion=bs.filter(b=>b.estado==='EN_TRANSITO').map(b=>b.id);
+      if(!S.cuarentenas.some(c=>c.alcance==='DESPACHO'&&c.despachoId===v.id&&c.estado!=='LEVANTADA') && enCamion.length){
+        registrar('RUPTURA_FRIO','sistema',{viaje:v.id,bultos:enCamion},`${v.codigo}: ${fmtT(t)} fuera de ${m.tMin}–${m.tMax} °C en ${lugar}`);
+        abrirCuarentena('DESPACHO',{despachoId:v.id,bultoIds:enCamion,provincia:emp(v.origenId).provincia},'RUPTURA_FRIO',`${fmtT(t)} en ${lugar}`,true,'sistema');
+      }
+      flash('crit','Ruptura de cadena de frío',`${fmtT(t)} está fuera de ${m.tMin}–${m.tMax} °C. Quedaron en cuarentena solo los bultos de este camión (${enCamion.map(id=>bul(id).codigo).join(', ')}); el resto del lote sigue normal (R9).`);
+    } else flash('ok',`Lectura registrada: ${fmtT(t)}`,`Dentro de rango en ${lugar}.`);
+    await commit();
+  },
+  async robo(d){
+    const u=user(), v=via(d.id), txt=val('robo-'+d.id); if(v.estado!=='EN_TRANSITO'||v.origenId!==u.empresaId) return;
+    if(!txt) return aviso('Describí qué pasó','Por ejemplo: robo del camión en Acceso Sur, denuncia policial n.º …');
+    const bs=v.bultoIds.map(bul).filter(b=>b.estado==='EN_TRANSITO');
+    v.estado='ROBADO'; bs.forEach(b=>{b.estado='ROBADO'; unidadesDe(b).forEach(x=>x.estado='ROBADA');});
+    const n=bs.reduce((a,b)=>a+b.cantidad,0);
+    registrar('ROBO_EXTRAVIO',u.id,{viaje:v.id,bultos:bs.map(b=>b.id)},`${v.codigo} · ${bs.map(b=>b.codigo).join(', ')} · ${n} cajas marcadas como robadas · ${txt}`);
+    abrirCuarentena('DESPACHO',{despachoId:v.id,bultoIds:bs.map(b=>b.id),provincia:emp(v.origenId).provincia},'ROBO',txt,true,'sistema');
+    flash('crit',`Informaste el robo de ${v.codigo}`,`${n} cajas quedan marcadas como robadas. Si alguna aparece en una farmacia, salta una alerta (R14).`); await commit();
+  },
+
+  /* Recepción por escaneo (R8) */
+  setBulto(d){ S.ui.recCod=d.q; S.ui.recRes=null; render(); },
+  async recibir(d,f){
+    const u=user(), cod=f.get('codigo').trim().toUpperCase(), b=bulCod(cod); S.ui.recCod=cod;
+    const res=(kind,title,body)=>{S.ui.recRes={kind,title,body};};
+    if(!b){ registrar('BULTO_INEXISTENTE',u.id,{empresa:u.empresaId},`Código ${cod} escaneado en ${nombreEmp(u.empresaId)}: no existe`); res('crit','Este código no existe','Ningún laboratorio armó un bulto con ese código. Puede ser una etiqueta falsa: separalo y avisá a ANMAT.'); return commit(); }
+    if(b.estado==='RECIBIDO'){
+      const rc=S.recepciones.filter(r=>r.bultoId===b.id).pop();
+      registrar('BULTO_DUPLICADO',u.id,{bultos:[b.id]},`${b.codigo} escaneado en ${nombreEmp(u.empresaId)}, pero ya fue recibido en ${nombreEmp(rc?rc.empresaId:b.ubicacionId)}`);
+      res('crit','Este bulto ya fue recibido en otro lugar',`${b.codigo} lo recibió ${nombreEmp(rc?rc.empresaId:b.ubicacionId)} el ${fmt(rc&&rc.ts)}. Un QR repetido es una posible copia.`); return commit(); }
+    if(b.estado!=='EN_TRANSITO'||!b.despachoId){ res('warn','Este bulto no está viajando',`Estado actual: ${BUL_EST[b.estado][0]}.`); return render(); }
+    const dest=destinoEnViaje(b); if(dest!==u.empresaId){ res('crit','Este bulto no es para tu empresa',`${b.codigo} va a ${nombreEmp(dest)}. Dejalo en el camión (R8).`); return render(); }
+    const bl=bloqueoBulto(b); if(bl){ res('crit','No lo recibas',`${bl}. Separalo; lo resuelve un inspector (R10).`); return render(); }
+    const v=via(b.despachoId), m=med(lote(b.loteId).medId), t=parseT(f.get('temp')), cant=parseInt(f.get('cantidad'),10), prec=!!f.get('precinto');
+    if(t===null) { res('warn','Ingresá la temperatura al abrir el camión',''); return render(); }
+    const prob=[]; if(!prec) prob.push('precinto roto'); if(cant!==b.cantidad) prob.push(`se contaron ${cant} cajas de ${b.cantidad}`); if(t<m.tMin||t>m.tMax) prob.push(`llegó a ${fmtT(t)}, fuera de ${m.tMin}–${m.tMax} °C`);
+    const ts=nowISO();
+    if(prob.length){
+      b.estado='RECHAZADO'; b.despachoId=null; b.ubicacionId=u.empresaId;
+      S.recepciones.push({bultoId:b.id,despachoId:v.id,empresaId:u.empresaId,ts,temp:t,precinto:prec,cantidad:cant,conforme:false,motivo:prob.join(' · '),por:u.id});
+      registrar('BULTO_RECHAZADO',u.id,{viaje:v.id,bultos:[b.id],lote:b.loteId},`${b.codigo} rechazado en ${nombreEmp(u.empresaId)}: ${prob.join(' · ')}`,{temp:t});
+      abrirCuarentena('BULTO',{bultoIds:[b.id],provincia:emp(u.empresaId).provincia},'RECHAZO_RECEPCION',prob.join(' · '),true,'sistema');
+      res('crit',`Rechazaste ${b.codigo}`,`${prob.join(' · ')}. El bulto quedó en cuarentena; lo resuelve un inspector. Los demás bultos del camión no se ven afectados.`);
+    } else {
+      const fin=v.tramo===1?'EN_DEPOSITO':'RECIBIDO';
+      b.estado=fin; b.despachoId=null; b.ubicacionId=u.empresaId;
+      unidadesDe(b).forEach(x=>{x.estado=v.tramo===1?'EN_DEPOSITO':'EN_STOCK'; x.empresaId=u.empresaId;});
+      S.recepciones.push({bultoId:b.id,despachoId:v.id,empresaId:u.empresaId,ts,temp:t,precinto:true,cantidad:cant,conforme:true,motivo:null,por:u.id});
+      registrar('BULTO_RECIBIDO',u.id,{viaje:v.id,bultos:[b.id],lote:b.loteId},`${b.codigo} recibido en ${nombreEmp(u.empresaId)} a ${fmtT(t)} · precinto ${b.precinto} intacto · ${b.cantidad} cajas`,{temp:t});
+      res('ok',`Recibiste ${b.codigo}`,`${b.cantidad} cajas de ${m.nombre} pasaron a ${v.tramo===1?'tu depósito':'tu stock'}.`);
+      S.ui.recCod='';
+    }
+    if(v.bultoIds.every(id=>bul(id).estado!=='EN_TRANSITO')){ v.estado='FINALIZADO'; registrar('VIAJE_FINALIZADO','sistema',{viaje:v.id},`${v.codigo} finalizado: todos los bultos entregados o rechazados`); }
+    await commit();
+  },
+
+  /* Farmacia (R11, R13, R14) */
+  setSerie(d){ S.ui.dispSerie=d.q; S.ui.dispRes=null; render(); },
+  async dispensar(d,f){
+    const u=user(), serie=f.get('serie').trim().toUpperCase(), dni=soloDig(f.get('dni')), os=f.get('obraSocial'), af=f.get('afiliado').trim(), rx=f.get('receta').trim();
+    S.ui.dispSerie=serie; const res=(k,t,b)=>{S.ui.dispRes={kind:k,title:t,body:b};};
+    const un=uni(serie);
+    if(!un){ registrar('SERIE_INEXISTENTE',u.id,{serie},`Serie ${serie} presentada en ${nombreEmp(u.empresaId)}: no existe`); res('crit','Serie inexistente: posible falsificación','No la dispenses. Quedó registrado para ANMAT.'); return commit(); }
+    const l=lote(un.loteId);
+    if(un.estado==='ROBADA'){ registrar('SERIE_ROBADA',u.id,{lote:l.id,serie},`Serie ${serie}, robada, presentada en ${nombreEmp(u.empresaId)}`); res('crit','Esta caja fue informada como robada','No la dispenses. Quedó registrado para ANMAT (R14).'); return commit(); }
+    if(un.estado==='DISPENSADA'){ const p=S.dispensaciones.find(x=>x.serie===serie&&!x.anulada);
+      registrar('INTENTO_DUPLICADO',u.id,{lote:l.id,serie},`Serie ${serie} ya dispensada el ${fmt(p.ts)} en ${nombreEmp(p.farmId)}`);
+      res('crit','Esta serie ya fue dispensada',`Se entregó el ${fmt(p.ts)} en ${nombreEmp(p.farmId)}. Otra caja con la misma serie es una posible copia (R11).`); return commit(); }
+    if(un.empresaId!==u.empresaId||un.estado!=='EN_STOCK'){ res('crit','Esta caja no está en tu stock',un.estado==='DEVUELTA'?'Fue devuelta.':`Está en ${nombreEmp(un.empresaId)} (${UNI_EST[un.estado][0].toLowerCase()}).`); return render(); }
+    const bl=bloqueoUnidad(un); if(bl){ res('crit','No se puede dispensar',bl+' (R10).'); return render(); }
+    if(dni&&(dni.length<7||dni.length>8)){ res('warn','DNI inválido','Tiene que tener 7 u 8 dígitos, o dejalo vacío.'); return render(); }
+    const part=os.startsWith('Particular'); if(!part&&!af){ res('warn','Falta el número de afiliado','Con obra social el afiliado es obligatorio (R13).'); return render(); }
+    un.estado='DISPENSADA'; const id='dis-'+(S.dispensaciones.length+1);
+    S.dispensaciones.push({id,serie,farmId:u.empresaId,dni,obraSocial:os,afiliado:part?'':af,receta:rx,ts:nowISO(),anulada:false});
+    registrar('DISPENSACION',u.id,{lote:l.id,serie},`Serie ${serie} · ${os}${dni?' · DNI '+maskDni(dni):''}`);
+    res('ok',`Dispensaste la serie ${serie}`,`${med(l.medId).nombre} · ${os}. En la cadena el DNI queda enmascarado.`); S.ui.dispSerie=''; await commit();
+  },
+  async anular(d){
+    const u=user(), x=S.dispensaciones.find(y=>y.id===d.id); if(!x||x.anulada||x.farmId!==u.empresaId) return;
+    if(Date.now()-new Date(x.ts).getTime()>2*HORA){ S.ui.dispRes={kind:'crit',title:'Ya no se puede anular',body:'Pasaron más de 2 horas (R11).'}; return render(); }
+    x.anulada=true; uni(x.serie).estado='EN_STOCK';
+    registrar('ANULACION_DISPENSA',u.id,{lote:uni(x.serie).loteId,serie:x.serie},`Serie ${x.serie} vuelve al stock`);
+    S.ui.dispRes={kind:'ok',title:`Anulaste la dispensación de ${x.serie}`,body:'La caja volvió a tu stock. El evento original sigue en la cadena (R12).'}; await commit();
+  },
+  async devolver(d,f){
+    const u=user(), serie=f.get('serie').trim().toUpperCase(), un=uni(serie), mot=f.get('motivo');
+    if(!un||un.empresaId!==u.empresaId||un.estado!=='EN_STOCK') return aviso('Esa serie no está en tu stock','Solo se devuelven cajas recibidas y sin dispensar.');
+    un.estado='DEVUELTA'; registrar('DEVOLUCION',u.id,{lote:un.loteId,serie},`Serie ${serie} devuelta · ${mot}`);
+    flash('ok',`Devolviste la serie ${serie}`,`Motivo: ${mot}. No vuelve a dispensarse (R14).`); await commit();
+  },
+
+  /* Inspector: cuarentenas (R12) */
+  async cuarentenaLote(d){
+    const l=lote(d.id), mot=val('cm-'+d.id), txt=val('ct-'+d.id); if(!txt) return aviso('Escribí el motivo de la cuarentena','');
+    const c=abrirCuarentena('LOTE',{loteId:l.id,provincia:emp(l.labId).provincia},mot,txt,false,user().id); c.inspectorId=insDe(user()).id;
+    const n=S.unidades.filter(x=>x.loteId===l.id&&!['DISPENSADA','ROBADA','DEVUELTA'].includes(x.estado)).length;
+    flash('warn',`${l.codigo} está en cuarentena`,`Se bloquearon ${fmtN(n)} cajas del lote, estén en el laboratorio, en camiones, en depósitos o en farmacias.`); await commit();
+  },
+  async levantar(d){
+    const c=S.cuarentenas.find(x=>x.id===d.id), dic=val('dic-'+d.id); if(!dic) return aviso('Escribí el dictamen','Es obligatorio y queda en la cadena.');
+    if(c.motivo==='RUPTURA_FRIO') return err('No se puede levantar','R9: tras una ruptura de frío solo cabe el recall.');
+    c.estado='LEVANTADA'; c.dictamen=dic; c.fin=nowISO(); c.inspectorId=insDe(user()).id;
+    if(c.alcance==='LOTE'){ const l=lote(c.loteId); l.estado=l.estadoPrevio||'LIBERADO'; }
+    registrar('CUARENTENA_LEVANTADA',user().id,{cuarentena:c.id,lote:c.loteId||undefined,bultos:c.bultoIds},`${c.id} levantada · ${dic}`);
+    flash('ok',`Levantaste ${c.id}`,'Lo que estaba bloqueado vuelve a circular.'); await commit();
+  },
+  async recall(d){
+    const c=S.cuarentenas.find(x=>x.id===d.id), dic=val('dic-'+d.id); if(!dic) return aviso('Escribí el dictamen','Un recall es definitivo.');
+    c.estado='CONVERTIDA_EN_RECALL'; c.dictamen=dic; c.fin=nowISO(); c.inspectorId=insDe(user()).id;
+    if(c.alcance==='LOTE') lote(c.loteId).estado='RECALL';
+    registrar('RECALL',user().id,{cuarentena:c.id,lote:c.loteId||undefined,bultos:c.bultoIds},`${c.id} convertida en recall · ${objetoCua(c)} · ${dic}`);
+    flash('crit','Recall emitido',`${objetoCua(c)}. Los pacientes que verifiquen estas cajas ven “No consumir”.`); await commit();
+  },
+
+  /* Reportes */
+  async tomarRep(d){ const r=S.reportes.find(x=>x.id===d.id); r.estado='EN_INVESTIGACION'; r.inspectorId=insDe(user()).id; S.ui.repAbierto=r.id;
+    registrar('REPORTE_TOMADO',user().id,{reporte:r.id,serie:r.serie,lote:r.loteId},`${r.id} tomado por ${insDe(user()).nombre}`); await commit(); },
+  abrirRep(d){ S.ui.repAbierto=S.ui.repAbierto===d.id?null:d.id; render(); },
+  async cerrarRep(d){ const r=S.reportes.find(x=>x.id===d.id), t=val('res-'+d.id); if(!t) return aviso('Escribí la conclusión','');
+    r.estado='CERRADO'; r.conclusion=t; registrar('REPORTE_CERRADO',user().id,{reporte:r.id,serie:r.serie,lote:r.loteId},`${r.id} · ${t}`);
+    flash('ok',`Cerraste ${r.id}`,'El paciente ve la conclusión en su portal.'); await commit(); },
+
+  /* Trazabilidad y paciente */
+  verTraza(d){ if(S.sesion){ S.ui.view='traza'; } S.ui.trazaQ=d.q; S.ui.flash=null; render(); window.scrollTo(0,0); },
+  buscarTraza(d,f){ S.ui.trazaQ=f.get('q'); render(); },
+  verificarSerie(d,f){ S.ui.pacQ=f.get('q').trim().toUpperCase(); S.ui.flash=null; render(); },
+  pacSerie(d){ if(S.sesion) S.ui.view='verificar'; S.ui.pacQ=d.q; S.ui.flash=null; render(); },
+  async reportar(d,f){
+    const u=user(), un=uni(d.serie), desc=f.get('desc').trim(); if(!desc) return aviso('Contanos qué pasó','');
+    const disp=S.dispensaciones.find(x=>x.serie===d.serie&&!x.anulada), prov=disp?emp(disp.farmId).provincia:un?emp(lote(un.loteId).labId).provincia:'Mendoza';
+    const id='REP-'+(1041+S.reportes.length);
+    S.reportes.push({id,serie:d.serie,dni:u.dni,motivo:f.get('motivo'),desc,ts:nowISO(),estado:'ABIERTO',inspectorId:null,loteId:un?un.loteId:null,provincia:prov,conclusion:null});
+    registrar('REPORTE_CIUDADANO',u.id,{reporte:id,serie:d.serie,lote:un?un.loteId:undefined},`${id} · ${f.get('motivo')} · serie ${d.serie}`);
+    flash('ok',`Enviamos tu reporte ${id}`,`Lo recibe la bandeja de los inspectores de ${prov}, con el recorrido completo de la caja.`); await commit();
+  },
+
+  /* Cadena y Sepolia */
+  verTodo(){ S.ui.verTodo=!S.ui.verTodo; render(); },
+  async verificarCadena(){ await verificar(); render(); toast(S.integridad.ok?'Cadena verificada: íntegra y coincide con Sepolia':'Cadena verificada: hay una alteración'); },
+  async anclarAhora(){ await cola; const a=await anclar(); render(); toast(a?`${a.id}: eventos #${a.desde} a #${a.hasta} anclados en una transacción`:'No hay eventos nuevos'); },
+  async tamper(){
+    const cand=S.ledger.filter(b=>b.tipo==='LECTURA_TEMPERATURA'&&anclajeDe(b.n));
+    const t=cand.find(b=>b.data.temp>8&&b.data.temp<30)||cand[Math.floor(cand.length/2)];
+    S.backup=JSON.parse(JSON.stringify(S.ledger));
+    const antes=t.data.temp, nuevo=antes>8&&antes<30?5.0:+(antes+4.5).toFixed(1);
+    t.data.temp=nuevo; t.data.txt=t.data.txt.replace(fmtT(antes),fmtT(nuevo));
+    S.tamper={desc:`Se cambió la temperatura del evento #${t.n} de ${fmtT(antes)} a ${fmtT(nuevo)} directamente en la base.`};
+    await verificar(); render(); toast('Se alteró un evento guardado');
+  },
+  async tamperAvanzado(){
+    const cand=S.ledger.filter(b=>b.tipo==='LECTURA_TEMPERATURA'&&anclajeDe(b.n));
+    const t=cand[Math.floor(cand.length/2)];
+    S.backup=JSON.parse(JSON.stringify(S.ledger));
+    const antes=t.data.temp, nuevo=+(antes+4.5).toFixed(1);
+    t.data.temp=nuevo; t.data.txt=t.data.txt.replace(fmtT(antes),fmtT(nuevo));
+    for(let i=t.n-1;i<S.ledger.length;i++){ const b=S.ledger[i]; b.prev=i?S.ledger[i-1].hash:GENESIS; b.hash=await sha(cuerpo(b)); }
+    S.tamper={desc:`Se cambió el evento #${t.n} (${fmtT(antes)} → ${fmtT(nuevo)}) y se recalcularon los hashes de los eventos #${t.n} a #${S.ledger.length} para que la base parezca coherente.`};
+    await verificar(); render(); toast('Se reescribió la base de datos');
+  },
+  async restaurar(){ S.ledger=S.backup; S.backup=null; S.tamper=null; await verificar(); render(); toast('Base original restaurada'); },
+};
+
+document.addEventListener('click', e=>{
+  const t=e.target.closest('[data-act]'); if(!t||t.tagName==='FORM'||t.disabled) return;
+  if(S.tamper && !PERMITIDAS_CON_TAMPER.includes(t.dataset.act)) { e.preventDefault(); return toast('Restaurá la base en “Cadena y Sepolia” antes de seguir operando'); }
+  const fn=A[t.dataset.act]; if(fn){ e.preventDefault(); fn({...t.dataset}); }
+});
+document.addEventListener('submit', e=>{
+  const f=e.target; e.preventDefault();
+  if(S.tamper && !PERMITIDAS_CON_TAMPER.includes(f.dataset.act)) return toast('Restaurá la base en “Cadena y Sepolia” antes de seguir operando');
+  const fn=A[f.dataset.act]; if(fn) fn({...f.dataset}, new FormData(f));
+});
+
+/* reloj: cuenta regresiva de la tanda, confirmaciones y anclaje automático */
+setInterval(async ()=>{
+  if(!S||!S.proximaTanda) return;
+  let cambio=false;
+  for(const a of S.anclajes) if(a.estado==='ENVIADO'){ const c=Math.min(3,Math.floor((Date.now()-new Date(a.ts).getTime())/CONF_MS)); if(c!==a.conf){ a.conf=c; cambio=true; } if(c>=3){ a.estado='CONFIRMADO'; cambio=true; } }
+  if(Date.now()>=S.proximaTanda && !S.tamper){ await cola; const a=await anclar(); if(a){ cambio=true; toast(`Tanda automática: ${a.id} ancló los eventos #${a.desde} a #${a.hasta}`); } }
+  const cd=$('#cd'); if(cd){ const s=Math.max(0,Math.round((S.proximaTanda-Date.now())/1000)); cd.textContent=`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; }
+  if(cambio){
+    const ae=document.activeElement, escribiendo=ae&&['INPUT','TEXTAREA','SELECT'].includes(ae.tagName);
+    if(!escribiendo && S.sesion) render(); else { const i=$('#integ'); if(i) i.outerHTML=integHTML(); }
+  }
+},1000);
+
+async function boot(){
+  const {s,E}=seed(); S=s;
+  S.sesion=null; S.tamper=null; S.backup=null; S.bloque=6812340; S.integridad={ok:true,interna:null,sepolia:null,verificado:nowISO()};
+  S.ui={loginTab:'ingresar',view:null,flash:null,trazaQ:'',pacQ:'',dispRes:null,dispSerie:'',recRes:null,recCod:'',repAbierto:null,loteSel:null,verTodo:false,ejemplo:0,pcDist:'',pcFarm:''};
+  for(const e of S.empresas){ e.docNombre='habilitacion.pdf'; e.docHash=await sha(S.docs[e.id]); }
+  cola=Promise.resolve();
+  // Anclajes históricos: una tanda por día con actividad; los eventos de la última hora quedan pendientes.
+  const corte = ago(HORA);
+  let dia=null;
+  for(const [ts,tipo,actor,ref,txt,extra] of E){
+    const ex = tipo==='SOLICITUD_HABILITACION' ? {docHash:emp(ref.empresa).docHash} : extra;
+    if(dia && ts.slice(0,10)!==dia && ts<corte){ await cola; await anclarHist(S.ledger[S.ledger.length-1], dia+'T23:55:00'); }
+    registrar(tipo,actor,ref,txt,ex,ts); dia=ts.slice(0,10);
+    if(ts>=corte) dia=null;
+  }
+  await cola;
+  const pendientes=S.ledger.filter(b=>b.ts>=corte);
+  if(!pendientes.length){ await anclarHist(S.ledger[S.ledger.length-1], nowISO()); }
+  else if(S.ledger.length>pendientes.length && (S.anclajes.length?S.anclajes[S.anclajes.length-1].hasta:0) < S.ledger.length-pendientes.length) await anclarHist(S.ledger[S.ledger.length-pendientes.length-1], ago(HORA+5*MIN));
+  S.proximaTanda=Date.now()+TANDA_MS;
+  await verificar();
+}
+async function anclarHist(last, ts){
+  const ult=S.anclajes.length?S.anclajes[S.anclajes.length-1].hasta:0; if(!last||last.n<=ult) return;
+  const tx=await sha('tx|'+last.hash+'|'+ts); S.bloque+=7200+(last.n%13);
+  S.anclajes.push({id:'ANC-'+p4(S.anclajes.length+1),desde:ult+1,hasta:last.n,hash:last.hash,tx,bloque:S.bloque,ts,estado:'CONFIRMADO',conf:3});
+  S.sepolia.push({numero:last.n,hash:last.hash,tx,bloque:S.bloque,ts});
+}
+boot().then(render);
+
+</script>
