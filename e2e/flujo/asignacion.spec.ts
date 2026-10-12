@@ -1,6 +1,7 @@
 import { APIRequestContext, expect, test } from '@playwright/test';
 import { cuentaSede } from '../soporte/cuentas';
 import { ingresar } from '../soporte/ingreso';
+import { elegirOpcion } from '../soporte/selectores';
 import { contrasenaDeUnaVez, cuitUnico, dniAlAzar, glnUnico, sufijoUnico } from '../soporte/identificadores';
 
 // e2e de FLUJO: MODIFICA DATOS. Lo corre SOLO el autor, a mano (ver CLAUDE.md).
@@ -58,12 +59,12 @@ test.describe('asignación de una solicitud (tablero de la Sede)', () => {
     await solicitud.getByRole('button', { name: /Asignar/ }).click();
     const dialogo = page.getByRole('dialog');
     await expect(dialogo).toContainText(razonSocial);
-    await dialogo.getByRole('combobox', { name: 'Inspector' }).click();
-    await page.getByRole('option').first().click();
+    await elegirOpcion(page, dialogo.getByRole('combobox', { name: 'Inspector' }));
     await dialogo.getByRole('button', { name: 'Asignar', exact: true }).click();
 
     await expect(dialogo).toBeHidden();
-    await expect(page.getByText(/^Asignado a /)).toBeVisible();
+    // El texto del aviso trae un espacio al principio (plantilla de Material): por eso no se ancla con ^.
+    await expect(page.locator('.mat-mdc-snack-bar-label').getByText(/Asignado a /)).toBeVisible();
     await expect(page.locator('.pendientes li', { hasText: razonSocial })).toHaveCount(0);
   });
 

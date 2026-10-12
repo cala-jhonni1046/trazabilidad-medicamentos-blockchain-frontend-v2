@@ -1,0 +1,16 @@
+import { Locator, Page, expect } from '@playwright/test';
+
+/**
+ * Elige una opción de un `mat-select` y espera a que su panel se cierre del todo.
+ * Sin esa espera, el telón (backdrop) del panel que se está cerrando intercepta el clic siguiente.
+ *
+ * @param page Página de Playwright.
+ * @param campo El combobox del `mat-select` (por ejemplo, `dialogo.getByRole('combobox', { name: 'Inspector' })`).
+ * @param opcion Texto de la opción, o una expresión regular; si se omite, elige la primera.
+ */
+export async function elegirOpcion(page: Page, campo: Locator, opcion?: string | RegExp): Promise<void> {
+  await campo.click();
+  const opciones = page.getByRole('option');
+  await (opcion === undefined ? opciones.first() : page.getByRole('option', { name: opcion })).click();
+  await expect(page.getByRole('listbox')).toBeHidden();
+}
