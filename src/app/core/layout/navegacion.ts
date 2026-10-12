@@ -41,8 +41,21 @@ export const MENU_POR_ROL: Record<RolUsuario, readonly ElementoMenu[]> = {
     { texto: 'Reportes', ruta: '/inspector/reportes', icono: 'report' },
     { texto: 'Cadena y Sepolia', ruta: '/inspector/cadena', icono: 'verified' },
   ],
-  LABORATORIO: [{ texto: 'Inicio', ruta: RUTA_INICIO_POR_ROL.LABORATORIO, icono: 'home' }],
-  DISTRIBUIDOR: [{ texto: 'Inicio', ruta: RUTA_INICIO_POR_ROL.DISTRIBUIDOR, icono: 'home' }],
+  LABORATORIO: [
+    { texto: 'Circuitos', ruta: RUTA_INICIO_POR_ROL.LABORATORIO, icono: 'link' },
+    { texto: 'Medicamentos', ruta: '/laboratorio/medicamentos', icono: 'inventory_2' },
+    { texto: 'Lotes', ruta: '/laboratorio/lotes', icono: 'dashboard' },
+    { texto: 'Bultos', ruta: '/laboratorio/bultos', icono: 'inventory_2' },
+    { texto: 'Viajes', ruta: '/laboratorio/viajes', icono: 'local_shipping' },
+    { texto: 'Equipo', ruta: '/laboratorio/equipo', icono: 'person' },
+  ],
+  DISTRIBUIDOR: [
+    { texto: 'Circuitos', ruta: RUTA_INICIO_POR_ROL.DISTRIBUIDOR, icono: 'link' },
+    { texto: 'Recibir bultos', ruta: '/distribuidora/recepcion', icono: 'inventory_2' },
+    { texto: 'Depósito', ruta: '/distribuidora/deposito', icono: 'domain' },
+    { texto: 'Viajes', ruta: '/distribuidora/viajes', icono: 'local_shipping' },
+    { texto: 'Equipo', ruta: '/distribuidora/equipo', icono: 'person' },
+  ],
   FARMACIA: [{ texto: 'Inicio', ruta: RUTA_INICIO_POR_ROL.FARMACIA, icono: 'home' }],
   PACIENTE: [{ texto: 'Inicio', ruta: RUTA_INICIO_POR_ROL.PACIENTE, icono: 'home' }],
 };

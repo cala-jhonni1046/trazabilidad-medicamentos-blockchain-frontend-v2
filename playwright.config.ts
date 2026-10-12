@@ -28,6 +28,7 @@ export default defineConfig({
     locale: 'es-AR',
     timezoneId: 'America/Argentina/Buenos_Aires',
     trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 });

@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { Page, expect, test } from '@playwright/test';
-import { cuentaFarmacia, cuentaInspector, cuentaSede } from '../soporte/cuentas';
+import { cuentaDistribuidora, cuentaFarmacia, cuentaInspector, cuentaLaboratorio, cuentaSede } from '../soporte/cuentas';
 import { ingresar } from '../soporte/ingreso';
 import { GTIN_DEMO, SERIE_DEMO, verificarCaja } from '../soporte/verificacion';
 
@@ -77,6 +77,25 @@ for (const modo of MODOS) {
       await sinViolaciones(page);
       await page.goto('/inspector/lotes');
       await expect(page.locator('mc-tarjeta', { hasText: 'Lotes' }).first().locator('tbody tr').first()).toBeVisible({ timeout: 20_000 });
+      await sinViolaciones(page);
+    });
+
+    test('Laboratorio: lotes y bultos', async ({ page }) => {
+      await ingresar(page, cuentaLaboratorio());
+      await page.goto('/laboratorio/lotes');
+      await expect(page.locator('tbody tr').first()).toBeVisible({ timeout: 20_000 });
+      await sinViolaciones(page);
+      await page.goto('/laboratorio/bultos');
+      await expect(page.getByRole('heading', { name: 'Armar un bulto' })).toBeVisible();
+      await expect(page.locator('main').getByText('Buscando lotes y circuitos…')).toHaveCount(0, { timeout: 20_000 });
+      await sinViolaciones(page);
+    });
+
+    test('Distribuidora: recepción', async ({ page }) => {
+      await ingresar(page, cuentaDistribuidora());
+      await page.goto('/distribuidora/recepcion');
+      await expect(page.getByRole('heading', { name: 'Escanear un bulto' })).toBeVisible();
+      await expect(page.locator('main').getByText('Cargando…')).toHaveCount(0, { timeout: 20_000 });
       await sinViolaciones(page);
     });
 

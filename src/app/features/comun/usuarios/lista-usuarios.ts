@@ -38,6 +38,8 @@ export class ListaUsuarios {
   readonly conMarcasDeEmpresa = input(false);
   /** Texto del botón de alta. */
   readonly textoAlta = input('Crear usuario');
+  /** Si se ofrece el botón de alta (la API igual decide quién puede crear). */
+  readonly puedeCrear = input(true);
 
   protected readonly rotuloRol = ROTULO_ROL;
   protected readonly datosAlta = computed<DatosDialogoNuevoUsuario>(() => ({

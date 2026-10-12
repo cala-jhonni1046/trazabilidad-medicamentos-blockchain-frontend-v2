@@ -1,0 +1,49 @@
+<mc-tarjeta titulo="Armar un viaje" [detalle]="estadoBultos() === 'ARMADO' ? 'Bultos armados, hacia una distribuidora' : 'Bultos de tu depósito, hacia una o más farmacias'">
+  @if (cargando()) {
+    <p role="status">Buscando bultos…</p>
+  } @else if (!hayElegibles()) {
+    <p class="secundario" role="status">
+      {{ estadoBultos() === 'ARMADO' ? 'No tenés bultos armados sin viaje. Armalos en "Bultos".' : 'No hay bultos en tu depósito para despachar.' }}
+    </p>
+    <mc-error-api [error]="errorGeneral()" />
+  } @else {
+    <form novalidate (submit)="enviar($event)">
+      <mc-error-api [error]="errorGeneral()" />
+      <fieldset class="bultos-conjunto">
+        <legend>Bultos del viaje</legend>
+        <ul class="bultos">
+          @for (e of elegibles(); track e.bulto.id) {
+            <li>
+              <mat-checkbox [checked]="elegidos().has(e.bulto.codigo)" (change)="alternar(e.bulto.codigo, $event.checked)">
+                <code>{{ e.bulto.codigo }}</code> · {{ e.bulto.cantidad }} cajas · para {{ e.destino }}
+              </mat-checkbox>
+            </li>
+          }
+        </ul>
+        @if (sinBultosElegidos()) {
+          <p class="falla" role="alert">Elegí al menos un bulto.</p>
+        }
+      </fieldset>
+      <div class="campos">
+        <mat-form-field>
+          <mat-label>Patente del camión</mat-label>
+          <input matInput autocomplete="off" [formField]="formulario.patente" />
+          @for (e of formulario.patente().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Chofer</mat-label>
+          <input matInput autocomplete="off" [formField]="formulario.chofer" />
+          @for (e of formulario.chofer().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Entrega estimada (hora de Argentina)</mat-label>
+          <input matInput type="datetime-local" [formField]="formulario.fechaEstimada" />
+          @for (e of formulario.fechaEstimada().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+        </mat-form-field>
+      </div>
+      <button mat-flat-button type="submit" [disabled]="formulario().submitting()">
+        {{ formulario().submitting() ? 'Creando…' : 'Crear viaje' }}
+      </button>
+    </form>
+  }
+</mc-tarjeta>

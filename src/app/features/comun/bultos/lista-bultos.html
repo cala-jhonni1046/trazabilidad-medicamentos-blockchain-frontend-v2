@@ -1,0 +1,49 @@
+<mc-tarjeta [titulo]="titulo()" [detalle]="lista.total() + ' en total'">
+  @if (modo() === 'laboratorio') {
+    <div class="mc-barra">
+      <mc-filtro-estado [opciones]="opciones" [valor]="lista.filtro()" (cambio)="lista.filtrarPor($event)" />
+    </div>
+  }
+
+  @if (lista.error(); as error) {
+    <mc-error-api [error]="error" />
+    <div><button mat-stroked-button type="button" (click)="lista.recargar()">Reintentar</button></div>
+  } @else if (lista.vacia()) {
+    <p class="mc-vacio">{{ modo() === 'deposito' ? 'El depósito está vacío.' : 'No hay bultos con ese filtro.' }}</p>
+  } @else {
+    <div class="mc-tabla" tabindex="0" role="region" [attr.aria-label]="titulo()">
+      <table>
+        <thead>
+          <tr><th>Bulto</th><th>Lote</th><th>Cajas</th><th>Farmacia de destino</th><th>Estado</th>@if (esLaboratorio()) { <th>Acciones</th> }</tr>
+        </thead>
+        <tbody>
+          @for (v of lista.elementos(); track v.bulto.id) {
+            @let b = v.bulto;
+            <tr>
+              <td><code>{{ b.codigo }}</code><span class="secundario">Precinto {{ b.precinto }}</span></td>
+              <td><code>{{ v.lote }}</code></td>
+              <td>{{ b.cantidad }}</td>
+              <td>{{ v.destino }}</td>
+              <td>
+                <mc-estado [presentacion]="presentacion[b.estado]" />
+                @if (b.bloqueado && b.mensajeBloqueo) {
+                  <span class="secundario">Bloqueado: {{ b.mensajeBloqueo }}</span>
+                }
+              </td>
+              @if (esLaboratorio()) {
+                <td>
+                  <div class="mc-acciones">
+                    @if (b.estado === 'ARMADO' && (b.viajeActualId ?? null) === null) {
+                      <button mat-stroked-button type="button" [disabled]="ocupada()" (click)="desarmar(v)">Desarmar<span class="mc-solo-lectores"> {{ b.codigo }}</span></button>
+                    }
+                  </div>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <mat-paginator [length]="lista.total()" [pageSize]="lista.tamano()" [pageIndex]="lista.paginaActual()" [pageSizeOptions]="[10, 20, 50]" (page)="cambiarPagina($event)" [attr.aria-label]="'Página de ' + titulo().toLowerCase()" />
+  }
+</mc-tarjeta>

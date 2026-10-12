@@ -51,8 +51,8 @@ describe('rutas de la aplicación', () => {
     await navegacion.navigateByUrl('/');
 
     expect(urlActual()).toBe(RUTA_INICIO_POR_ROL[rol]);
-    // La Sede aterriza en su tablero y el inspector en su bandeja; los demás roles, en el inicio provisorio.
-    const esperado = { SEDE_CENTRAL: 'Resumen', INSPECTOR: 'Pendientes de tu acción' }[rol as 'SEDE_CENTRAL' | 'INSPECTOR'] ?? 'Hola, Ana Prueba';
+    // Cada rol aterriza en su primera pantalla; los que todavía no la tienen, en el inicio provisorio.
+    const esperado = ({ SEDE_CENTRAL: 'Resumen', INSPECTOR: 'Pendientes de tu acción', LABORATORIO: 'Circuitos', DISTRIBUIDOR: 'Circuitos' } as Partial<Record<string, string>>)[rol] ?? 'Hola, Ana Prueba';
     expect(navegacion.routeNativeElement?.textContent).toContain(esperado);
   });
 

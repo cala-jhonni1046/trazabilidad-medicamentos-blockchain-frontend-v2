@@ -1,6 +1,8 @@
 import {
   ESTADO_ANCLAJE,
   ESTADO_AUDITORIA,
+  ESTADO_BULTO,
+  ESTADO_DESPACHO,
   ESTADO_CUARENTENA,
   ESTADO_ENLACE_CUIT,
   ESTADO_HABILITACION,
@@ -12,7 +14,10 @@ import {
 import { ICONOS } from '../ui/iconos';
 import {
   PRESENTACION_ESTADO_ANCLAJE,
+  PRESENTACION_ESTADO_BULTO,
   PRESENTACION_ESTADO_CIRCUITO,
+  PRESENTACION_ESTADO_VIAJE,
+  PRESENTACION_RECEPCION,
   PRESENTACION_ESTADO_CUARENTENA,
   PRESENTACION_ESTADO_INSPECTOR,
   PRESENTACION_ESTADO_LOTE,
@@ -91,6 +96,8 @@ describe('catálogo: resto de los estados', () => {
     ['EstadoCuarentena', ESTADO_CUARENTENA, PRESENTACION_ESTADO_CUARENTENA],
     ['EstadoAuditoria', ESTADO_AUDITORIA, PRESENTACION_ESTADO_REPORTE],
     ['EstadoVerificacionBlockchain', ESTADO_VERIFICACION_BLOCKCHAIN, PRESENTACION_ESTADO_VERIFICACION_BLOCKCHAIN],
+    ['EstadoBulto', ESTADO_BULTO, PRESENTACION_ESTADO_BULTO],
+    ['EstadoDespacho', ESTADO_DESPACHO, PRESENTACION_ESTADO_VIAJE],
   ] as const;
 
   it.each(catalogos)('%s: cada valor del contrato tiene texto, tono e ícono existente', (_nombre, valores, catalogo) => {
@@ -116,5 +123,23 @@ describe('catálogo: resto de los estados', () => {
       { valor: 'ACTIVO', texto: 'Activo' },
       { valor: 'BAJA', texto: 'Baja' },
     ]);
+  });
+});
+
+describe('catálogo: bultos, viajes y recepciones', () => {
+  it('ROBADO y RECHAZADO son críticos; EN_TRANSITO en tránsito; RECIBIDO y FINALIZADO correctos', () => {
+    expect(PRESENTACION_ESTADO_BULTO.ROBADO.tono).toBe('critico');
+    expect(PRESENTACION_ESTADO_BULTO.RECHAZADO.tono).toBe('critico');
+    expect(PRESENTACION_ESTADO_BULTO.EN_TRANSITO.tono).toBe('transito');
+    expect(PRESENTACION_ESTADO_BULTO.RECIBIDO.tono).toBe('correcto');
+    expect(PRESENTACION_ESTADO_VIAJE.ROBADO.tono).toBe('critico');
+    expect(PRESENTACION_ESTADO_VIAJE.FINALIZADO.tono).toBe('correcto');
+    expect(PRESENTACION_ESTADO_VIAJE.CANCELADO.tono).toBe('neutro');
+  });
+
+  it('la recepción conforme es correcta y la rechazada, crítica, con ícono existente', () => {
+    expect(PRESENTACION_RECEPCION.conforme.tono).toBe('correcto');
+    expect(PRESENTACION_RECEPCION.rechazada.tono).toBe('critico');
+    expect(ICONOS[PRESENTACION_RECEPCION.rechazada.icono]).toContain('<svg');
   });
 });

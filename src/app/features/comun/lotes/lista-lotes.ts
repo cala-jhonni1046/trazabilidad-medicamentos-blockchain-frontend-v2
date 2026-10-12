@@ -52,6 +52,7 @@ export class ListaLotes {
   protected readonly presentacion = PRESENTACION_ESTADO_LOTE;
   protected readonly opciones = opcionesDeEstado(ESTADO_LOTE, PRESENTACION_ESTADO_LOTE);
   protected readonly esInspector = computed(() => this.sesion.sesion()?.rol === 'INSPECTOR');
+  protected readonly esDirectorTecnico = computed(() => this.sesion.sesion()?.rol === 'LABORATORIO' && this.sesion.sesion()?.esDirectorTecnico === true);
 
   protected readonly lista = new ListaPaginada<LoteVista, EstadoLote | null>(null, ({ pagina, tamano, filtro }) => {
     const parametros = { page: pagina, size: tamano };
@@ -63,6 +64,11 @@ export class ListaLotes {
   });
 
   protected readonly ocupada = signal(false);
+
+  /** Refresca el listado desde afuera (por ejemplo, después de registrar un lote). */
+  recargar(): void {
+    this.lista.recargar();
+  }
 
   protected cambiarPagina(evento: PageEvent): void {
     this.lista.irA(evento.pageIndex, evento.pageSize);

@@ -15,6 +15,7 @@ import edit from '@material-symbols/svg-400/outlined/edit.svg';
 import error from '@material-symbols/svg-400/outlined/error.svg';
 import help from '@material-symbols/svg-400/outlined/help.svg';
 import home from '@material-symbols/svg-400/outlined/home.svg';
+import inventory2 from '@material-symbols/svg-400/outlined/inventory_2.svg';
 import lightMode from '@material-symbols/svg-400/outlined/light_mode.svg';
 import link from '@material-symbols/svg-400/outlined/link.svg';
 import localShipping from '@material-symbols/svg-400/outlined/local_shipping.svg';
@@ -28,6 +29,7 @@ import refresh from '@material-symbols/svg-400/outlined/refresh.svg';
 import report from '@material-symbols/svg-400/outlined/report.svg';
 import schedule from '@material-symbols/svg-400/outlined/schedule.svg';
 import search from '@material-symbols/svg-400/outlined/search.svg';
+import thermostat from '@material-symbols/svg-400/outlined/thermostat.svg';
 import verified from '@material-symbols/svg-400/outlined/verified.svg';
 import warning from '@material-symbols/svg-400/outlined/warning.svg';
 
@@ -47,6 +49,7 @@ export type NombreIcono =
   | 'error'
   | 'help'
   | 'home'
+  | 'inventory_2'
   | 'light_mode'
   | 'link'
   | 'local_shipping'
@@ -60,6 +63,7 @@ export type NombreIcono =
   | 'report'
   | 'schedule'
   | 'search'
+  | 'thermostat'
   | 'verified'
   | 'warning';
 
@@ -79,6 +83,7 @@ export const ICONOS: Record<NombreIcono, string> = {
   error,
   help,
   home,
+  inventory_2: inventory2,
   light_mode: lightMode,
   link,
   local_shipping: localShipping,
@@ -92,6 +97,7 @@ export const ICONOS: Record<NombreIcono, string> = {
   report,
   schedule,
   search,
+  thermostat,
   verified,
   warning,
 };

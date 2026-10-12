@@ -28,6 +28,7 @@ Frontend Angular 22 de MediChain: trazabilidad de medicamentos (ANMAT), cadena d
 - Listados: `core/listas/lista-paginada.ts` (`ListaPaginada`: página, tamaño, filtro por estado, error y vacío como signals) + `mat-paginator` en español (`proveerPaginadorEs()`) + `mc-filtro-estado`. Las tablas usan las clases globales `.mc-tabla`, `.mc-acciones` y `.mc-solo-lectores` de `_base.scss`. Cada recurso (listado, mosaico) falla por separado.
 - Acciones que modifican datos: servicios `*.acciones.ts` (providedIn root) que usan `EjecutorAcciones`: con diálogo (`DialogoAccion`: confirma, o pide motivo / fundamento / conclusión, con un selector opcional) o directas ("Tomar"). Un rechazo de la API (404, 409…) se muestra TAL CUAL con su `regla`, dentro del diálogo o en un aviso. Las acciones que se ofrecen salen del estado y del rol solo para mostrar; la API decide.
 - Capas: componente → página → `<pantalla>.datos.ts` → servicio generado → HttpClient. Los componentes NUNCA inyectan HttpClient ni servicios generados.
+- Una carga que depende de un `input()` va en un `effect` (con `untracked` para lanzarla), nunca en el constructor ni en un `queueMicrotask`: el input puede no estar asignado todavía y la pantalla se queda cargando. Lo detectó un e2e entrando por el menú.
 - Lecturas con `rxResource`; acciones devuelven `Promise<Resultado<T>>`.
 - Errores: el interceptor resuelve lo global (sin conexión, 401, 403, 5xx); 400, 404, 409 y 503 se muestran en la pantalla con `<mc-error-api>`. El código de un 409 viene en `regla`.
 

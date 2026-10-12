@@ -32,7 +32,7 @@
               </td>
               <td>
                 <div class="mc-acciones">
-                  @if (esInspector() && l.estado === 'PENDIENTE_LIBERACION') {
+                  @if ((esInspector() || esDirectorTecnico()) && l.estado === 'PENDIENTE_LIBERACION') {
                     <button mat-flat-button type="button" [disabled]="ocupada()" (click)="liberar(l)">Liberar<span class="mc-solo-lectores"> {{ l.codigo }}</span></button>
                   }
                   @if (esInspector() && l.estado === 'LIBERADO') {

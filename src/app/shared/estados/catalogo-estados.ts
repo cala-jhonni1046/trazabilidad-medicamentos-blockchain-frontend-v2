@@ -2,6 +2,8 @@ import {
   ESTADO_ANCLAJE,
   EstadoAnclaje,
   EstadoAuditoria,
+  EstadoBulto,
+  EstadoDespacho,
   EstadoCuarentena,
   EstadoEnlaceCuit,
   EstadoHabilitacion,
@@ -129,3 +131,32 @@ export function opcionesDeEstado<E extends string>(
 ): readonly OpcionFiltro<E>[] {
   return valores.map((valor) => ({ valor, texto: catalogo[valor].texto }));
 }
+
+/**
+ * Bulto: RECIBIDO correcto; RECHAZADO y ROBADO críticos; EN_TRANSITO en tránsito;
+ * ARMADO, EN_DEPOSITO y DESARMADO neutros.
+ */
+export const PRESENTACION_ESTADO_BULTO: Record<EstadoBulto, PresentacionEstado> = {
+  ARMADO: { texto: 'Armado', tono: 'neutro', icono: 'inventory_2' },
+  EN_TRANSITO: { texto: 'En tránsito', tono: 'transito', icono: 'local_shipping' },
+  EN_DEPOSITO: { texto: 'En depósito', tono: 'neutro', icono: 'domain' },
+  RECIBIDO: { texto: 'Recibido', tono: 'correcto', icono: 'check_circle' },
+  RECHAZADO: { texto: 'Rechazado', tono: 'critico', icono: 'cancel' },
+  ROBADO: { texto: 'Robado', tono: 'critico', icono: 'report' },
+  DESARMADO: { texto: 'Desarmado', tono: 'neutro', icono: 'block' },
+};
+
+/** Viaje: FINALIZADO correcto; ROBADO crítico; EN_TRANSITO en tránsito; PROGRAMADO y CANCELADO neutros. */
+export const PRESENTACION_ESTADO_VIAJE: Record<EstadoDespacho, PresentacionEstado> = {
+  PROGRAMADO: { texto: 'Programado', tono: 'neutro', icono: 'schedule' },
+  EN_TRANSITO: { texto: 'En tránsito', tono: 'transito', icono: 'local_shipping' },
+  FINALIZADO: { texto: 'Finalizado', tono: 'correcto', icono: 'check_circle' },
+  ROBADO: { texto: 'Robado', tono: 'critico', icono: 'report' },
+  CANCELADO: { texto: 'Cancelado', tono: 'neutro', icono: 'cancel' },
+};
+
+/** Resultado de una recepción: lo decide el servidor (`conforme`). */
+export const PRESENTACION_RECEPCION: Record<'conforme' | 'rechazada', PresentacionEstado> = {
+  conforme: { texto: 'Conforme', tono: 'correcto', icono: 'check_circle' },
+  rechazada: { texto: 'Rechazada', tono: 'critico', icono: 'cancel' },
+};

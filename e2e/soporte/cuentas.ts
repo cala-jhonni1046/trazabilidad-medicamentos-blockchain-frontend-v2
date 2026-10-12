@@ -69,9 +69,9 @@ export function cuentaSede(): Cuenta {
 export const cuentaInspector = (): Cuenta =>
   cuentaDemo('INSPECTOR', 'inspector.mendoza@medichain.demo', 'Inspector ANMAT', '/inspector', 'Bandeja', 'Pendientes de tu acción');
 export const cuentaLaboratorio = (): Cuenta =>
-  cuentaDemo('LABORATORIO', 'admin@laboratorio-andino.demo', 'Laboratorio', '/laboratorio');
+  cuentaDemo('LABORATORIO', 'admin@laboratorio-andino.demo', 'Laboratorio', '/laboratorio', 'Circuitos', 'Circuitos');
 export const cuentaDistribuidora = (): Cuenta =>
-  cuentaDemo('DISTRIBUIDOR', 'admin@distribuidora-piedemonte.demo', 'Distribuidora', '/distribuidora');
+  cuentaDemo('DISTRIBUIDOR', 'admin@distribuidora-piedemonte.demo', 'Distribuidora', '/distribuidora', 'Circuitos', 'Circuitos');
 export const cuentaFarmacia = (): Cuenta =>
   cuentaDemo('FARMACIA', 'admin@farmacia-cerroarco.demo', 'Farmacia', '/farmacia');
 export const cuentaPaciente = (): Cuenta =>

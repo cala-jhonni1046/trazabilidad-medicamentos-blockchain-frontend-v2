@@ -1,8 +1,10 @@
 <mc-tarjeta [titulo]="titulo()" [detalle]="lista.total() + ' en total'">
-  <div class="mc-barra">
-    <span></span>
-    <button mat-flat-button type="button" (click)="crear()"><mc-icono nombre="add" />{{ textoAlta() }}</button>
-  </div>
+  @if (puedeCrear()) {
+    <div class="mc-barra">
+      <span></span>
+      <button mat-flat-button type="button" (click)="crear()"><mc-icono nombre="add" />{{ textoAlta() }}</button>
+    </div>
+  }
 
   @if (lista.error(); as error) {
     <mc-error-api [error]="error" />

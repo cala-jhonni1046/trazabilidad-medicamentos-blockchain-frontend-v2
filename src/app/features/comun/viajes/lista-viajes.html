@@ -1,0 +1,72 @@
+<mc-tarjeta titulo="Viajes" [detalle]="lista.total() + ' en total'">
+  @if (lista.error(); as error) {
+    <mc-error-api [error]="error" />
+    <div><button mat-stroked-button type="button" (click)="lista.recargar()">Reintentar</button></div>
+  } @else if (lista.vacia()) {
+    <p class="mc-vacio">Todavía no hay viajes.</p>
+  } @else {
+    <div class="mc-tabla" tabindex="0" role="region" aria-label="Viajes">
+      <table>
+        <thead>
+          <tr><th>Viaje</th><th>Bultos</th><th>Camión</th><th>Entrega estimada</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          @for (v of lista.elementos(); track v.viaje.id) {
+            @let viaje = v.viaje;
+            <tr>
+              <td>
+                <strong>{{ viaje.codigo }}</strong>
+                <span class="secundario">{{ rotuloTramo[viaje.tramo] }} · sale de {{ v.origen }}</span>
+              </td>
+              <td>
+                @for (codigo of viaje.bultoCodigos; track codigo) {
+                  <code>{{ codigo }}</code>{{ $last ? '' : ' ' }}
+                }
+              </td>
+              <td>{{ viaje.patente }}<span class="secundario">{{ viaje.chofer }}</span></td>
+              <td>
+                {{ viaje.fechaEstimadaEntrega | fechaHora }}
+                @if (viaje.fechaSalida) {
+                  <span class="secundario">Salió el {{ viaje.fechaSalida | fechaHora }}</span>
+                }
+              </td>
+              <td><mc-estado [presentacion]="presentacion[viaje.estado]" /></td>
+              <td>
+                <div class="mc-acciones">
+                  @if (esOrigen(v) && viaje.estado === 'PROGRAMADO') {
+                    <button mat-flat-button type="button" [disabled]="ocupado()" (click)="salida(v)">Registrar salida<span class="mc-solo-lectores"> {{ viaje.codigo }}</span></button>
+                    <button mat-stroked-button type="button" [disabled]="ocupado()" (click)="cancelar(v)">Cancelar<span class="mc-solo-lectores"> {{ viaje.codigo }}</span></button>
+                  }
+                  @if (esOrigen(v) && viaje.estado === 'EN_TRANSITO') {
+                    <button mat-stroked-button type="button" [disabled]="ocupado()" (click)="robo(v)">Reportar robo<span class="mc-solo-lectores"> del viaje {{ viaje.codigo }}</span></button>
+                  }
+                  @if (viaje.estado !== 'PROGRAMADO' && viaje.estado !== 'CANCELADO') {
+                    <button mat-stroked-button type="button" (click)="verTemperaturas(v)">
+                      {{ temperaturas()?.id === viaje.id ? 'Ocultar temperatura' : 'Temperatura' }}<span class="mc-solo-lectores"> {{ viaje.codigo }}</span>
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+            @if (temperaturas(); as abierta) {
+              @if (abierta.id === viaje.id) {
+                <tr>
+                  <td colspan="6">
+                    @if (abierta.error; as error) {
+                      <mc-error-api [error]="error" />
+                    } @else if (abierta.lecturas; as lecturas) {
+                      <mc-grafico-temperatura [lecturas]="lecturas" />
+                    } @else {
+                      <p role="status">Cargando las lecturas…</p>
+                    }
+                  </td>
+                </tr>
+              }
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+    <mat-paginator [length]="lista.total()" [pageSize]="lista.tamano()" [pageIndex]="lista.paginaActual()" [pageSizeOptions]="[10, 20, 50]" (page)="cambiarPagina($event)" aria-label="Página de viajes" />
+  }
+</mc-tarjeta>

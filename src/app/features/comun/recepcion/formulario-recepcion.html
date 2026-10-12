@@ -1,0 +1,43 @@
+<mc-tarjeta titulo="Escanear un bulto" detalle="Solo recibe la empresa de destino, con el viaje en tránsito">
+  <form novalidate (submit)="enviar($event)">
+    <mc-error-api [error]="errorGeneral()" />
+    <div class="campos">
+      <mat-form-field>
+        <mat-label>Código del bulto</mat-label>
+        <input matInput autocomplete="off" spellcheck="false" placeholder="BUL-0001" [formField]="formulario.codigoBulto" />
+        @for (e of formulario.codigoBulto().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Cajas contadas</mat-label>
+        <input matInput inputmode="numeric" autocomplete="off" [formField]="formulario.cantidadVerificada" />
+        @for (e of formulario.cantidadVerificada().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Temperatura de llegada (°C)</mat-label>
+        <input matInput inputmode="decimal" autocomplete="off" [formField]="formulario.temperatura" />
+        @for (e of formulario.temperatura().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Observación (opcional)</mat-label>
+        <input matInput autocomplete="off" [formField]="formulario.observacion" />
+        @for (e of formulario.observacion().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+      </mat-form-field>
+    </div>
+    <p><mat-checkbox [formField]="formulario.precintoIntacto">El precinto llegó intacto</mat-checkbox></p>
+    <button mat-flat-button type="submit" [disabled]="formulario().submitting()">
+      {{ formulario().submitting() ? 'Registrando…' : 'Registrar recepción' }}
+    </button>
+  </form>
+
+  @if (ultima(); as r) {
+    <div class="resultado" role="status">
+      <p>
+        <strong>{{ r.codigoBulto }}</strong>
+        <mc-estado [presentacion]="r.conforme ? presentacion.conforme : presentacion.rechazada" />
+      </p>
+      @if (r.motivoRechazo) {
+        <p>{{ r.motivoRechazo }}</p>
+      }
+    </div>
+  }
+</mc-tarjeta>

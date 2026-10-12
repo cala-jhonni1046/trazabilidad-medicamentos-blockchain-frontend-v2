@@ -41,3 +41,11 @@ Al cerrar B12, buscar `TODO B12` y quitar cada rodeo.
     menú no tiene insignias.
 13. **`EtapaRecorridoDTO`, `AnclajeDTO.estado` y `ErrorResponseDTO.regla`:** que `regla` sea un enum
     documentado (R1–R15 y los códigos no-R). Hoy es `string` y el frontend lo muestra tal cual.
+
+## Agregados durante el Lote B (laboratorio y distribuidora)
+14. **`EmpresaResumenDTO` con campos obligatorios** (`razonSocial`, `provincia`, `id`, `cuit`, `tipo`): hoy
+    ninguno es `required` y el generador los tipea opcionales (el formulario de circuitos los trata como tales).
+15. **Viajes y recepción:** (a) `listarViajes` sin `?estado=` y sin saber cuáles bultos del viaje son de MI
+    farmacia (punto 8): "En camino hacia vos" muestra todos los códigos del viaje; (b) las temperaturas del
+    viaje se piden hasta 100 por página (un viaje largo puede tener más); (c) `listarBultos` y `listarLotes`
+    sin búsqueda por código para los formularios de armado y de viaje (se ofrecen hasta 100 elegibles).

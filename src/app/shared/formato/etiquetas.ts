@@ -5,6 +5,7 @@ import {
   Provincia,
   TipoEmpresa,
   TipoEvento,
+  TramoDespacho,
 } from '../../core/api/modelos';
 
 // Textos para mostrar de los enums "de dominio" que no son estados (los estados van en
@@ -118,4 +119,10 @@ export const ROTULO_TIPO_EVENTO: Record<TipoEvento, string> = {
   REPORTE_CIUDADANO: 'Reporte ciudadano',
   REPORTE_TOMADO: 'Reporte tomado',
   REPORTE_CERRADO: 'Reporte cerrado',
+};
+
+/** Tramo de un viaje. */
+export const ROTULO_TRAMO: Record<TramoDespacho, string> = {
+  LAB_A_DISTRIBUIDOR: 'Laboratorio → Distribuidora',
+  DISTRIBUIDOR_A_FARMACIA: 'Distribuidora → Farmacias',
 };
