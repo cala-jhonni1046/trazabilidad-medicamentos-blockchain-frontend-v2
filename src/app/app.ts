@@ -1,12 +1,11 @@
-import { Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
+/** Componente raíz: por ahora solo muestra la ruta activa (el layout llega en su paso). */
 @Component({
-  imports: [RouterOutlet],
   selector: 'mc-root',
-  styleUrl: './app.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterOutlet],
   templateUrl: './app.html',
 })
-export class App {
-  protected readonly title = signal('medichain-frontend');
-}
+export class App {}

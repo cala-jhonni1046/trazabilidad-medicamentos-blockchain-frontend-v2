@@ -1,0 +1,101 @@
+// Tokens de diseño de MediChain: la única fuente de colores, tipografías y radios.
+// Los componentes usan SOLO var(--mc-*), nunca colores escritos a mano.
+//
+// Tres bloques de color:
+//   1. :root                        → claro (por defecto).
+//   2. :root[data-theme='dark']     → oscuro elegido por la persona (TemaService).
+//   3. prefers-color-scheme: dark   → oscuro del sistema, salvo que se haya elegido claro.
+// Sin atributo data-theme (preferencia "sistema") manda el sistema operativo.
+@use 'sass:meta';
+
+/// Familias tipográficas (las usan también el tema de Material y la base).
+$fuente-titulos: ('Archivo Variable', 'Helvetica Neue', Arial, sans-serif);
+$fuente-texto: ('Source Sans 3 Variable', 'Segoe UI', system-ui, sans-serif);
+$fuente-mono: ('JetBrains Mono Variable', ui-monospace, Menlo, Consolas, monospace);
+
+/// Paleta del modo claro.
+@mixin colores-claro {
+  color-scheme: light;
+  --mc-fondo: #F4F6F8;
+  --mc-superficie: #FFFFFF;
+  --mc-superficie-2: #F8FAFB;
+  --mc-texto: #0F1B2A;
+  --mc-texto-secundario: #526070;
+  --mc-lateral: #0F1B2A;
+  --mc-borde: #D8DEE5;
+  --mc-borde-fuerte: #8A96A3;
+  // Primario: solo para acciones.
+  --mc-primario: #1B5E9E;
+  --mc-primario-suave: #E6EEF7;
+  // Texto sobre un fondo primario (botones rellenos): blanco da 6,7:1.
+  --mc-sobre-primario: #FFFFFF;
+  // Primario sobre una superficie invertida (acción de un aviso): el primario del modo oscuro.
+  --mc-primario-inverso: #6AA6E0;
+  // Tonos de estado: color (texto e ícono) y suave (fondo).
+  --mc-correcto: #157347;
+  --mc-correcto-suave: #E3F4EA;
+  --mc-atencion: #8A5300;
+  --mc-atencion-suave: #FDF1DC;
+  --mc-critico: #B42318;
+  --mc-critico-suave: #FDE7E5;
+  --mc-transito: #0E6E8C;
+  --mc-transito-suave: #E2F2F7;
+  --mc-blockchain: #6237B8;
+  --mc-blockchain-suave: #F0EBFB;
+  --mc-neutro: #475467;
+  --mc-neutro-suave: #EEF1F4;
+}
+
+/// Paleta del modo oscuro.
+@mixin colores-oscuro {
+  color-scheme: dark;
+  --mc-fondo: #0B131D;
+  --mc-superficie: #121C28;
+  --mc-superficie-2: #172231;
+  --mc-texto: #E4EAF1;
+  --mc-texto-secundario: #9AA8B8;
+  --mc-lateral: #070E16;
+  --mc-borde: #233244;
+  --mc-borde-fuerte: #64748A;
+  --mc-primario: #6AA6E0;
+  --mc-primario-suave: #12283D;
+  // Sobre el primario claro (#6AA6E0) el blanco da 2,6:1 y no alcanza AA: va el fondo oscuro (7,2:1).
+  --mc-sobre-primario: #0B131D;
+  --mc-primario-inverso: #1B5E9E;
+  --mc-correcto: #4CC38A;
+  --mc-correcto-suave: #0F2B1F;
+  --mc-atencion: #E8A93F;
+  --mc-atencion-suave: #33240C;
+  --mc-critico: #F27A6E;
+  --mc-critico-suave: #3A1714;
+  --mc-transito: #4FBFDB;
+  --mc-transito-suave: #0C2A33;
+  --mc-blockchain: #A98BEF;
+  --mc-blockchain-suave: #24183F;
+  --mc-neutro: #A3B1C2;
+  --mc-neutro-suave: #1A2532;
+}
+
+:root {
+  // meta.inspect conserva las comillas: "Source Sans 3 Variable" sin comillas no es válido en CSS.
+  --mc-fuente-titulos: #{meta.inspect($fuente-titulos)};
+  --mc-fuente-texto: #{meta.inspect($fuente-texto)};
+  --mc-fuente-mono: #{meta.inspect($fuente-mono)};
+
+  // Radios de borde, como en el prototipo.
+  --mc-radio-control: 7px;
+  --mc-radio-tarjeta: 10px;
+  --mc-radio-pastilla: 999px;
+
+  @include colores-claro;
+}
+
+:root[data-theme='dark'] {
+  @include colores-oscuro;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    @include colores-oscuro;
+  }
+}

@@ -35,6 +35,12 @@
           },
           "configurations": {
             "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/app/dev/dev.routes.ts",
+                  "with": "src/app/dev/dev.routes.produccion.ts"
+                }
+              ],
               "budgets": [
                 {
                   "type": "initial",

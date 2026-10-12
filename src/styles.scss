@@ -1,1 +1,12 @@
-/* You can add global styles to this file, and also import other style files */
+// Hoja de estilos global de MediChain. El orden importa:
+// 1. Fuentes (servidas desde node_modules con @fontsource, sin pedidos a Google).
+// 2. Tokens --mc-* (colores de claro y oscuro, tipografías, radios).
+// 3. Tema de Angular Material, que usa los tokens.
+// 4. Estilos base.
+// (Cada uno con su nombre: los tres archivos se llaman "wght" y Sass no admite nombres repetidos.)
+@use '@fontsource-variable/archivo/wght' as fuente-archivo;
+@use '@fontsource-variable/source-sans-3/wght' as fuente-source-sans;
+@use '@fontsource-variable/jetbrains-mono/wght' as fuente-jetbrains-mono;
+@use 'styles/tokens';
+@use 'styles/material';
+@use 'styles/base';

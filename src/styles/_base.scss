@@ -1,0 +1,84 @@
+// Estilos base de la aplicación: cuerpo, tipografía, foco y movimiento.
+// Solo usa tokens (var(--mc-*)).
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--mc-fondo);
+  color: var(--mc-texto);
+  font-family: var(--mc-fuente-texto);
+  font-size: 0.9375rem; // 15 px, como el prototipo
+  line-height: 1.5;
+}
+
+// Títulos con Archivo.
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-family: var(--mc-fuente-titulos);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+h3 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--mc-primario);
+}
+
+// Hashes, códigos (L2026-0415, BUL-0001) y series con JetBrains Mono.
+code,
+kbd,
+samp,
+pre,
+.mc-mono {
+  font-family: var(--mc-fuente-mono);
+  font-size: 0.85em;
+}
+
+// Foco visible solo con teclado, en todos los elementos.
+:focus-visible {
+  outline: 2px solid var(--mc-primario);
+  outline-offset: 2px;
+}
+
+// Quien pidió menos movimiento en su sistema no ve animaciones ni transiciones.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

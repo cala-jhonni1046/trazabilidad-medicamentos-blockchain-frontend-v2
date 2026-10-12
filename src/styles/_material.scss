@@ -1,0 +1,85 @@
+// Tema de Angular Material conectado a los tokens de MediChain.
+//
+// mat.theme genera las variables de sistema --mat-sys-*. Cada color que usan los
+// componentes se reemplaza por un token --mc-*, así Material cambia de modo junto con
+// el resto de la aplicación (los tokens ya cambian entre claro y oscuro).
+// La paleta azure es solo la base de lo que no se reemplaza (casi nada).
+// Ojo: mat.theme ignora sin avisar una clave que no exista; los nombres salen de
+// core/tokens/m3/_md-sys-color.scss de @angular/material.
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        theme-type: color-scheme,
+      ),
+      // Las familias van como var(): si se pasan las listas de Sass, Material les quita las
+      // comillas y "Source Sans 3 Variable" sin comillas no es una familia válida en CSS.
+      typography: (
+        plain-family: var(--mc-fuente-texto),
+        brand-family: var(--mc-fuente-titulos),
+        bold-weight: 700,
+        medium-weight: 600,
+        regular-weight: 400,
+      ),
+      // Controles más compactos que el valor por defecto, como en el prototipo.
+      density: -2,
+    ),
+    (
+      primary: var(--mc-primario),
+      on-primary: var(--mc-sobre-primario),
+      primary-container: var(--mc-primario-suave),
+      on-primary-container: var(--mc-primario),
+      inverse-primary: var(--mc-primario-inverso),
+      // Material usa "secondary" en selecciones (por ejemplo el botón elegido de un grupo).
+      secondary: var(--mc-primario),
+      on-secondary: var(--mc-sobre-primario),
+      secondary-container: var(--mc-primario-suave),
+      on-secondary-container: var(--mc-primario),
+      error: var(--mc-critico),
+      // Mismo contraste que sobre el primario: claro sobre el crítico claro, oscuro sobre el oscuro.
+      on-error: var(--mc-sobre-primario),
+      error-container: var(--mc-critico-suave),
+      on-error-container: var(--mc-critico),
+      background: var(--mc-fondo),
+      on-background: var(--mc-texto),
+      surface: var(--mc-superficie),
+      on-surface: var(--mc-texto),
+      surface-variant: var(--mc-superficie-2),
+      on-surface-variant: var(--mc-texto-secundario),
+      surface-container-lowest: var(--mc-superficie),
+      surface-container-low: var(--mc-superficie),
+      surface-container: var(--mc-superficie),
+      surface-container-high: var(--mc-superficie),
+      surface-container-highest: var(--mc-superficie-2),
+      // Superficie invertida (avisos tipo snackbar): texto como fondo y fondo como texto.
+      inverse-surface: var(--mc-texto),
+      inverse-on-surface: var(--mc-fondo),
+      outline: var(--mc-borde-fuerte),
+      outline-variant: var(--mc-borde),
+    )
+  );
+
+  // Formas: el radio del prototipo en lugar de la "pastilla" de Material 3.
+  @include mat.button-overrides(
+    (
+      filled-container-shape: var(--mc-radio-control),
+      outlined-container-shape: var(--mc-radio-control),
+      protected-container-shape: var(--mc-radio-control),
+      text-container-shape: var(--mc-radio-control),
+      tonal-container-shape: var(--mc-radio-control),
+    )
+  );
+  @include mat.form-field-overrides(
+    (
+      outlined-container-shape: var(--mc-radio-control),
+    )
+  );
+  @include mat.button-toggle-overrides(
+    (
+      shape: var(--mc-radio-control),
+    )
+  );
+}

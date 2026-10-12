@@ -1,0 +1,107 @@
+<main class="muestrario">
+  <header class="encabezado">
+    <div>
+      <h1>Muestrario de diseño</h1>
+      <p class="secundario">
+        Solo en desarrollo. Tokens, tipografía y componentes de Material en modo claro y oscuro.
+      </p>
+    </div>
+    <div class="tema">
+      <mc-selector-tema />
+      <p class="secundario">Preferencia: {{ tema.preferencia() }} · En pantalla: {{ tema.modo() }}</p>
+    </div>
+  </header>
+
+  <section class="tarjeta" aria-labelledby="titulo-colores">
+    <h2 id="titulo-colores">Superficies, texto y primario</h2>
+    <ul class="colores">
+      @for (color of colores; track color.token) {
+        <li class="color">
+          <span class="muestra" [style.background]="'var(--mc-' + color.token + ')'"></span>
+          <code>--mc-{{ color.token }}</code>
+          <span class="secundario">{{ color.uso }}</span>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <section class="tarjeta" aria-labelledby="titulo-tonos">
+    <h2 id="titulo-tonos">Tonos de estado</h2>
+    <p class="secundario">
+      Color sobre su suave (fondo de una etiqueta) y color sobre la superficie. Los estados reales llevan
+      además ícono y texto, desde el catálogo de estados.
+    </p>
+    <ul class="tonos">
+      @for (tono of tonos; track tono.clave) {
+        <li
+          class="tono"
+          [style.--tono]="'var(--mc-' + tono.clave + ')'"
+          [style.--tono-suave]="'var(--mc-' + tono.clave + '-suave)'"
+        >
+          <span class="etiqueta">{{ tono.nombre }}</span>
+          <span class="texto-tono">{{ tono.nombre }} sobre superficie</span>
+          <code>--mc-{{ tono.clave }} · --mc-{{ tono.clave }}-suave</code>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <section class="tarjeta" aria-labelledby="titulo-tipografia">
+    <h2 id="titulo-tipografia">Tipografía</h2>
+    <h1>Título 1 · Archivo</h1>
+    <h2>Título 2 · Archivo</h2>
+    <h3>Título 3 · Archivo</h3>
+    <p>
+      Texto principal en Source Sans 3: la farmacia recibió el bulto y las cajas pasaron a su stock. Ñandú,
+      acentos y diéresis: pingüino.
+    </p>
+    <p class="secundario">Texto secundario: dato complementario o ayuda.</p>
+    <p>Códigos en JetBrains Mono: <code>L2026-0415</code> · <code>BUL-0001</code> · <code>L20260415S000001</code></p>
+    <p class="hash"><code>{{ hashEjemplo }}</code></p>
+  </section>
+
+  <section class="tarjeta" aria-labelledby="titulo-material">
+    <h2 id="titulo-material">Componentes de Material</h2>
+
+    <div class="fila">
+      <button mat-flat-button type="button">Acción principal</button>
+      <button mat-stroked-button type="button">Secundaria</button>
+      <button mat-button type="button">De texto</button>
+      <button mat-flat-button type="button" disabled>Deshabilitada</button>
+      <button mat-stroked-button type="button" (click)="mostrarAviso()">Mostrar aviso</button>
+    </div>
+
+    <div class="campos">
+      <mat-form-field>
+        <mat-label>Código de lote</mat-label>
+        <input matInput placeholder="L2026-0415" />
+        <mat-hint>Hasta 12 caracteres</mat-hint>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Provincia</mat-label>
+        <mat-select>
+          <mat-option value="MENDOZA">Mendoza</mat-option>
+          <mat-option value="SAN_JUAN">San Juan</mat-option>
+          <mat-option value="SAN_LUIS">San Luis</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Campo deshabilitado</mat-label>
+        <input matInput value="No editable" disabled />
+      </mat-form-field>
+    </div>
+
+    <div class="fila">
+      <mat-checkbox>Precinto intacto</mat-checkbox>
+      <mat-slide-toggle>Particular (sin obra social)</mat-slide-toggle>
+      <mat-spinner diameter="28" aria-label="Cargando" />
+    </div>
+    <mat-progress-bar mode="indeterminate" aria-label="Cargando" />
+  </section>
+
+  <section class="tarjeta" aria-labelledby="titulo-foco">
+    <h2 id="titulo-foco">Foco con teclado</h2>
+    <p>Recorré la página con Tab: cada control muestra un contorno con el color primario.</p>
+    <p><a href="#titulo-foco">Enlace de ejemplo</a></p>
+  </section>
+</main>

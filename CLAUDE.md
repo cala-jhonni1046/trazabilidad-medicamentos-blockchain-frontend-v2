@@ -22,6 +22,7 @@ Frontend Angular 22 de MediChain: trazabilidad de medicamentos (ANMAT), cadena d
 
 ## Arquitectura (conservar siempre)
 - `core/` (api, auth, errores, nombres, tema, layout), `shared/` (estados, ui, escaner, formato), `features/<rol>/` y `features/comun/` (pantallas de varios roles).
+- `dev/`: herramientas solo de desarrollo (muestrario de diseño en `/dev`). En producción, `angular.json` reemplaza `dev.routes.ts` por `dev.routes.produccion.ts` (lista vacía) y no llegan al bundle.
 - Capas: componente → página → `<pantalla>.datos.ts` → servicio generado → HttpClient. Los componentes NUNCA inyectan HttpClient ni servicios generados.
 - Lecturas con `rxResource`; acciones devuelven `Promise<Resultado<T>>`.
 - Errores: el interceptor resuelve lo global (sin conexión, 401, 403, 5xx); 400, 404, 409 y 503 se muestran en la pantalla con `<mc-error-api>`. El código de un 409 viene en `regla`.
@@ -51,6 +52,7 @@ Frontend Angular 22 de MediChain: trazabilidad de medicamentos (ANMAT), cadena d
 - NUNCA `git add .`, `git add -A` ni `git commit -a`: agregar archivo por archivo y revisar `git diff --staged` antes de cada commit.
 - No hacer `git push`: lo hace el autor.
 - Mensajes en español: `Paso F<n>: <qué se hizo>`.
+- Numeración: desde F3, los commits van uno por delante del plan de F0 (el contrato, F2 del plan, es el commit `Paso F3`; el tema, F3 del plan, es `Paso F4`; y así). Los mensajes de commit siguen siempre la numeración de los commits.
 - Nunca a Git: `node_modules/`, `dist/`, `src/app/core/api/generado/`, `.env*`, reportes de Playwright.
 
 ## Comandos

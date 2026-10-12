@@ -1,0 +1,92 @@
+// Estilos del muestrario: solo tokens var(--mc-*).
+
+.muestrario {
+  display: grid;
+  gap: 18px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.tema {
+  display: grid;
+  gap: 6px;
+  justify-items: end;
+}
+
+.secundario {
+  color: var(--mc-texto-secundario);
+}
+
+.tarjeta {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  background: var(--mc-superficie);
+  border: 1px solid var(--mc-borde);
+  border-radius: var(--mc-radio-tarjeta);
+}
+
+.colores,
+.tonos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.color,
+.tono {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  font-size: 0.875rem;
+}
+
+.muestra {
+  height: 44px;
+  border: 1px solid var(--mc-borde);
+  border-radius: var(--mc-radio-control);
+}
+
+.etiqueta {
+  justify-self: start;
+  padding: 2px 10px;
+  border-radius: var(--mc-radio-pastilla);
+  background: var(--tono-suave);
+  color: var(--tono);
+  font-weight: 700;
+}
+
+.texto-tono {
+  color: var(--tono);
+  font-weight: 600;
+}
+
+.hash code {
+  word-break: break-all;
+  color: var(--mc-texto-secundario);
+}
+
+.fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.campos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
