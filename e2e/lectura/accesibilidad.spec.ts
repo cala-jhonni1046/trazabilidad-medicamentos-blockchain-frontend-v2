@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { Page, expect, test } from '@playwright/test';
-import { cuentaDistribuidora, cuentaFarmacia, cuentaInspector, cuentaLaboratorio, cuentaSede } from '../soporte/cuentas';
+import { cuentaDistribuidora, cuentaFarmacia, cuentaInspector, cuentaLaboratorio, cuentaPaciente, cuentaSede } from '../soporte/cuentas';
 import { ingresar } from '../soporte/ingreso';
 import { GTIN_DEMO, SERIE_DEMO, verificarCaja } from '../soporte/verificacion';
 
@@ -96,6 +96,23 @@ for (const modo of MODOS) {
       await page.goto('/distribuidora/recepcion');
       await expect(page.getByRole('heading', { name: 'Escanear un bulto' })).toBeVisible();
       await expect(page.locator('main').getByText('Cargando…')).toHaveCount(0, { timeout: 20_000 });
+      await sinViolaciones(page);
+    });
+
+    test('Farmacia: dispensar y stock', async ({ page }) => {
+      await ingresar(page, cuentaFarmacia());
+      await page.goto('/farmacia/dispensar');
+      await expect(page.getByRole('heading', { name: 'Dispensar una caja' })).toBeVisible();
+      await expect(page.locator('main').getByText('Cargando…')).toHaveCount(0, { timeout: 20_000 });
+      await sinViolaciones(page);
+      await page.goto('/farmacia/stock');
+      await expect(page.locator('tbody tr, .mc-vacio').first()).toBeVisible({ timeout: 20_000 });
+      await sinViolaciones(page);
+    });
+
+    test('Paciente: verificar y reportar', async ({ page }) => {
+      await ingresar(page, cuentaPaciente());
+      await expect(page.getByRole('heading', { name: 'Reportar un problema con una caja' })).toBeVisible();
       await sinViolaciones(page);
     });
 

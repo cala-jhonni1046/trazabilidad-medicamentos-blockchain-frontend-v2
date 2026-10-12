@@ -56,6 +56,15 @@ export const MENU_POR_ROL: Record<RolUsuario, readonly ElementoMenu[]> = {
     { texto: 'Viajes', ruta: '/distribuidora/viajes', icono: 'local_shipping' },
     { texto: 'Equipo', ruta: '/distribuidora/equipo', icono: 'person' },
   ],
-  FARMACIA: [{ texto: 'Inicio', ruta: RUTA_INICIO_POR_ROL.FARMACIA, icono: 'home' }],
-  PACIENTE: [{ texto: 'Inicio', ruta: RUTA_INICIO_POR_ROL.PACIENTE, icono: 'home' }],
+  FARMACIA: [
+    { texto: 'Circuitos', ruta: RUTA_INICIO_POR_ROL.FARMACIA, icono: 'link' },
+    { texto: 'Por recibir', ruta: '/farmacia/recepcion', icono: 'inventory_2' },
+    { texto: 'Stock', ruta: '/farmacia/stock', icono: 'domain' },
+    { texto: 'Dispensar', ruta: '/farmacia/dispensar', icono: 'person_check' },
+    { texto: 'Equipo', ruta: '/farmacia/equipo', icono: 'person' },
+  ],
+  PACIENTE: [
+    { texto: 'Verificar un medicamento', ruta: RUTA_INICIO_POR_ROL.PACIENTE, icono: 'verified' },
+    { texto: 'Mis reportes', ruta: '/paciente/reportes', icono: 'report' },
+  ],
 };

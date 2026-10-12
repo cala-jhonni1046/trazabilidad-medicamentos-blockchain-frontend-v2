@@ -1,0 +1,47 @@
+<mc-tarjeta titulo="Dispensar una caja" detalle="Escaneá el DataMatrix o escribí GTIN y serie">
+  <form novalidate (submit)="enviar($event)">
+    <mc-campo-codigo (leido)="alLeer($event)" />
+    <mc-error-api [error]="errorGeneral()" />
+    <div class="campos">
+      <mat-form-field>
+        <mat-label>GTIN</mat-label>
+        <input matInput inputmode="numeric" autocomplete="off" [formField]="formulario.gtin" />
+        @for (e of formulario.gtin().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Número de serie</mat-label>
+        <input matInput autocomplete="off" spellcheck="false" [formField]="formulario.serie" />
+        @for (e of formulario.serie().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Número de receta</mat-label>
+        <input matInput autocomplete="off" [formField]="formulario.numeroReceta" />
+        @for (e of formulario.numeroReceta().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>DNI del paciente (opcional)</mat-label>
+        <input matInput inputmode="numeric" autocomplete="off" [formField]="formulario.dni" />
+        <mat-hint>Se guarda enmascarado</mat-hint>
+        @for (e of formulario.dni().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+      </mat-form-field>
+    </div>
+    <p><mat-checkbox [formField]="formulario.particular">Particular (sin obra social)</mat-checkbox></p>
+    @if (!formulario.particular().value()) {
+      <div class="campos">
+        <mat-form-field>
+          <mat-label>Obra social o prepaga</mat-label>
+          <input matInput autocomplete="off" [formField]="formulario.obraSocial" />
+          @for (e of formulario.obraSocial().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Número de afiliado</mat-label>
+          <input matInput autocomplete="off" [formField]="formulario.numeroAfiliado" />
+          @for (e of formulario.numeroAfiliado().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+        </mat-form-field>
+      </div>
+    }
+    <button mat-flat-button type="submit" [disabled]="formulario().submitting()">
+      {{ formulario().submitting() ? 'Dispensando…' : 'Verificar y dispensar' }}
+    </button>
+  </form>
+</mc-tarjeta>

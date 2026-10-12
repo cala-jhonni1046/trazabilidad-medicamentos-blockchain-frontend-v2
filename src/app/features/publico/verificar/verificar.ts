@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, output, signal } from '@angular/core';
 import { FormField, form, required, submit, ValidationError } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -42,6 +42,9 @@ interface AvisoPegado {
 export class Verificar {
   private readonly datos = inject(VerificarDatos);
   private readonly documento = inject(DOCUMENT);
+
+  /** Se emite con el GTIN y la serie de la caja cada vez que la verificación responde (por ejemplo, para ofrecer reportarla). */
+  readonly consultada = output<{ gtin: string; serie: string }>();
 
   private readonly modelo = signal<DatosCaja>({ gtin: '', serie: '' });
 
@@ -108,6 +111,7 @@ export class Verificar {
       const respuesta = await this.datos.verificar(gtin.trim(), serie.trim());
       if (respuesta.ok) {
         this.resultado.set(respuesta.valor);
+        this.consultada.emit({ gtin: respuesta.valor.gtin, serie: respuesta.valor.serie });
         return undefined;
       }
       return this.repartirError(respuesta.error);

@@ -51,8 +51,15 @@ describe('rutas de la aplicación', () => {
     await navegacion.navigateByUrl('/');
 
     expect(urlActual()).toBe(RUTA_INICIO_POR_ROL[rol]);
-    // Cada rol aterriza en su primera pantalla; los que todavía no la tienen, en el inicio provisorio.
-    const esperado = ({ SEDE_CENTRAL: 'Resumen', INSPECTOR: 'Pendientes de tu acción', LABORATORIO: 'Circuitos', DISTRIBUIDOR: 'Circuitos' } as Partial<Record<string, string>>)[rol] ?? 'Hola, Ana Prueba';
+    // Cada rol aterriza en su primera pantalla.
+    const esperado = {
+      SEDE_CENTRAL: 'Resumen',
+      INSPECTOR: 'Pendientes de tu acción',
+      LABORATORIO: 'Circuitos',
+      DISTRIBUIDOR: 'Circuitos',
+      FARMACIA: 'Circuitos',
+      PACIENTE: 'Verificar un medicamento',
+    }[rol];
     expect(navegacion.routeNativeElement?.textContent).toContain(esperado);
   });
 

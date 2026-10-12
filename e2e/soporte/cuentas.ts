@@ -73,9 +73,9 @@ export const cuentaLaboratorio = (): Cuenta =>
 export const cuentaDistribuidora = (): Cuenta =>
   cuentaDemo('DISTRIBUIDOR', 'admin@distribuidora-piedemonte.demo', 'Distribuidora', '/distribuidora', 'Circuitos', 'Circuitos');
 export const cuentaFarmacia = (): Cuenta =>
-  cuentaDemo('FARMACIA', 'admin@farmacia-cerroarco.demo', 'Farmacia', '/farmacia');
+  cuentaDemo('FARMACIA', 'admin@farmacia-cerroarco.demo', 'Farmacia', '/farmacia', 'Circuitos', 'Circuitos');
 export const cuentaPaciente = (): Cuenta =>
-  cuentaDemo('PACIENTE', 'paciente@medichain.demo', 'Paciente', '/paciente');
+  cuentaDemo('PACIENTE', 'paciente@medichain.demo', 'Paciente', '/paciente', 'Verificar un medicamento', 'Verificar un medicamento');
 
 /** Las seis cuentas, una por rol (como funciones: así la variable se lee recién al usarla). */
 export const CUENTAS_POR_ROL: readonly (() => Cuenta)[] = [

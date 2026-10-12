@@ -25,11 +25,13 @@ import openInNew from '@material-symbols/svg-400/outlined/open_in_new.svg';
 import pauseCircle from '@material-symbols/svg-400/outlined/pause_circle.svg';
 import person from '@material-symbols/svg-400/outlined/person.svg';
 import personCheck from '@material-symbols/svg-400/outlined/person_check.svg';
+import qrCodeScanner from '@material-symbols/svg-400/outlined/qr_code_scanner.svg';
 import refresh from '@material-symbols/svg-400/outlined/refresh.svg';
 import report from '@material-symbols/svg-400/outlined/report.svg';
 import schedule from '@material-symbols/svg-400/outlined/schedule.svg';
 import search from '@material-symbols/svg-400/outlined/search.svg';
 import thermostat from '@material-symbols/svg-400/outlined/thermostat.svg';
+import undo from '@material-symbols/svg-400/outlined/undo.svg';
 import verified from '@material-symbols/svg-400/outlined/verified.svg';
 import warning from '@material-symbols/svg-400/outlined/warning.svg';
 
@@ -59,11 +61,13 @@ export type NombreIcono =
   | 'pause_circle'
   | 'person'
   | 'person_check'
+  | 'qr_code_scanner'
   | 'refresh'
   | 'report'
   | 'schedule'
   | 'search'
   | 'thermostat'
+  | 'undo'
   | 'verified'
   | 'warning';
 
@@ -93,11 +97,13 @@ export const ICONOS: Record<NombreIcono, string> = {
   pause_circle: pauseCircle,
   person,
   person_check: personCheck,
+  qr_code_scanner: qrCodeScanner,
   refresh,
   report,
   schedule,
   search,
   thermostat,
+  undo,
   verified,
   warning,
 };

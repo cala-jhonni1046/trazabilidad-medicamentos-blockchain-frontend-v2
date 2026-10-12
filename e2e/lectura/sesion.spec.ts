@@ -66,7 +66,7 @@ test.describe('sesión', () => {
     await ingresar(page, cuentaFarmacia());
 
     await expect(page.locator('mc-aviso-empresa').getByRole('status')).toContainText('suspendida');
-    await expect(page.getByRole('navigation', { name: 'Secciones' })).toContainText('Inicio');
+    await expect(page.getByRole('navigation', { name: 'Secciones' })).toContainText('Circuitos');
   });
 });
 

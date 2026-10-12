@@ -1,0 +1,44 @@
+<mc-tarjeta titulo="Reportar un problema con una caja" detalle="Lo recibe un inspector de la provincia que indiques">
+  <form novalidate (submit)="enviar($event)">
+    <mc-campo-codigo (leido)="alLeer($event)" />
+    <mc-error-api [error]="errorGeneral()" />
+    <div class="campos">
+      <mat-form-field>
+        <mat-label>GTIN</mat-label>
+        <input matInput inputmode="numeric" autocomplete="off" [formField]="formulario.gtin" />
+        @for (e of formulario.gtin().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Número de serie</mat-label>
+        <input matInput autocomplete="off" spellcheck="false" [formField]="formulario.serie" />
+        @for (e of formulario.serie().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Qué pasó</mat-label>
+        <mat-select [formField]="formulario.motivo">
+          @for (m of motivos; track m.valor) { <mat-option [value]="m.valor">{{ m.texto }}</mat-option> }
+        </mat-select>
+        @for (e of formulario.motivo().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Provincia donde la conseguiste</mat-label>
+        <mat-select [formField]="formulario.provincia">
+          @for (p of provincias; track p.valor) { <mat-option [value]="p.valor">{{ p.texto }}</mat-option> }
+        </mat-select>
+        @for (e of formulario.provincia().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+      </mat-form-field>
+    </div>
+    <mat-form-field class="ancho">
+      <mat-label>Contanos qué viste (opcional)</mat-label>
+      <textarea matInput rows="3" [formField]="formulario.descripcion"></textarea>
+      <mat-hint>Queda solo en tu reporte, nunca en el registro público</mat-hint>
+      @for (e of formulario.descripcion().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+    </mat-form-field>
+    <button mat-flat-button type="submit" [disabled]="formulario().submitting()">
+      {{ formulario().submitting() ? 'Enviando…' : 'Enviar reporte' }}
+    </button>
+  </form>
+  @if (creado(); as r) {
+    <p class="confirmacion" role="status">Reporte {{ r.codigo }} enviado. Podés seguirlo en "Mis reportes".</p>
+  }
+</mc-tarjeta>

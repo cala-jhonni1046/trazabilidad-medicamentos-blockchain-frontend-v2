@@ -1,5 +1,6 @@
 import {
   AlcanceCuarentena,
+  MotivoDevolucion,
   MotivoBloqueo,
   MotivoReporte,
   Provincia,
@@ -125,4 +126,12 @@ export const ROTULO_TIPO_EVENTO: Record<TipoEvento, string> = {
 export const ROTULO_TRAMO: Record<TramoDespacho, string> = {
   LAB_A_DISTRIBUIDOR: 'Laboratorio → Distribuidora',
   DISTRIBUIDOR_A_FARMACIA: 'Distribuidora → Farmacias',
+};
+
+/** Motivo de la devolución de una caja a la farmacia. */
+export const ROTULO_MOTIVO_DEVOLUCION: Record<MotivoDevolucion, string> = {
+  DANADA: 'Caja dañada',
+  VENCIDA: 'Vencida',
+  RETIRO_DEL_MERCADO: 'Retiro del mercado',
+  OTRO: 'Otro',
 };

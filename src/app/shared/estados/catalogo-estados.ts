@@ -9,6 +9,7 @@ import {
   EstadoHabilitacion,
   EstadoInspector,
   EstadoLote,
+  EstadoUnidad,
   EstadoVerificacion,
   EstadoVerificacionBlockchain,
 } from '../../core/api/modelos';
@@ -159,4 +160,25 @@ export const PRESENTACION_ESTADO_VIAJE: Record<EstadoDespacho, PresentacionEstad
 export const PRESENTACION_RECEPCION: Record<'conforme' | 'rechazada', PresentacionEstado> = {
   conforme: { texto: 'Conforme', tono: 'correcto', icono: 'check_circle' },
   rechazada: { texto: 'Rechazada', tono: 'critico', icono: 'cancel' },
+};
+
+/**
+ * Caja (unidad trazable): EN_STOCK correcto; DEVUELTA atención; ROBADA y RECHAZADA críticas;
+ * EN_TRANSITO en tránsito; el resto neutro.
+ */
+export const PRESENTACION_ESTADO_UNIDAD: Record<EstadoUnidad, PresentacionEstado> = {
+  EN_LABORATORIO: { texto: 'En laboratorio', tono: 'neutro', icono: 'inventory_2' },
+  EN_TRANSITO: { texto: 'En tránsito', tono: 'transito', icono: 'local_shipping' },
+  EN_DEPOSITO: { texto: 'En depósito', tono: 'neutro', icono: 'domain' },
+  EN_STOCK: { texto: 'En stock', tono: 'correcto', icono: 'check_circle' },
+  DISPENSADA: { texto: 'Dispensada', tono: 'neutro', icono: 'person_check' },
+  DEVUELTA: { texto: 'Devuelta', tono: 'atencion', icono: 'undo' },
+  ROBADA: { texto: 'Robada', tono: 'critico', icono: 'report' },
+  RECHAZADA: { texto: 'Rechazada', tono: 'critico', icono: 'cancel' },
+};
+
+/** Una dispensación está vigente o anulada (`anulada` lo informa la API). */
+export const PRESENTACION_DISPENSACION: Record<'vigente' | 'anulada', PresentacionEstado> = {
+  vigente: { texto: 'Dispensada', tono: 'correcto', icono: 'person_check' },
+  anulada: { texto: 'Anulada', tono: 'neutro', icono: 'undo' },
 };

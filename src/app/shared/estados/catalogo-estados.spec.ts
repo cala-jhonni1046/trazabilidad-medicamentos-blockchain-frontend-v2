@@ -8,13 +8,16 @@ import {
   ESTADO_HABILITACION,
   ESTADO_INSPECTOR,
   ESTADO_LOTE,
+  ESTADO_UNIDAD,
   ESTADO_VERIFICACION,
   ESTADO_VERIFICACION_BLOCKCHAIN,
 } from '../../core/api/modelos';
 import { ICONOS } from '../ui/iconos';
 import {
   PRESENTACION_ESTADO_ANCLAJE,
+  PRESENTACION_DISPENSACION,
   PRESENTACION_ESTADO_BULTO,
+  PRESENTACION_ESTADO_UNIDAD,
   PRESENTACION_ESTADO_CIRCUITO,
   PRESENTACION_ESTADO_VIAJE,
   PRESENTACION_RECEPCION,
@@ -98,6 +101,7 @@ describe('catálogo: resto de los estados', () => {
     ['EstadoVerificacionBlockchain', ESTADO_VERIFICACION_BLOCKCHAIN, PRESENTACION_ESTADO_VERIFICACION_BLOCKCHAIN],
     ['EstadoBulto', ESTADO_BULTO, PRESENTACION_ESTADO_BULTO],
     ['EstadoDespacho', ESTADO_DESPACHO, PRESENTACION_ESTADO_VIAJE],
+    ['EstadoUnidad', ESTADO_UNIDAD, PRESENTACION_ESTADO_UNIDAD],
   ] as const;
 
   it.each(catalogos)('%s: cada valor del contrato tiene texto, tono e ícono existente', (_nombre, valores, catalogo) => {
@@ -141,5 +145,20 @@ describe('catálogo: bultos, viajes y recepciones', () => {
     expect(PRESENTACION_RECEPCION.conforme.tono).toBe('correcto');
     expect(PRESENTACION_RECEPCION.rechazada.tono).toBe('critico');
     expect(ICONOS[PRESENTACION_RECEPCION.rechazada.icono]).toContain('<svg');
+  });
+});
+
+describe('catálogo: cajas y dispensaciones', () => {
+  it('ROBADA y RECHAZADA son críticas, DEVUELTA atención y EN_STOCK correcta', () => {
+    expect(PRESENTACION_ESTADO_UNIDAD.ROBADA.tono).toBe('critico');
+    expect(PRESENTACION_ESTADO_UNIDAD.RECHAZADA.tono).toBe('critico');
+    expect(PRESENTACION_ESTADO_UNIDAD.DEVUELTA.tono).toBe('atencion');
+    expect(PRESENTACION_ESTADO_UNIDAD.EN_STOCK.tono).toBe('correcto');
+  });
+
+  it('una dispensación vigente es correcta y una anulada, neutra', () => {
+    expect(PRESENTACION_DISPENSACION.vigente.tono).toBe('correcto');
+    expect(PRESENTACION_DISPENSACION.anulada.tono).toBe('neutro');
+    expect(ICONOS[PRESENTACION_DISPENSACION.anulada.icono]).toContain('<svg');
   });
 });

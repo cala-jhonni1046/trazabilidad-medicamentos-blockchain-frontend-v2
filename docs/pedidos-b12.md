@@ -49,3 +49,10 @@ Al cerrar B12, buscar `TODO B12` y quitar cada rodeo.
     farmacia (punto 8): "En camino hacia vos" muestra todos los códigos del viaje; (b) las temperaturas del
     viaje se piden hasta 100 por página (un viaje largo puede tener más); (c) `listarBultos` y `listarLotes`
     sin búsqueda por código para los formularios de armado y de viaje (se ofrecen hasta 100 elegibles).
+
+## Agregados durante el Lote C (farmacia y paciente)
+16. **Stock de la farmacia:** `listarCajas` sin `?estado=` (punto 8) ni búsqueda por serie; además cada caja trae solo
+    `loteId` y hay que pedir el lote y su medicamento para mostrar el nombre (2 pedidos con caché por caja distinta).
+    La pantalla "Stock" muestra la página con el estado de cada caja; no puede pedir "solo en stock".
+17. **Dispensaciones y reportes del paciente:** el listado de dispensaciones no tiene búsqueda ni filtro de anuladas;
+    "Mis reportes" reutiliza el listado del inspector (el paciente nunca ve la conclusión porque la API no se la manda).
