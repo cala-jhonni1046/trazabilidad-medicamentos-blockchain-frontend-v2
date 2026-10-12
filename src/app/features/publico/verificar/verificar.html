@@ -1,0 +1,53 @@
+<section class="verificar">
+  <header>
+    <h1>Verificar un medicamento</h1>
+    <p class="secundario">
+      Escaneá o escribí los datos de la caja para saber si es original y por dónde pasó. No hace falta cuenta
+      y no se pide ningún dato personal.
+    </p>
+  </header>
+
+  <form class="tarjeta" novalidate (submit)="verificar($event)">
+    <mat-form-field>
+      <mat-label>Pegar el código completo (opcional)</mat-label>
+      <input matInput autocomplete="off" spellcheck="false" (change)="leerPegado($event)" (input)="alEscribir($event)" />
+      <mat-hint>El código del DataMatrix, o "GTIN serie". Completa los dos campos de abajo.</mat-hint>
+    </mat-form-field>
+    @if (avisoPegado(); as aviso) {
+      <p class="aviso-pegado" [class.error]="!aviso.correcto" role="status">{{ aviso.texto }}</p>
+    }
+
+    <mc-error-api [error]="errorGeneral()" />
+
+    <div class="campos">
+      <mat-form-field>
+        <mat-label>GTIN</mat-label>
+        <input matInput inputmode="numeric" autocomplete="off" [formField]="formulario.gtin" />
+        <mat-hint>14 dígitos</mat-hint>
+        @for (error of formulario.gtin().errors(); track $index) {
+          <mat-error>{{ error.message }}</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Número de serie</mat-label>
+        <input matInput autocomplete="off" spellcheck="false" [formField]="formulario.serie" />
+        <mat-hint>Letras y números, hasta 20</mat-hint>
+        @for (error of formulario.serie().errors(); track $index) {
+          <mat-error>{{ error.message }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <div>
+      <button mat-flat-button type="submit" [disabled]="formulario().submitting()">
+        <mc-icono nombre="search" />{{ formulario().submitting() ? 'Verificando…' : 'Verificar' }}
+      </button>
+    </div>
+  </form>
+
+  <div class="zona-resultado" aria-live="polite">
+    @if (resultado(); as r) {
+      <mc-resultado-verificacion [resultado]="r" />
+    }
+  </div>
+</section>

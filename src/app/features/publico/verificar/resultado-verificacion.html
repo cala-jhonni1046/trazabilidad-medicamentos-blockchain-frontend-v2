@@ -1,0 +1,75 @@
+<section class="resultado" [class]="'tono-' + estado().tono" aria-labelledby="titulo-resultado">
+  <header class="cabecera">
+    <h2 id="titulo-resultado" class="titulo" tabindex="-1">
+      @if (resultado().producto) {
+        {{ resultado().producto }}
+      } @else {
+        Caja consultada
+      }
+    </h2>
+    <mc-estado [presentacion]="estado()" />
+  </header>
+
+  <p class="mensaje">{{ resultado().mensaje }}</p>
+
+  <dl class="datos">
+    @if (resultado().principioActivo) {
+      <dt>Principio activo</dt>
+      <dd>{{ resultado().principioActivo }}{{ resultado().concentracion ? ' · ' + resultado().concentracion : '' }}</dd>
+    }
+    @if (resultado().presentacion) {
+      <dt>Presentación</dt>
+      <dd>{{ resultado().presentacion }}</dd>
+    }
+    @if (resultado().laboratorio) {
+      <dt>Laboratorio</dt>
+      <dd>{{ resultado().laboratorio }}</dd>
+    }
+    @if (resultado().lote) {
+      <dt>Lote</dt>
+      <dd><code>{{ resultado().lote }}</code></dd>
+    }
+    @if (resultado().vencimiento) {
+      <dt>Vencimiento</dt>
+      <dd>{{ resultado().vencimiento | dia }}</dd>
+    }
+    <dt>GTIN</dt>
+    <dd><code>{{ resultado().gtin }}</code></dd>
+    <dt>Serie</dt>
+    <dd><code>{{ resultado().serie }}</code></dd>
+  </dl>
+
+  @if (resultado().recorrido.length > 0) {
+    <h3>Recorrido</h3>
+    <ol class="recorrido">
+      @for (etapa of resultado().recorrido; track $index) {
+        <li>
+          <span class="etapa">{{ legible(etapa.etapa) }}</span>
+          <span class="empresa">{{ etapa.empresa }}</span>
+          <span class="fecha">{{ etapa.fecha | dia }}</span>
+        </li>
+      }
+    </ol>
+  }
+
+  @if (anclaje(); as a) {
+    <h3>Registro en blockchain</h3>
+    <div class="anclaje">
+      <mc-estado [presentacion]="a.estado" />
+      @if (a.datos.red) {
+        <span>Red: {{ a.datos.red }}</span>
+      }
+      @if (a.datos.bloque !== null && a.datos.bloque !== undefined) {
+        <span>Bloque <code>{{ a.datos.bloque }}</code></span>
+      }
+      @if (a.datos.transactionHash) {
+        <span class="hash"><code>{{ a.datos.transactionHash }}</code></span>
+      }
+      @if (enlaceSeguro(); as enlace) {
+        <a [href]="enlace" target="_blank" rel="noopener noreferrer">
+          Ver en Etherscan <mc-icono nombre="open_in_new" /><span class="solo-lectores">(se abre en una pestaña nueva)</span>
+        </a>
+      }
+    </div>
+  }
+</section>

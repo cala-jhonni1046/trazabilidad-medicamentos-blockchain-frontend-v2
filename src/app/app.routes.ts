@@ -15,15 +15,20 @@ export const routes: Routes = [
   // "/": al inicio del rol, o a ingresar si no hay sesión.
   { path: '', pathMatch: 'full', redirectTo: redirigirAlInicio },
   {
-    // Pantallas públicas dentro del marco público (por ahora, solo ingresar).
-    path: 'ingresar',
-    canMatch: [invitadoGuard],
+    // Pantallas públicas, dentro del marco público. "verificar" sirve también a quien tiene sesión.
+    path: '',
     loadComponent: () => import('./core/layout/shell-publico').then((modulo) => modulo.ShellPublico),
     children: [
       {
-        path: '',
+        path: 'ingresar',
         title: 'Ingresar · MediChain',
+        canMatch: [invitadoGuard],
         loadComponent: () => import('./features/publico/ingresar/ingresar').then((modulo) => modulo.Ingresar),
+      },
+      {
+        path: 'verificar',
+        title: 'Verificar un medicamento · MediChain',
+        loadComponent: () => import('./features/publico/verificar/verificar').then((modulo) => modulo.Verificar),
       },
     ],
   },

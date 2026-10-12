@@ -1,15 +1,24 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { SesionService } from '../auth/sesion.service';
 import { SelectorTema } from '../tema/selector-tema';
 
 /** Marco de las pantallas públicas (ingreso, verificación): marca arriba y tema a la derecha. */
 @Component({
   selector: 'mc-shell-publico',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, RouterOutlet, SelectorTema],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, SelectorTema],
   template: `
     <header class="barra">
       <a class="marca" routerLink="/" aria-label="MediChain, ir al inicio">Medi<span>Chain</span></a>
+      <nav class="enlaces" aria-label="Principal">
+        <a routerLink="/verificar" routerLinkActive="activo" ariaCurrentWhenActive="page">Verificar un medicamento</a>
+        @if (sesion.autenticado()) {
+          <a routerLink="/">Volver a mi cuenta</a>
+        } @else {
+          <a routerLink="/ingresar" routerLinkActive="activo" ariaCurrentWhenActive="page">Ingresar</a>
+        }
+      </nav>
       <mc-selector-tema />
     </header>
     <main class="contenido">
@@ -41,6 +50,24 @@ import { SelectorTema } from '../tema/selector-tema';
     .marca span {
       color: var(--mc-primario);
     }
+    .enlaces {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 16px;
+      margin-right: auto;
+      margin-left: 16px;
+    }
+    .enlaces a {
+      padding: 4px 2px;
+      color: var(--mc-texto);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .enlaces a:hover,
+    .enlaces a.activo {
+      color: var(--mc-primario);
+      text-decoration: underline;
+    }
     .contenido {
       max-width: 1040px;
       margin: 0 auto;
@@ -48,4 +75,6 @@ import { SelectorTema } from '../tema/selector-tema';
     }
   `,
 })
-export class ShellPublico {}
+export class ShellPublico {
+  protected readonly sesion = inject(SesionService);
+}

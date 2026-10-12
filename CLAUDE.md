@@ -18,6 +18,7 @@ Frontend Angular 22 de MediChain: trazabilidad de medicamentos (ANMAT), cadena d
 - Código generado en `src/app/core/api/generado/` (fuera de Git): no se edita. `npm run api:generar` corre solo antes de start, build y test.
 - Cambio de contrato: `npm run api:descargar` → revisar `git diff api/openapi.json` → `npm run api:generar` → build (un valor nuevo de enum hace fallar el catálogo de estados hasta mapearlo) → tests → commit del contrato aparte.
 - El cliente generado usa `rootUrl = ''` (URLs relativas `/api/...`); nunca el `servers` del contrato.
+- Pedidos pendientes al backend (paso B12): `docs/pedidos-b12.md`. Un rodeo del frontend por algo que el contrato aún no resuelve se marca `// TODO B12: …` y se anota ahí.
 - Los campos que pueden venir `null` se generan como opcionales pero llegan como `null`: comparar con `== null` o `??`, nunca `=== undefined`.
 
 ## Arquitectura (conservar siempre)

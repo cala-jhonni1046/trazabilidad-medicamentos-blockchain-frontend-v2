@@ -3,7 +3,7 @@ import { FormField, email, form, required, submit, ValidationError } from '@angu
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { destinoDespuesDeIngresar, mensajeDeMotivo } from '../../../core/auth/destino-seguro';
 import { SesionService } from '../../../core/auth/sesion.service';
 import { ErrorApi } from '../../../core/errores/error-api';
@@ -26,7 +26,7 @@ interface DatosIngreso {
 @Component({
   selector: 'mc-ingresar',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ErrorApiComponente, FormField, MatButtonModule, MatFormFieldModule, MatInputModule],
+  imports: [ErrorApiComponente, FormField, MatButtonModule, MatFormFieldModule, MatInputModule, RouterLink],
   providers: [...proveerOpcionesMaterial()],
   templateUrl: './ingresar.html',
   styleUrl: './ingresar.scss',

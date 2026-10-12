@@ -1,0 +1,34 @@
+.verificar {
+  display: grid;
+  gap: 16px;
+  max-width: 720px;
+  margin: 8px auto 0;
+}
+
+.secundario {
+  color: var(--mc-texto-secundario);
+}
+
+.tarjeta {
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+  background: var(--mc-superficie);
+  border: 1px solid var(--mc-borde);
+  border-radius: var(--mc-radio-tarjeta);
+}
+
+.campos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0 12px;
+}
+
+.aviso-pegado {
+  color: var(--mc-correcto);
+  font-weight: 600;
+
+  &.error {
+    color: var(--mc-critico);
+  }
+}
