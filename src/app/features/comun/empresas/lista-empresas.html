@@ -1,0 +1,74 @@
+<mc-tarjeta [titulo]="titulo()" [detalle]="modo() === 'bandeja' ? lista.total() + ' pendientes' : lista.total() + ' en total'">
+  @if (modo() === 'todas') {
+    <div class="mc-barra">
+      <mc-filtro-estado [opciones]="opciones" [valor]="lista.filtro()" (cambio)="lista.filtrarPor($event)" />
+    </div>
+  }
+
+  @if (lista.error(); as error) {
+    <mc-error-api [error]="error" />
+    <div><button mat-stroked-button type="button" (click)="lista.recargar()">Reintentar</button></div>
+  } @else if (lista.vacia()) {
+    <p class="mc-vacio">{{ modo() === 'bandeja' ? 'No hay solicitudes para revisar.' : 'No hay empresas con ese filtro.' }}</p>
+  } @else {
+    <div class="mc-tabla" tabindex="0" role="region" [attr.aria-label]="titulo()">
+      <table>
+        <thead>
+          <tr><th>Empresa</th><th>Ubicación</th><th>Estado</th><th>Solicitud</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          @for (e of lista.elementos(); track e.id) {
+            <tr>
+              <td>
+                <strong>{{ e.razonSocial }}</strong>
+                <span class="secundario">{{ rotuloTipo[e.tipo] }} · CUIT {{ e.cuit }}</span>
+              </td>
+              <td>{{ e.localidad }}, {{ rotuloProvincia[e.provincia] }}</td>
+              <td>
+                <mc-estado [presentacion]="presentacion[e.estado]" />
+                @if (e.motivoRechazo) {
+                  <span class="secundario">Rechazo: {{ e.motivoRechazo }}</span>
+                }
+                @if (e.motivoSuspension) {
+                  <span class="secundario">Suspensión: {{ e.motivoSuspension }}</span>
+                }
+              </td>
+              <td>{{ e.fechaSolicitud | fechaHora }}</td>
+              <td>
+                <div class="mc-acciones">
+                  @if (esSede() || esInspector()) {
+                    <button mat-stroked-button type="button" (click)="documento(e)">
+                      <mc-icono nombre="download" />PDF<span class="mc-solo-lectores"> de {{ e.razonSocial }}</span>
+                    </button>
+                  }
+                  @if (esInspector() && e.estado === 'PENDIENTE') {
+                    @if ((e.inspectorRevisorId ?? null) === null) {
+                      <button mat-flat-button type="button" [disabled]="ocupada()" (click)="tomar(e)">Tomar<span class="mc-solo-lectores"> {{ e.razonSocial }}</span></button>
+                    } @else {
+                      <button mat-flat-button type="button" [disabled]="ocupada()" (click)="habilitar(e)">Habilitar<span class="mc-solo-lectores"> {{ e.razonSocial }}</span></button>
+                      <button mat-stroked-button type="button" [disabled]="ocupada()" (click)="rechazar(e)">Rechazar<span class="mc-solo-lectores"> {{ e.razonSocial }}</span></button>
+                    }
+                  }
+                  @if (esSede() && e.estado === 'HABILITADA') {
+                    <button mat-stroked-button type="button" [disabled]="ocupada()" (click)="suspender(e)">Suspender<span class="mc-solo-lectores"> {{ e.razonSocial }}</span></button>
+                  }
+                  @if (esSede() && e.estado === 'SUSPENDIDA') {
+                    <button mat-flat-button type="button" [disabled]="ocupada()" (click)="rehabilitar(e)">Rehabilitar<span class="mc-solo-lectores"> {{ e.razonSocial }}</span></button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <mat-paginator
+      [length]="lista.total()"
+      [pageSize]="lista.tamano()"
+      [pageIndex]="lista.paginaActual()"
+      [pageSizeOptions]="[10, 20, 50]"
+      (page)="cambiarPagina($event)"
+      [attr.aria-label]="'Página de ' + titulo().toLowerCase()"
+    />
+  }
+</mc-tarjeta>

@@ -8,7 +8,13 @@
   <ul class="mosaicos">
     @for (mosaico of datos.mosaicos(); track mosaico.clave) {
       <li>
-        <mc-mosaico [etiqueta]="mosaico.etiqueta" [valor]="mosaico.valor" [estado]="mosaico.estado" [tono]="mosaico.tono" />
+        @if (mosaico.clave === 'eventos' || mosaico.clave === 'anclajes') {
+          <a class="mosaico-enlace" routerLink="/sede/cadena">
+            <mc-mosaico [etiqueta]="mosaico.etiqueta" [valor]="mosaico.valor" [estado]="mosaico.estado" [tono]="mosaico.tono" />
+          </a>
+        } @else {
+          <mc-mosaico [etiqueta]="mosaico.etiqueta" [valor]="mosaico.valor" [estado]="mosaico.estado" [tono]="mosaico.tono" />
+        }
       </li>
     }
   </ul>

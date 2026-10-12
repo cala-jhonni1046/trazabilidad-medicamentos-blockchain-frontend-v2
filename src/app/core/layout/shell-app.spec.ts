@@ -34,7 +34,7 @@ describe('ShellApp', () => {
 
     expect(raiz.querySelector('.rol')?.textContent).toContain('Inspector ANMAT');
     expect(raiz.querySelector('.nombre')?.textContent).toContain('Paula Díaz');
-    expect(raiz.querySelector('nav a')?.textContent).toContain('Inicio');
+    expect(raiz.querySelector('nav a')?.textContent).toContain('Bandeja');
     expect(raiz.querySelector('mc-aviso-empresa [role="status"]')).toBeNull();
     http.verify();
   });

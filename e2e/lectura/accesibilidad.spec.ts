@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { Page, expect, test } from '@playwright/test';
-import { cuentaFarmacia, cuentaSede } from '../soporte/cuentas';
+import { cuentaFarmacia, cuentaInspector, cuentaSede } from '../soporte/cuentas';
 import { ingresar } from '../soporte/ingreso';
 import { GTIN_DEMO, SERIE_DEMO, verificarCaja } from '../soporte/verificacion';
 
@@ -56,6 +56,27 @@ for (const modo of MODOS) {
       await ingresar(page, cuentaSede());
       await expect(page.locator('mc-mosaico .valor').first()).toHaveText(/^\s*\d[\d.]*\s*$/);
       await expect(page.locator('mc-tarjeta').first()).toBeVisible();
+      await sinViolaciones(page);
+    });
+
+    test('Sede: inspectores y cadena', async ({ page }) => {
+      await ingresar(page, cuentaSede());
+      await page.goto('/sede/inspectores');
+      await expect(page.locator('tbody tr').first()).toBeVisible({ timeout: 20_000 });
+      await sinViolaciones(page);
+      await page.goto('/sede/cadena');
+      await expect(page.getByText('Último evento local')).toBeVisible();
+      await expect(page.locator('mc-tarjeta', { hasText: 'Eventos de la cadena' }).locator('tbody tr').first()).toBeVisible({ timeout: 20_000 });
+      await sinViolaciones(page);
+    });
+
+    test('Inspector: bandeja y lotes', async ({ page }) => {
+      await ingresar(page, cuentaInspector());
+      await expect(page.getByRole('heading', { name: 'Pendientes de tu acción' })).toBeVisible();
+      await expect(page.locator('main').getByText('Cargando…')).toHaveCount(0, { timeout: 20_000 });
+      await sinViolaciones(page);
+      await page.goto('/inspector/lotes');
+      await expect(page.locator('mc-tarjeta', { hasText: 'Lotes' }).first().locator('tbody tr').first()).toBeVisible({ timeout: 20_000 });
       await sinViolaciones(page);
     });
 

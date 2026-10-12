@@ -87,3 +87,77 @@ pre,
 .mat-icon svg {
   fill: currentColor;
 }
+
+// ---- Clases compartidas de listados (tablas, acciones, texto para lectores de pantalla) ----
+
+.mc-tabla {
+  overflow-x: auto;
+  border: 1px solid var(--mc-borde);
+  border-radius: var(--mc-radio-control);
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  th {
+    padding: 9px 12px;
+    text-align: left;
+    font-size: 0.72rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--mc-texto-secundario);
+    background: var(--mc-superficie-2);
+    border-bottom: 1px solid var(--mc-borde);
+  }
+
+  td {
+    padding: 9px 12px;
+    vertical-align: top;
+    border-bottom: 1px solid var(--mc-borde);
+  }
+
+  tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .secundario {
+    display: block;
+    color: var(--mc-texto-secundario);
+    font-size: 0.85rem;
+  }
+}
+
+.mc-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mc-vacio {
+  color: var(--mc-texto-secundario);
+}
+
+.mc-falla {
+  color: var(--mc-critico);
+  font-weight: 600;
+}
+
+.mc-barra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mc-solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

@@ -51,8 +51,9 @@ describe('rutas de la aplicación', () => {
     await navegacion.navigateByUrl('/');
 
     expect(urlActual()).toBe(RUTA_INICIO_POR_ROL[rol]);
-    // La Sede aterriza en su tablero; los demás roles, en el inicio provisorio.
-    expect(navegacion.routeNativeElement?.textContent).toContain(rol === 'SEDE_CENTRAL' ? 'Resumen' : 'Hola, Ana Prueba');
+    // La Sede aterriza en su tablero y el inspector en su bandeja; los demás roles, en el inicio provisorio.
+    const esperado = { SEDE_CENTRAL: 'Resumen', INSPECTOR: 'Pendientes de tu acción' }[rol as 'SEDE_CENTRAL' | 'INSPECTOR'] ?? 'Hola, Ana Prueba';
+    expect(navegacion.routeNativeElement?.textContent).toContain(esperado);
   });
 
   it('una farmacia que pide la ruta de la Sede termina en su propio inicio', async () => {
@@ -77,5 +78,31 @@ describe('rutas de la aplicación', () => {
     await navegacion.navigateByUrl('/no-existe');
 
     expect(navegacion.routeNativeElement?.textContent).toContain('No encontramos esta página');
+  });
+
+  it('las pantallas del inspector y de la Sede existen dentro de su rol', async () => {
+    const inspector = await prepararNavegacion('INSPECTOR');
+    for (const [ruta, texto] of [['/inspector/empresas', 'Empresas registradas'], ['/inspector/circuitos', 'Circuitos'], ['/inspector/lotes', 'Lotes y cuarentenas'], ['/inspector/reportes', 'Reportes ciudadanos'], ['/inspector/cadena', 'Estado del anclaje']]) {
+      await inspector.navigateByUrl(ruta);
+      expect(inspector.routeNativeElement?.textContent, ruta).toContain(texto);
+    }
+    TestBed.resetTestingModule();
+
+    const sede = await prepararNavegacion('SEDE_CENTRAL');
+    for (const [ruta, texto] of [['/sede/inspectores', 'Inspectores ANMAT'], ['/sede/empresas', 'Empresas registradas'], ['/sede/circuitos', 'Circuitos'], ['/sede/cadena', 'Estado del anclaje'], ['/sede/usuarios', 'Usuarios del sistema']]) {
+      await sede.navigateByUrl(ruta);
+      expect(sede.routeNativeElement?.textContent, ruta).toContain(texto);
+    }
+  });
+
+  it('un inspector no entra a las pantallas de la Sede y viceversa', async () => {
+    const inspector = await prepararNavegacion('INSPECTOR');
+    await inspector.navigateByUrl('/sede/inspectores');
+    expect(urlActual()).toBe('/inspector');
+    TestBed.resetTestingModule();
+
+    const sede = await prepararNavegacion('SEDE_CENTRAL');
+    await sede.navigateByUrl('/inspector/lotes');
+    expect(urlActual()).toBe('/sede');
   });
 });

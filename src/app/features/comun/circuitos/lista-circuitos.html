@@ -1,0 +1,82 @@
+<mc-tarjeta [titulo]="titulo()" [detalle]="lista.total() + (modo() === 'todos' ? ' en total' : ' pendientes')">
+  @if (modo() === 'todos') {
+    <div class="mc-barra">
+      <mc-filtro-estado [opciones]="opciones" [valor]="lista.filtro()" (cambio)="lista.filtrarPor($event)" />
+    </div>
+  }
+
+  @if (lista.error(); as error) {
+    <mc-error-api [error]="error" />
+    <div><button mat-stroked-button type="button" (click)="lista.recargar()">Reintentar</button></div>
+  } @else if (lista.vacia()) {
+    <p class="mc-vacio">{{ modo() === 'todos' ? 'No hay circuitos con ese filtro.' : 'No hay circuitos pendientes.' }}</p>
+  } @else {
+    <div class="mc-tabla" tabindex="0" role="region" [attr.aria-label]="titulo()">
+      <table>
+        <thead>
+          <tr><th>Circuito</th><th>Recorrido</th><th>Estado</th><th>Propuesto</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          @for (v of lista.elementos(); track v.circuito.id) {
+            @let c = v.circuito;
+            <tr>
+              <td><strong>{{ c.codigo }}</strong></td>
+              <td>
+                {{ v.laboratorio }} → {{ v.distribuidor }} → {{ v.farmacia }}
+              </td>
+              <td>
+                <mc-estado [presentacion]="presentacion[c.estado]" />
+                @if (c.estado === 'PENDIENTE_EMPRESAS') {
+                  <span class="secundario">
+                    Distribuidora: {{ c.fechaAceptacionDistribuidor ? 'aceptó' : 'pendiente' }} · Farmacia: {{ c.fechaAceptacionFarmacia ? 'aceptó' : 'pendiente' }}
+                  </span>
+                }
+                @if (c.motivoRechazo) {
+                  <span class="secundario">Rechazo: {{ c.motivoRechazo }}</span>
+                }
+                @if (c.motivoSuspension) {
+                  <span class="secundario">Suspensión: {{ c.motivoSuspension }}</span>
+                }
+              </td>
+              <td>{{ c.fechaPropuesta | fechaHora }}</td>
+              <td>
+                <div class="mc-acciones">
+                  @if (rol() === 'INSPECTOR' && c.estado === 'PENDIENTE_INSPECTOR') {
+                    @if ((c.inspectorRevisorId ?? null) === null) {
+                      <button mat-flat-button type="button" [disabled]="ocupada()" (click)="tomar(c)">Tomar<span class="mc-solo-lectores"> {{ c.codigo }}</span></button>
+                    } @else {
+                      <button mat-flat-button type="button" [disabled]="ocupada()" (click)="aprobar(c)">Aprobar<span class="mc-solo-lectores"> {{ c.codigo }}</span></button>
+                      <button mat-stroked-button type="button" [disabled]="ocupada()" (click)="rechazar(c)">Rechazar<span class="mc-solo-lectores"> {{ c.codigo }}</span></button>
+                    }
+                  }
+                  @if ((rol() === 'INSPECTOR' || rol() === 'SEDE_CENTRAL') && c.estado === 'APROBADO') {
+                    <button mat-stroked-button type="button" [disabled]="ocupada()" (click)="suspender(c)">Suspender<span class="mc-solo-lectores"> {{ c.codigo }}</span></button>
+                  }
+                  @if ((rol() === 'INSPECTOR' || rol() === 'SEDE_CENTRAL') && c.estado === 'SUSPENDIDO') {
+                    <button mat-flat-button type="button" [disabled]="ocupada()" (click)="rehabilitar(c)">Rehabilitar<span class="mc-solo-lectores"> {{ c.codigo }}</span></button>
+                  }
+                  @if ((rol() === 'DISTRIBUIDOR' || rol() === 'FARMACIA') && esAdminEmpresa() && c.estado === 'PENDIENTE_EMPRESAS') {
+                    @if (yaAcepto(c)) {
+                      <span class="secundario">Ya aceptaste</span>
+                    } @else {
+                      <button mat-flat-button type="button" [disabled]="ocupada()" (click)="aceptar(c)">Aceptar<span class="mc-solo-lectores"> {{ c.codigo }}</span></button>
+                    }
+                    <button mat-stroked-button type="button" [disabled]="ocupada()" (click)="rechazarPorEmpresa(c)">Rechazar<span class="mc-solo-lectores"> {{ c.codigo }}</span></button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <mat-paginator
+      [length]="lista.total()"
+      [pageSize]="lista.tamano()"
+      [pageIndex]="lista.paginaActual()"
+      [pageSizeOptions]="[10, 20, 50]"
+      (page)="cambiarPagina($event)"
+      [attr.aria-label]="'Página de ' + titulo().toLowerCase()"
+    />
+  }
+</mc-tarjeta>

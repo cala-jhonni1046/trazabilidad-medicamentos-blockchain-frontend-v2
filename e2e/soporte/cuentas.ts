@@ -34,15 +34,22 @@ function variableObligatoria(nombre: string): string {
 }
 
 /** Cuenta de la demo para un rol de empresa, inspector o paciente. */
-function cuentaDemo(rol: RolUsuario, email: string, rotulo: string, inicio: string): Cuenta {
+function cuentaDemo(
+  rol: RolUsuario,
+  email: string,
+  rotulo: string,
+  inicio: string,
+  entradaMenu = 'Inicio',
+  tituloInicio = 'Hola,',
+): Cuenta {
   return {
     rol,
     email,
     password: variableObligatoria('E2E_DEMO_PASSWORD'),
     rotulo,
     inicio,
-    entradaMenu: 'Inicio',
-    tituloInicio: 'Hola,',
+    entradaMenu,
+    tituloInicio,
   };
 }
 
@@ -60,7 +67,7 @@ export function cuentaSede(): Cuenta {
 }
 
 export const cuentaInspector = (): Cuenta =>
-  cuentaDemo('INSPECTOR', 'inspector.mendoza@medichain.demo', 'Inspector ANMAT', '/inspector');
+  cuentaDemo('INSPECTOR', 'inspector.mendoza@medichain.demo', 'Inspector ANMAT', '/inspector', 'Bandeja', 'Pendientes de tu acción');
 export const cuentaLaboratorio = (): Cuenta =>
   cuentaDemo('LABORATORIO', 'admin@laboratorio-andino.demo', 'Laboratorio', '/laboratorio');
 export const cuentaDistribuidora = (): Cuenta =>

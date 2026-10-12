@@ -1,8 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, shareReplay } from 'rxjs';
 import { EmpresasService } from '../api/generado/services/empresas.service';
+import { LotesService } from '../api/generado/services/lotes.service';
+import { MedicamentosService } from '../api/generado/services/medicamentos.service';
 import { UsuariosService } from '../api/generado/services/usuarios.service';
-import { EmpresaResponseDto } from '../api/modelos';
+import { EmpresaResponseDto, LoteResponseDto, MedicamentoResponseDto } from '../api/modelos';
 
 /**
  * Caché de nombres: los DTO del backend traen ids (empresaId, usuarioId…) y las pantallas
@@ -18,9 +20,13 @@ import { EmpresaResponseDto } from '../api/modelos';
 export class NombresService {
   private readonly empresas = inject(EmpresasService);
   private readonly usuarios = inject(UsuariosService);
+  private readonly medicamentos = inject(MedicamentosService);
+  private readonly lotes = inject(LotesService);
 
   private readonly cacheEmpresas = new Map<string, Observable<EmpresaResponseDto | null>>();
   private readonly cacheUsuarios = new Map<string, Observable<string | null>>();
+  private readonly cacheMedicamentos = new Map<string, Observable<MedicamentoResponseDto | null>>();
+  private readonly cacheLotes = new Map<string, Observable<LoteResponseDto | null>>();
 
   /** La empresa con ese id, o null si no se pudo leer. */
   empresa(id: string): Observable<EmpresaResponseDto | null> {
@@ -34,10 +40,22 @@ export class NombresService {
     );
   }
 
+  /** El medicamento con ese id, o null si no se pudo leer. */
+  medicamento(id: string): Observable<MedicamentoResponseDto | null> {
+    return this.conCache(this.cacheMedicamentos, id, () => this.medicamentos.obtenerMedicamento({ id }));
+  }
+
+  /** El lote con ese id, o null si no se pudo leer. */
+  lote(id: string): Observable<LoteResponseDto | null> {
+    return this.conCache(this.cacheLotes, id, () => this.lotes.obtenerLote({ id }));
+  }
+
   /** Olvida todo lo guardado (por ejemplo, al cerrar sesión). */
   vaciar(): void {
     this.cacheEmpresas.clear();
     this.cacheUsuarios.clear();
+    this.cacheMedicamentos.clear();
+    this.cacheLotes.clear();
   }
 
   /** Devuelve el pedido guardado para el id, o lo crea; un fallo se convierte en null y se descarta. */

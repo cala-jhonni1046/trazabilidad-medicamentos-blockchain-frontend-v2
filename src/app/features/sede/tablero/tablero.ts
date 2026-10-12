@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
+import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { EmpresaResponseDto } from '../../../core/api/modelos';
 import { AvisosService } from '../../../core/errores/avisos.service';
@@ -19,7 +20,7 @@ import { CircuitoPendiente, TableroDatos } from './tablero.datos';
 @Component({
   selector: 'mc-tablero',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FechaHoraPipe, Icono, MatButtonModule, Mosaico, Tarjeta],
+  imports: [FechaHoraPipe, Icono, MatButtonModule, Mosaico, RouterLink, Tarjeta],
   providers: [TableroDatos],
   templateUrl: './tablero.html',
   styleUrl: './tablero.scss',

@@ -1,0 +1,245 @@
+<header class="encabezado">
+  <h1>Cadena y Sepolia</h1>
+  <button mat-stroked-button type="button" (click)="datos.recargar()"><mc-icono nombre="refresh" />Actualizar</button>
+</header>
+
+<mc-tarjeta titulo="Estado del anclaje" detalle="Cada 5 minutos, si hay eventos nuevos, el último hash se ancla en Sepolia">
+  @let estado = datos.estado;
+  @if (estado.status() === 'error') {
+    <p class="falla" role="alert">No se pudo leer el estado del anclaje.</p>
+    <div><button mat-stroked-button type="button" (click)="estado.reload()">Reintentar</button></div>
+  } @else if (!estado.hasValue()) {
+    <p role="status">Consultando la red…</p>
+  } @else {
+    @let e = estado.value();
+    @if (e.mensaje) {
+      <p class="aviso" role="status">{{ e.mensaje }}</p>
+    }
+    @if (e.anclajeAutomaticoFrenado) {
+      <p class="aviso" role="status"><strong>El anclaje automático está frenado.</strong></p>
+    }
+    <dl class="datos">
+      <dt>Anclaje</dt>
+      <dd>{{ e.habilitado ? 'Habilitado' : 'Deshabilitado en este entorno' }}</dd>
+      <dt>Último evento local</dt>
+      <dd>#{{ e.ultimoNumeroLocal }}</dd>
+      @if ((e.ultimoNumeroAnclado ?? null) !== null) {
+        <dt>Último evento anclado</dt>
+        <dd>#{{ e.ultimoNumeroAnclado }}</dd>
+      }
+      @if ((e.eventosSinAnclar ?? null) !== null) {
+        <dt>Eventos sin anclar</dt>
+        <dd>{{ e.eventosSinAnclar }}</dd>
+      }
+      @if (e.red) {
+        <dt>Red</dt>
+        <dd>{{ e.red }}@if ((e.chainId ?? null) !== null) { (id {{ e.chainId }}) }</dd>
+      }
+      @if (e.contrato) {
+        <dt>Contrato</dt>
+        <dd>
+          <mc-hash [valor]="e.contrato" etiqueta="la dirección del contrato" />
+          @if (enlaceSeguro(e.enlaceContrato); as enlace) {
+            <a [href]="enlace" target="_blank" rel="noopener noreferrer">Etherscan<span class="solo-lectores"> (pestaña nueva)</span></a>
+          }
+        </dd>
+      }
+      @if (e.billetera) {
+        <dt>Billetera</dt>
+        <dd>
+          <mc-hash [valor]="e.billetera" etiqueta="la dirección de la billetera" />
+          @if (enlaceSeguro(e.enlaceBilletera); as enlace) {
+            <a [href]="enlace" target="_blank" rel="noopener noreferrer">Etherscan<span class="solo-lectores"> (pestaña nueva)</span></a>
+          }
+        </dd>
+      }
+      @if ((e.saldoEth ?? null) !== null) {
+        <dt>Saldo</dt>
+        <dd>{{ e.saldoEth }} ETH</dd>
+      }
+      @if ((e.comisionActualGwei ?? null) !== null) {
+        <dt>Comisión actual</dt>
+        <dd>{{ e.comisionActualGwei }} gwei</dd>
+      }
+      @if ((e.costoPorAnclajeEth ?? null) !== null) {
+        <dt>Costo por anclaje</dt>
+        <dd>{{ e.costoPorAnclajeEth }} ETH@if ((e.anclajesEstimados ?? null) !== null) { · alcanza para {{ e.anclajesEstimados }} }</dd>
+      }
+    </dl>
+    <div class="anclajes-estado">
+      @if (e.anclajeEnCurso; as enCurso) {
+        <div><strong>En curso:</strong> {{ rango(enCurso) }} <mc-estado [presentacion]="presentarAnclaje(enCurso.estado)" /></div>
+      }
+      @if (e.ultimoAnclaje; as ultimo) {
+        <div><strong>Último:</strong> {{ rango(ultimo) }} <mc-estado [presentacion]="presentarAnclaje(ultimo.estado)" /></div>
+      }
+    </div>
+  }
+
+  @if (puedeAnclar()) {
+    <div class="acciones">
+      <button mat-flat-button type="button" (click)="anclarAhora()"><mc-icono nombre="link" />Anclar ya</button>
+    </div>
+    <mc-error-api [error]="errorAnclaje()" />
+  }
+
+  @if (datos.anclajeEnSeguimiento(); as seguido) {
+    <div class="seguimiento" aria-live="polite">
+      <strong>Anclaje enviado {{ rango(seguido) }}:</strong>
+      <mc-estado [presentacion]="presentarAnclaje(seguido.estado)" />
+      <span>{{ seguido.confirmaciones }} confirmaciones</span>
+      @if (seguido.transactionHash) {
+        <mc-hash [valor]="seguido.transactionHash" etiqueta="el hash de la transacción" />
+      }
+      @if (enlaceSeguro(seguido.enlaceEtherscan); as enlace) {
+        <a [href]="enlace" target="_blank" rel="noopener noreferrer">Ver en Etherscan<span class="solo-lectores"> (pestaña nueva)</span></a>
+      }
+      @if (seguido.estado === 'FALLIDO' && seguido.ultimoError) {
+        <span class="falla">{{ seguido.ultimoError }}</span>
+      }
+      @if (datos.seguimientoVencido()) {
+        <span>Sigue en curso: tocá "Actualizar" para ver cómo avanza.</span>
+      }
+      <mc-error-api [error]="datos.errorSeguimiento()" />
+    </div>
+  }
+</mc-tarjeta>
+
+<mc-tarjeta titulo="Verificación de la cadena" detalle="Recalcula todos los hashes y los compara con lo anclado en Sepolia">
+  <div class="acciones">
+    <button mat-flat-button type="button" [disabled]="datos.verificacion().tipo === 'verificando'" (click)="datos.verificarCadena()">
+      {{ datos.verificacion().tipo === 'verificando' ? 'Verificando…' : 'Verificar ahora' }}
+    </button>
+  </div>
+  @let v = datos.verificacion();
+  <div aria-live="polite" [attr.aria-busy]="v.tipo === 'verificando'">
+    @switch (v.tipo) {
+      @case ('error') {
+        <mc-error-api [error]="v.error" />
+      }
+      @case ('listo') {
+        <div class="informe" [class.rota]="!v.informe.integra">
+          <p class="titulo-informe">
+            @if (v.informe.integra) {
+              <mc-icono nombre="verified" /> Cadena íntegra · {{ v.informe.eventosVerificados }} eventos verificados
+            } @else {
+              <mc-icono nombre="error" /> La cadena NO es íntegra
+              @if ((v.informe.primerNumeroRoto ?? null) !== null) {
+                (se rompe en el evento #{{ v.informe.primerNumeroRoto }})
+              }
+            }
+          </p>
+          @if (v.informe.motivo) {
+            <p>{{ v.informe.motivo }}</p>
+          }
+          <p>{{ v.informe.resumen }}</p>
+          <p class="blockchain">
+            <strong>Blockchain:</strong>
+            <mc-estado [presentacion]="presentarBlockchain[v.informe.blockchain.estado]" />
+            @if (v.informe.blockchain.estado === 'ALTERADA' && (v.informe.blockchain.alteradoDesde ?? null) !== null) {
+              <span>eventos #{{ v.informe.blockchain.alteradoDesde }} a #{{ v.informe.blockchain.alteradoHasta }}</span>
+            }
+          </p>
+          @if (v.informe.blockchain.motivo) {
+            <p>{{ v.informe.blockchain.motivo }}</p>
+          }
+          <p class="secundario">
+            {{ v.informe.blockchain.anclajesVerificados }} anclajes verificados
+            @if ((v.informe.blockchain.eventosSinAnclar ?? null) !== null) {
+              · {{ v.informe.blockchain.eventosSinAnclar }} eventos sin anclar
+            }
+          </p>
+        </div>
+      }
+    }
+  </div>
+</mc-tarjeta>
+
+<mc-tarjeta titulo="Anclajes en Sepolia" detalle="Los más nuevos primero">
+  @let anclajes = datos.historialAnclajes;
+  @if (anclajes.error(); as error) {
+    <mc-error-api [error]="error" />
+    <div><button mat-stroked-button type="button" (click)="anclajes.recargar()">Reintentar</button></div>
+  } @else if (anclajes.vacia()) {
+    <p class="vacio">Todavía no hay anclajes.</p>
+  } @else {
+    <div class="tabla" tabindex="0" role="region" aria-label="Anclajes en Sepolia">
+      <table>
+        <thead>
+          <tr><th>Eventos</th><th>Hash anclado</th><th>Transacción</th><th>Bloque</th><th>Fecha</th><th>Estado</th></tr>
+        </thead>
+        <tbody>
+          @for (a of anclajes.elementos(); track a.id) {
+            <tr>
+              <td>{{ rango(a) }}</td>
+              <td><mc-hash [valor]="a.hashAnclado" etiqueta="el hash anclado" /></td>
+              <td>
+                @if (a.transactionHash) {
+                  <mc-hash [valor]="a.transactionHash" etiqueta="la transacción" />
+                  @if (enlaceSeguro(a.enlaceEtherscan); as enlace) {
+                    <a [href]="enlace" target="_blank" rel="noopener noreferrer">Etherscan<span class="solo-lectores"> (pestaña nueva)</span></a>
+                  }
+                } @else {
+                  —
+                }
+              </td>
+              <td>{{ a.bloque ?? '—' }}</td>
+              <td>{{ a.fechaCreacion | fechaHora }}</td>
+              <td>
+                <mc-estado [presentacion]="presentarAnclaje(a.estado)" />
+                @if (a.estado === 'FALLIDO' && a.ultimoError) {
+                  <span class="causa">{{ a.ultimoError }}</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <mat-paginator
+      [length]="anclajes.total()"
+      [pageSize]="anclajes.tamano()"
+      [pageIndex]="anclajes.paginaActual()"
+      [pageSizeOptions]="[10, 20, 50]"
+      (page)="cambiarPaginaAnclajes($event)"
+      aria-label="Página de anclajes"
+    />
+  }
+</mc-tarjeta>
+
+<mc-tarjeta titulo="Eventos de la cadena" detalle="Del más reciente al más antiguo">
+  @let eventos = datos.historialEventos;
+  @if (eventos.error(); as error) {
+    <mc-error-api [error]="error" />
+    <div><button mat-stroked-button type="button" (click)="eventos.recargar()">Reintentar</button></div>
+  } @else if (eventos.vacia()) {
+    <p class="vacio">Todavía no hay eventos.</p>
+  } @else {
+    <div class="tabla" tabindex="0" role="region" aria-label="Eventos de la cadena">
+      <table>
+        <thead>
+          <tr><th>#</th><th>Fecha</th><th>Evento</th><th>Hash anterior</th><th>Hash</th></tr>
+        </thead>
+        <tbody>
+          @for (ev of eventos.elementos(); track ev.id) {
+            <tr>
+              <td>{{ ev.numero }}</td>
+              <td>{{ ev.fechaHora | fechaHora }}</td>
+              <td>{{ rotuloEvento[ev.tipo] }}</td>
+              <td><mc-hash [valor]="ev.hashAnterior" etiqueta="el hash anterior" /></td>
+              <td><mc-hash [valor]="ev.hash" etiqueta="el hash" /></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <mat-paginator
+      [length]="eventos.total()"
+      [pageSize]="eventos.tamano()"
+      [pageIndex]="eventos.paginaActual()"
+      [pageSizeOptions]="[10, 20, 50]"
+      (page)="cambiarPaginaEventos($event)"
+      aria-label="Página de eventos"
+    />
+  }
+</mc-tarjeta>

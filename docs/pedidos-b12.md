@@ -28,3 +28,16 @@ Al cerrar B12, buscar `TODO B12` y quitar cada rodeo.
    Rodeo: recorrer las páginas.
 9. **Trazabilidad por código** (lote, bulto o serie, con sus eventos). Sin esto no hay pantalla
    de trazabilidad.
+
+## Agregados durante el Lote A (Sede e inspector)
+10. **Resumen para el tablero de la Sede** (un endpoint con los totales: empresas, pendientes, inspectores
+    activos, circuitos aprobados, cuarentenas activas, eventos y anclajes). Hoy son 7 pedidos `size=1` que
+    leen `page.totalElements` (`TableroDatos`).
+11. **Códigos y nombres en medidas, lotes y eventos:** `CuarentenaResponseDTO` solo trae `loteId`/`bultoIds`
+    (el listado busca el código del lote con `NombresService.lote`) y `EventoTrazabilidadResponseDTO` solo
+    trae ids de actor y entidad (no se muestran). Va junto con los puntos 6 y 7.
+12. **Contadores de la bandeja del inspector** (cuántas empresas, circuitos, biológicos, cuarentenas y
+    reportes tiene pendientes) para mostrarlos en el menú. Hoy cada listado muestra su propio total y el
+    menú no tiene insignias.
+13. **`EtapaRecorridoDTO`, `AnclajeDTO.estado` y `ErrorResponseDTO.regla`:** que `regla` sea un enum
+    documentado (R1–R15 y los códigos no-R). Hoy es `string` y el frontend lo muestra tal cual.

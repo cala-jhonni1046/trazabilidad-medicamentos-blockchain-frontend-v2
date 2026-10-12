@@ -1,4 +1,16 @@
-import { EstadoAnclaje, EstadoHabilitacion, EstadoVerificacion, ESTADO_ANCLAJE } from '../../core/api/modelos';
+import {
+  ESTADO_ANCLAJE,
+  EstadoAnclaje,
+  EstadoAuditoria,
+  EstadoCuarentena,
+  EstadoEnlaceCuit,
+  EstadoHabilitacion,
+  EstadoInspector,
+  EstadoLote,
+  EstadoVerificacion,
+  EstadoVerificacionBlockchain,
+} from '../../core/api/modelos';
+import { OpcionFiltro } from '../ui/filtro-estado';
 import { NombreIcono } from '../ui/iconos';
 
 // Catálogo de estados: el ÚNICO lugar donde un valor de enum del contrato se convierte en
@@ -63,4 +75,57 @@ export function presentarEstadoAnclaje(valor: string): PresentacionEstado {
     return { texto: 'No disponible', tono: 'neutro', icono: 'help' };
   }
   return { texto: valor === '' ? 'Estado desconocido' : valor, tono: 'neutro', icono: 'help' };
+}
+
+/** Circuito: los dos pendientes en atención; APROBADO correcto; RECHAZADO y SUSPENDIDO críticos. */
+export const PRESENTACION_ESTADO_CIRCUITO: Record<EstadoEnlaceCuit, PresentacionEstado> = {
+  PENDIENTE_EMPRESAS: { texto: 'Esperando a las empresas', tono: 'atencion', icono: 'schedule' },
+  PENDIENTE_INSPECTOR: { texto: 'Esperando al inspector', tono: 'atencion', icono: 'schedule' },
+  APROBADO: { texto: 'Aprobado', tono: 'correcto', icono: 'check_circle' },
+  RECHAZADO: { texto: 'Rechazado', tono: 'critico', icono: 'cancel' },
+  SUSPENDIDO: { texto: 'Suspendido', tono: 'critico', icono: 'pause_circle' },
+};
+
+/** Inspector ANMAT: ACTIVO correcto; BAJA crítico. */
+export const PRESENTACION_ESTADO_INSPECTOR: Record<EstadoInspector, PresentacionEstado> = {
+  ACTIVO: { texto: 'Activo', tono: 'correcto', icono: 'check_circle' },
+  BAJA: { texto: 'Baja', tono: 'critico', icono: 'cancel' },
+};
+
+/** Lote: PENDIENTE_LIBERACION y CUARENTENA en atención; LIBERADO correcto; RECALL crítico. */
+export const PRESENTACION_ESTADO_LOTE: Record<EstadoLote, PresentacionEstado> = {
+  PENDIENTE_LIBERACION: { texto: 'Pendiente de liberación', tono: 'atencion', icono: 'schedule' },
+  LIBERADO: { texto: 'Liberado', tono: 'correcto', icono: 'check_circle' },
+  CUARENTENA: { texto: 'En cuarentena', tono: 'atencion', icono: 'warning' },
+  RECALL: { texto: 'Recall', tono: 'critico', icono: 'report' },
+};
+
+/** Medida sanitaria: ACTIVA atención; LEVANTADA correcto; CONVERTIDA_EN_RECALL crítico. */
+export const PRESENTACION_ESTADO_CUARENTENA: Record<EstadoCuarentena, PresentacionEstado> = {
+  ACTIVA: { texto: 'Activa', tono: 'atencion', icono: 'warning' },
+  LEVANTADA: { texto: 'Levantada', tono: 'correcto', icono: 'check_circle' },
+  CONVERTIDA_EN_RECALL: { texto: 'Recall', tono: 'critico', icono: 'report' },
+};
+
+/** Reporte ciudadano: ABIERTO y EN_INVESTIGACION en atención; CERRADO correcto. */
+export const PRESENTACION_ESTADO_REPORTE: Record<EstadoAuditoria, PresentacionEstado> = {
+  ABIERTO: { texto: 'Abierto', tono: 'atencion', icono: 'warning' },
+  EN_INVESTIGACION: { texto: 'En investigación', tono: 'atencion', icono: 'search' },
+  CERRADO: { texto: 'Cerrado', tono: 'correcto', icono: 'check_circle' },
+};
+
+/** Verificación de la cadena contra la blockchain: ALTERADA es crítica. */
+export const PRESENTACION_ESTADO_VERIFICACION_BLOCKCHAIN: Record<EstadoVerificacionBlockchain, PresentacionEstado> = {
+  VERIFICADA: { texto: 'Verificada', tono: 'correcto', icono: 'verified' },
+  ALTERADA: { texto: 'Alterada', tono: 'critico', icono: 'error' },
+  NO_CONSULTADA: { texto: 'No consultada', tono: 'atencion', icono: 'warning' },
+  NO_DISPONIBLE: { texto: 'No disponible', tono: 'neutro', icono: 'help' },
+};
+
+/** Opciones de un filtro por estado, con el texto del catálogo, en el orden del contrato. */
+export function opcionesDeEstado<E extends string>(
+  valores: readonly E[],
+  catalogo: Record<E, PresentacionEstado>,
+): readonly OpcionFiltro<E>[] {
+  return valores.map((valor) => ({ valor, texto: catalogo[valor].texto }));
 }

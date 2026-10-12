@@ -1,0 +1,57 @@
+<mc-tarjeta [titulo]="titulo()" [detalle]="lista.total() + (modo() === 'todos' ? ' en total' : ' pendientes')">
+  @if (modo() === 'todos') {
+    <div class="mc-barra">
+      <mc-filtro-estado [opciones]="opciones" [valor]="lista.filtro()" (cambio)="lista.filtrarPor($event)" />
+    </div>
+  }
+
+  @if (lista.error(); as error) {
+    <mc-error-api [error]="error" />
+    <div><button mat-stroked-button type="button" (click)="lista.recargar()">Reintentar</button></div>
+  } @else if (lista.vacia()) {
+    <p class="mc-vacio">{{ modo() === 'todos' ? 'No hay lotes con ese filtro.' : 'No hay biológicos por liberar.' }}</p>
+  } @else {
+    <div class="mc-tabla" tabindex="0" role="region" [attr.aria-label]="titulo()">
+      <table>
+        <thead>
+          <tr><th>Lote</th><th>Medicamento</th><th>Vence</th><th>Cajas</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          @for (v of lista.elementos(); track v.lote.id) {
+            @let l = v.lote;
+            <tr>
+              <td><code>{{ l.codigo }}</code><span class="secundario">{{ v.laboratorio }}</span></td>
+              <td>{{ v.medicamento }}</td>
+              <td>{{ l.fechaVencimiento | dia }}</td>
+              <td>{{ l.cantidad }}</td>
+              <td>
+                <mc-estado [presentacion]="presentacion[l.estado]" />
+                @if (l.bloqueado && l.mensajeBloqueo) {
+                  <span class="secundario">Bloqueado: {{ l.mensajeBloqueo }}</span>
+                }
+              </td>
+              <td>
+                <div class="mc-acciones">
+                  @if (esInspector() && l.estado === 'PENDIENTE_LIBERACION') {
+                    <button mat-flat-button type="button" [disabled]="ocupada()" (click)="liberar(l)">Liberar<span class="mc-solo-lectores"> {{ l.codigo }}</span></button>
+                  }
+                  @if (esInspector() && l.estado === 'LIBERADO') {
+                    <button mat-stroked-button type="button" [disabled]="ocupada()" (click)="cuarentena(l)">Poner en cuarentena<span class="mc-solo-lectores"> {{ l.codigo }}</span></button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <mat-paginator
+      [length]="lista.total()"
+      [pageSize]="lista.tamano()"
+      [pageIndex]="lista.paginaActual()"
+      [pageSizeOptions]="[10, 20, 50]"
+      (page)="cambiarPagina($event)"
+      [attr.aria-label]="'Página de ' + titulo().toLowerCase()"
+    />
+  }
+</mc-tarjeta>

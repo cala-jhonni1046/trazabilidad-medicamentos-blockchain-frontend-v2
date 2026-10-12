@@ -1,7 +1,24 @@
-import { ESTADO_ANCLAJE, ESTADO_HABILITACION, ESTADO_VERIFICACION } from '../../core/api/modelos';
+import {
+  ESTADO_ANCLAJE,
+  ESTADO_AUDITORIA,
+  ESTADO_CUARENTENA,
+  ESTADO_ENLACE_CUIT,
+  ESTADO_HABILITACION,
+  ESTADO_INSPECTOR,
+  ESTADO_LOTE,
+  ESTADO_VERIFICACION,
+  ESTADO_VERIFICACION_BLOCKCHAIN,
+} from '../../core/api/modelos';
 import { ICONOS } from '../ui/iconos';
 import {
   PRESENTACION_ESTADO_ANCLAJE,
+  PRESENTACION_ESTADO_CIRCUITO,
+  PRESENTACION_ESTADO_CUARENTENA,
+  PRESENTACION_ESTADO_INSPECTOR,
+  PRESENTACION_ESTADO_LOTE,
+  PRESENTACION_ESTADO_REPORTE,
+  PRESENTACION_ESTADO_VERIFICACION_BLOCKCHAIN,
+  opcionesDeEstado,
   PRESENTACION_ESTADO_HABILITACION,
   PRESENTACION_ESTADO_VERIFICACION,
   presentarEstadoAnclaje,
@@ -63,5 +80,41 @@ describe('catálogo: anclaje', () => {
       icono: 'help',
     });
     expect(presentarEstadoAnclaje('').texto).toBe('Estado desconocido');
+  });
+});
+
+describe('catálogo: resto de los estados', () => {
+  const catalogos = [
+    ['EstadoEnlaceCuit', ESTADO_ENLACE_CUIT, PRESENTACION_ESTADO_CIRCUITO],
+    ['EstadoInspector', ESTADO_INSPECTOR, PRESENTACION_ESTADO_INSPECTOR],
+    ['EstadoLote', ESTADO_LOTE, PRESENTACION_ESTADO_LOTE],
+    ['EstadoCuarentena', ESTADO_CUARENTENA, PRESENTACION_ESTADO_CUARENTENA],
+    ['EstadoAuditoria', ESTADO_AUDITORIA, PRESENTACION_ESTADO_REPORTE],
+    ['EstadoVerificacionBlockchain', ESTADO_VERIFICACION_BLOCKCHAIN, PRESENTACION_ESTADO_VERIFICACION_BLOCKCHAIN],
+  ] as const;
+
+  it.each(catalogos)('%s: cada valor del contrato tiene texto, tono e ícono existente', (_nombre, valores, catalogo) => {
+    for (const valor of valores as readonly string[]) {
+      const presentacion = (catalogo as Record<string, { texto: string; icono: keyof typeof ICONOS }>)[valor];
+      expect(presentacion.texto.length).toBeGreaterThan(0);
+      expect(ICONOS[presentacion.icono]).toContain('<svg');
+    }
+  });
+
+  it('ALTERADA, RECALL, SUSPENDIDO y BAJA son críticos; las medidas y lotes en cuarentena, atención', () => {
+    expect(PRESENTACION_ESTADO_VERIFICACION_BLOCKCHAIN.ALTERADA.tono).toBe('critico');
+    expect(PRESENTACION_ESTADO_LOTE.RECALL.tono).toBe('critico');
+    expect(PRESENTACION_ESTADO_CIRCUITO.SUSPENDIDO.tono).toBe('critico');
+    expect(PRESENTACION_ESTADO_INSPECTOR.BAJA.tono).toBe('critico');
+    expect(PRESENTACION_ESTADO_CUARENTENA.ACTIVA.tono).toBe('atencion');
+    expect(PRESENTACION_ESTADO_LOTE.CUARENTENA.tono).toBe('atencion');
+    expect(PRESENTACION_ESTADO_LOTE.PENDIENTE_LIBERACION.tono).toBe('atencion');
+  });
+
+  it('opcionesDeEstado arma las opciones del filtro con los textos del catálogo', () => {
+    expect(opcionesDeEstado(ESTADO_INSPECTOR, PRESENTACION_ESTADO_INSPECTOR)).toEqual([
+      { valor: 'ACTIVO', texto: 'Activo' },
+      { valor: 'BAJA', texto: 'Baja' },
+    ]);
   });
 });

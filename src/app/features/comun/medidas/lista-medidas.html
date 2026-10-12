@@ -1,0 +1,66 @@
+<mc-tarjeta [titulo]="titulo()" [detalle]="lista.total() + (modo() === 'todas' ? ' en total' : ' pendientes')">
+  @if (modo() === 'todas') {
+    <div class="mc-barra">
+      <mc-filtro-estado [opciones]="opciones" [valor]="lista.filtro()" (cambio)="lista.filtrarPor($event)" />
+    </div>
+  }
+
+  @if (lista.error(); as error) {
+    <mc-error-api [error]="error" />
+    <div><button mat-stroked-button type="button" (click)="lista.recargar()">Reintentar</button></div>
+  } @else if (lista.vacia()) {
+    <p class="mc-vacio">{{ modo() === 'todas' ? 'No hay medidas con ese filtro.' : 'No hay medidas por revisar.' }}</p>
+  } @else {
+    <div class="mc-tabla" tabindex="0" role="region" [attr.aria-label]="titulo()">
+      <table>
+        <thead>
+          <tr><th>Medida</th><th>Motivo</th><th>Estado</th><th>Desde</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          @for (v of lista.elementos(); track v.medida.id) {
+            @let m = v.medida;
+            <tr>
+              <td>
+                <strong>{{ v.objetivo }}</strong>
+                <span class="secundario">{{ rotuloAlcance[m.alcance] }} · {{ rotuloProvincia[m.provincia] }}{{ m.automatica ? ' · automática' : '' }}</span>
+              </td>
+              <td>
+                {{ rotuloMotivo[m.motivo] }}
+                @if (m.descripcion) {
+                  <span class="secundario">{{ m.descripcion }}</span>
+                }
+              </td>
+              <td>
+                <mc-estado [presentacion]="presentacion[m.estado]" />
+                @if (m.dictamen) {
+                  <span class="secundario">Dictamen registrado</span>
+                }
+              </td>
+              <td>{{ m.fechaInicio | fechaHora }}</td>
+              <td>
+                <div class="mc-acciones">
+                  @if (esInspector() && m.estado === 'ACTIVA') {
+                    @if ((m.inspectorRevisorId ?? null) === null) {
+                      <button mat-flat-button type="button" [disabled]="ocupada()" (click)="tomar(v)">Tomar<span class="mc-solo-lectores"> {{ v.objetivo }}</span></button>
+                    } @else {
+                      <button mat-stroked-button type="button" [disabled]="ocupada()" (click)="levantar(v)">Levantar<span class="mc-solo-lectores"> {{ v.objetivo }}</span></button>
+                      <button mat-stroked-button type="button" [disabled]="ocupada()" (click)="recall(v)">Recall<span class="mc-solo-lectores"> {{ v.objetivo }}</span></button>
+                    }
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <mat-paginator
+      [length]="lista.total()"
+      [pageSize]="lista.tamano()"
+      [pageIndex]="lista.paginaActual()"
+      [pageSizeOptions]="[10, 20, 50]"
+      (page)="cambiarPagina($event)"
+      [attr.aria-label]="'Página de ' + titulo().toLowerCase()"
+    />
+  }
+</mc-tarjeta>

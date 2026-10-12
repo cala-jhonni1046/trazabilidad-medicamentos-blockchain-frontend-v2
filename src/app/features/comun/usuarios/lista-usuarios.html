@@ -1,0 +1,47 @@
+<mc-tarjeta [titulo]="titulo()" [detalle]="lista.total() + ' en total'">
+  <div class="mc-barra">
+    <span></span>
+    <button mat-flat-button type="button" (click)="crear()"><mc-icono nombre="add" />{{ textoAlta() }}</button>
+  </div>
+
+  @if (lista.error(); as error) {
+    <mc-error-api [error]="error" />
+    <div><button mat-stroked-button type="button" (click)="lista.recargar()">Reintentar</button></div>
+  } @else if (lista.vacia()) {
+    <p class="mc-vacio">Todavía no hay usuarios.</p>
+  } @else {
+    <div class="mc-tabla" tabindex="0" role="region" [attr.aria-label]="titulo()">
+      <table>
+        <thead>
+          <tr><th>Usuario</th><th>Rol</th><th>Cuenta</th><th>Último ingreso</th></tr>
+        </thead>
+        <tbody>
+          @for (u of lista.elementos(); track u.id) {
+            <tr>
+              <td>
+                <strong>{{ u.nombre }} {{ u.apellido }}</strong>
+                <span class="secundario">{{ u.email }}</span>
+              </td>
+              <td>
+                {{ rotuloRol[u.rol] }}
+                @if (u.esAdminEmpresa || u.esDirectorTecnico) {
+                  <span class="secundario">{{ u.esAdminEmpresa ? 'Administrador' : '' }}{{ u.esAdminEmpresa && u.esDirectorTecnico ? ' · ' : '' }}{{ u.esDirectorTecnico ? 'Director técnico' : '' }}</span>
+                }
+              </td>
+              <td>{{ u.activo ? 'Activa' : 'Inactiva' }}</td>
+              <td>{{ u.ultimoLogin ? (u.ultimoLogin | fechaHora) : 'Nunca' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <mat-paginator
+      [length]="lista.total()"
+      [pageSize]="lista.tamano()"
+      [pageIndex]="lista.paginaActual()"
+      [pageSizeOptions]="[10, 20, 50]"
+      (page)="cambiarPagina($event)"
+      aria-label="Página de usuarios"
+    />
+  }
+</mc-tarjeta>

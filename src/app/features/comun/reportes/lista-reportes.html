@@ -1,0 +1,83 @@
+<mc-tarjeta [titulo]="titulo()" [detalle]="lista.total() + (modo() === 'todos' ? ' en total' : ' pendientes')">
+  @if (modo() === 'todos') {
+    <div class="mc-barra">
+      <mc-filtro-estado [opciones]="opciones" [valor]="lista.filtro()" (cambio)="lista.filtrarPor($event)" />
+    </div>
+  }
+
+  @if (lista.error(); as error) {
+    <mc-error-api [error]="error" />
+    <div><button mat-stroked-button type="button" (click)="lista.recargar()">Reintentar</button></div>
+  } @else if (lista.vacia()) {
+    <p class="mc-vacio">{{ modo() === 'todos' ? 'No hay reportes con ese filtro.' : 'No hay reportes por atender.' }}</p>
+  } @else {
+    <div class="mc-tabla" tabindex="0" role="region" [attr.aria-label]="titulo()">
+      <table>
+        <thead>
+          <tr><th>Reporte</th><th>Caja</th><th>Qué pasó</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          @for (r of lista.elementos(); track r.id) {
+            <tr>
+              <td>
+                <strong>{{ r.codigo }}</strong>
+                <span class="secundario">{{ r.fechaReporte | fechaHora }} · {{ rotuloProvincia[r.provincia] }}</span>
+              </td>
+              <td>
+                <code>{{ r.serieReportada }}</code>
+                <span class="secundario">GTIN {{ r.gtinReportado }}{{ r.cajaExiste ? '' : ' · la caja no existe' }}</span>
+              </td>
+              <td>
+                {{ rotuloMotivo[r.motivo] }}
+                @if (r.descripcion) {
+                  <span class="secundario">“{{ r.descripcion }}”</span>
+                }
+                @if (r.conclusion) {
+                  <span class="secundario">Conclusión: {{ r.conclusion }}</span>
+                }
+              </td>
+              <td><mc-estado [presentacion]="presentacion[r.estado]" /></td>
+              <td>
+                <div class="mc-acciones">
+                  <button mat-stroked-button type="button" (click)="verCaja(r)">
+                    {{ cajaAbierta()?.id === r.id ? 'Ocultar caja' : 'Ver caja' }}<span class="mc-solo-lectores"> del reporte {{ r.codigo }}</span>
+                  </button>
+                  @if (esInspector() && r.estado === 'ABIERTO') {
+                    <button mat-flat-button type="button" [disabled]="ocupada()" (click)="tomar(r)">Tomar el caso<span class="mc-solo-lectores"> {{ r.codigo }}</span></button>
+                  }
+                  @if (esInspector() && r.estado === 'EN_INVESTIGACION') {
+                    <button mat-flat-button type="button" [disabled]="ocupada()" (click)="cerrar(r)">Cerrar caso<span class="mc-solo-lectores"> {{ r.codigo }}</span></button>
+                    <a mat-stroked-button routerLink="/inspector/lotes">Tomar medidas sobre el lote</a>
+                  }
+                </div>
+              </td>
+            </tr>
+            @if (cajaAbierta(); as abierta) {
+              @if (abierta.id === r.id) {
+                <tr>
+                  <td colspan="5">
+                    @if (abierta.error; as error) {
+                      <mc-error-api [error]="error" />
+                    } @else if (abierta.resultado; as resultado) {
+                      <mc-resultado-verificacion [resultado]="resultado" />
+                    } @else {
+                      <p role="status">Verificando la caja…</p>
+                    }
+                  </td>
+                </tr>
+              }
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+    <mat-paginator
+      [length]="lista.total()"
+      [pageSize]="lista.tamano()"
+      [pageIndex]="lista.paginaActual()"
+      [pageSizeOptions]="[10, 20, 50]"
+      (page)="cambiarPagina($event)"
+      [attr.aria-label]="'Página de ' + titulo().toLowerCase()"
+    />
+  }
+</mc-tarjeta>

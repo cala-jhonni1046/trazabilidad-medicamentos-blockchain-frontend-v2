@@ -1,0 +1,150 @@
+:host {
+  display: grid;
+  gap: 18px;
+}
+
+.encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.datos {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  margin: 0;
+
+  dt {
+    color: var(--mc-texto-secundario);
+  }
+
+  dd {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    align-items: center;
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+.anclajes-estado,
+.seguimiento {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+}
+
+.seguimiento {
+  padding: 12px 14px;
+  background: var(--mc-superficie-2);
+  border: 1px solid var(--mc-borde);
+  border-radius: var(--mc-radio-control);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.aviso {
+  padding: 10px 14px;
+  background: var(--mc-atencion-suave);
+  color: var(--mc-atencion);
+  border: 1px solid var(--mc-atencion);
+  border-radius: var(--mc-radio-control);
+}
+
+.falla {
+  color: var(--mc-critico);
+  font-weight: 600;
+}
+
+.informe {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  background: var(--mc-correcto-suave);
+  border: 1px solid var(--mc-correcto);
+  border-radius: var(--mc-radio-control);
+
+  &.rota {
+    background: var(--mc-critico-suave);
+    border-color: var(--mc-critico);
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.titulo-informe {
+  font-weight: 700;
+}
+
+.blockchain {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.secundario,
+.vacio {
+  color: var(--mc-texto-secundario);
+}
+
+.tabla {
+  overflow-x: auto;
+  border: 1px solid var(--mc-borde);
+  border-radius: var(--mc-radio-control);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+th {
+  padding: 9px 12px;
+  text-align: left;
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--mc-texto-secundario);
+  background: var(--mc-superficie-2);
+  border-bottom: 1px solid var(--mc-borde);
+}
+
+td {
+  padding: 9px 12px;
+  vertical-align: top;
+  border-bottom: 1px solid var(--mc-borde);
+}
+
+tr:last-child td {
+  border-bottom: 0;
+}
+
+.causa {
+  display: block;
+  margin-top: 4px;
+  color: var(--mc-critico);
+  font-size: 0.8rem;
+}
+
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

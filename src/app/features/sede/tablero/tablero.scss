@@ -73,3 +73,14 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+.mosaico-enlace {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--mc-radio-tarjeta);
+
+  &:hover mc-mosaico {
+    border-color: var(--mc-primario);
+  }
+}
