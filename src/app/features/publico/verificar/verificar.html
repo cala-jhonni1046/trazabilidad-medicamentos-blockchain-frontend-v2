@@ -8,14 +8,7 @@
   </header>
 
   <form class="tarjeta" novalidate (submit)="verificar($event)">
-    <mat-form-field>
-      <mat-label>Pegar el código completo (opcional)</mat-label>
-      <input matInput autocomplete="off" spellcheck="false" (change)="leerPegado($event)" (input)="alEscribir($event)" />
-      <mat-hint>El código del DataMatrix, o "GTIN serie". Completa los dos campos de abajo.</mat-hint>
-    </mat-form-field>
-    @if (avisoPegado(); as aviso) {
-      <p class="aviso-pegado" [class.error]="!aviso.correcto" role="status">{{ aviso.texto }}</p>
-    }
+    <mc-campo-codigo (leido)="alLeer($event)" />
 
     <mc-error-api [error]="errorGeneral()" />
 

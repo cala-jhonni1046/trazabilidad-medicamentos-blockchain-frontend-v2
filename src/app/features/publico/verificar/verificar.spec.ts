@@ -112,7 +112,7 @@ describe('Verificar', () => {
 
     expect(campo(raiz, 'GTIN').value).toBe(GTIN);
     expect(campo(raiz, 'Número de serie').value).toBe('L20260001S000001');
-    expect(raiz.querySelector('.aviso-pegado')?.textContent).toContain('Código leído');
+    expect(raiz.querySelector('mc-campo-codigo .aviso')?.textContent).toContain('Código leído');
     expect(pegado.value).toBe('');
   });
 
@@ -124,7 +124,7 @@ describe('Verificar', () => {
     pegado.dispatchEvent(new Event('change'));
     await esperar();
 
-    expect(raiz.querySelector('.aviso-pegado.error')?.textContent).toContain('No pudimos leer este código');
+    expect(raiz.querySelector('mc-campo-codigo .aviso.error')?.textContent).toContain('No pudimos leer este código');
     expect(campo(raiz, 'GTIN').value).toBe('');
   });
 

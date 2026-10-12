@@ -1,3 +1,4 @@
+<mc-saltar-al-contenido />
 <div class="app">
   <aside class="lateral">
     <a class="marca" routerLink="/" aria-label="MediChain, ir al inicio">Medi<span>Chain</span></a>
@@ -31,7 +32,7 @@
   <div class="principal">
     <div class="barra"><mc-selector-tema /></div>
     <mc-aviso-empresa [empresa]="datosEmpresa.empresa()" />
-    <main class="contenido">
+    <main id="contenido" class="contenido" tabindex="-1">
       <router-outlet />
     </main>
   </div>

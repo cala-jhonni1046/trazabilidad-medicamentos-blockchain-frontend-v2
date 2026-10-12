@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ROTULO_PROVINCIA } from '../../shared/formato/etiquetas';
 import { Icono } from '../../shared/ui/icono';
+import { SaltarAlContenido } from '../../shared/ui/saltar-al-contenido';
 import { SesionService } from '../auth/sesion.service';
 import { SelectorTema } from '../tema/selector-tema';
 import { AvisoEmpresa } from './aviso-empresa';
@@ -15,7 +16,7 @@ import { MENU_POR_ROL, ROTULO_ROL } from './navegacion';
 @Component({
   selector: 'mc-shell-app',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AvisoEmpresa, Icono, RouterLink, RouterLinkActive, RouterOutlet, SelectorTema],
+  imports: [AvisoEmpresa, Icono, RouterLink, RouterLinkActive, RouterOutlet, SaltarAlContenido, SelectorTema],
   providers: [EmpresaPropiaDatos],
   templateUrl: './shell-app.html',
   styleUrl: './shell-app.scss',

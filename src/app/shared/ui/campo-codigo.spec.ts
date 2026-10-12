@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { CamaraEscaner } from '../escaner/camara';
 import { CampoCodigo, CodigoLeido } from './campo-codigo';
 
 async function crear() {
@@ -53,3 +54,26 @@ describe('mc-campo-codigo', () => {
     expect(raiz.querySelector('.aviso')).toBeNull();
   });
 });
+
+describe('mc-campo-codigo con la cámara', () => {
+  it('"Escanear con la cámara" abre el escáner y lo carga bajo demanda', async () => {
+    const { raiz, fixture } = await crearConCamara();
+
+    const boton = Array.from(raiz.querySelectorAll('button')).find((b) => b.textContent?.includes('Escanear con la cámara')) as HTMLButtonElement;
+    boton.click();
+
+    await vi.waitFor(() => {
+      fixture.detectChanges();
+      expect(raiz.querySelector('mc-escaner-gs1')).not.toBeNull();
+    });
+    expect(Array.from(raiz.querySelectorAll('button')).some((b) => b.textContent?.includes('Escanear con la cámara'))).toBe(false);
+  });
+});
+
+async function crearConCamara() {
+  const camara = { disponible: () => false, abrirCamara: vi.fn(), crearDetector: vi.fn() };
+  TestBed.configureTestingModule({ providers: [{ provide: CamaraEscaner, useValue: camara }] });
+  const fixture = TestBed.createComponent(CampoCodigo);
+  await fixture.whenStable();
+  return { fixture, raiz: fixture.nativeElement as HTMLElement };
+}

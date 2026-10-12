@@ -1,8 +1,11 @@
 import { ChangeDetectionStrategy, Component, output, signal } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { proveerOpcionesMaterial } from '../../core/tema/opciones-material';
 import { leerCodigoPegado } from '../escaner/parser-gs1';
+import { EscanerGs1 } from '../escaner/escaner-gs1';
+import { Icono } from './icono';
 
 /** GTIN y serie leídos de un código. */
 export interface CodigoLeido {
@@ -18,7 +21,7 @@ export interface CodigoLeido {
 @Component({
   selector: 'mc-campo-codigo',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MatFormFieldModule, MatInputModule],
+  imports: [EscanerGs1, Icono, MatButtonModule, MatFormFieldModule, MatInputModule],
   providers: [...proveerOpcionesMaterial()],
   template: `
     <mat-form-field>
@@ -28,6 +31,15 @@ export interface CodigoLeido {
     </mat-form-field>
     @if (aviso(); as a) {
       <p class="aviso" [class.error]="!a.correcto" role="status">{{ a.texto }}</p>
+    }
+    @if (escaneando()) {
+      @defer {
+        <mc-escaner-gs1 (leido)="alEscanear($event)" (cerrado)="escaneando.set(false)" />
+      } @placeholder {
+        <p role="status">Preparando el escáner…</p>
+      }
+    } @else {
+      <button mat-stroked-button type="button" (click)="escaneando.set(true)"><mc-icono nombre="qr_code_scanner" />Escanear con la cámara</button>
     }
   `,
   styles: `
@@ -52,6 +64,14 @@ export class CampoCodigo {
   readonly leido = output<CodigoLeido>();
 
   protected readonly aviso = signal<{ correcto: boolean; texto: string } | null>(null);
+  /** True mientras el escáner de cámara está abierto. */
+  protected readonly escaneando = signal(false);
+
+  /** El escáner reconoció una caja: se pasa a los campos como cualquier código leído. */
+  protected alEscanear(codigo: CodigoLeido): void {
+    this.leido.emit(codigo);
+    this.aviso.set({ correcto: true, texto: 'Código leído con la cámara: completamos el GTIN y la serie.' });
+  }
 
   protected alEscribir(evento: Event): void {
     if ((evento as InputEvent).inputType === 'insertFromPaste') {

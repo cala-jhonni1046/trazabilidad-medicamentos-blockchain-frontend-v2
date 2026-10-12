@@ -23,12 +23,3 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 0 12px;
 }
-
-.aviso-pegado {
-  color: var(--mc-correcto);
-  font-weight: 600;
-
-  &.error {
-    color: var(--mc-critico);
-  }
-}

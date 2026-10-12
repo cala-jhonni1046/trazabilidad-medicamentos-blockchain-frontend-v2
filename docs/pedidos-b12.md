@@ -56,3 +56,8 @@ Al cerrar B12, buscar `TODO B12` y quitar cada rodeo.
     La pantalla "Stock" muestra la página con el estado de cada caja; no puede pedir "solo en stock".
 17. **Dispensaciones y reportes del paciente:** el listado de dispensaciones no tiene búsqueda ni filtro de anuladas;
     "Mis reportes" reutiliza el listado del inspector (el paciente nunca ve la conclusión porque la API no se la manda).
+
+## Agregado durante el Lote D (escáner y pulido)
+18. **Política de seguridad (CSP) para el Docker final:** el escáner usa un binario WebAssembly (`/zxing/zxing_reader.wasm`),
+    que exige `'wasm-unsafe-eval'` en `script-src` del servidor web que sirva el frontend; la API y el resto no necesitan nada más.
+    Anotado acá para no olvidarlo cuando se haga la imagen (el Docker se hace al final del proyecto).

@@ -24,6 +24,8 @@ Frontend Angular 22 de MediChain: trazabilidad de medicamentos (ANMAT), cadena d
 ## Arquitectura (conservar siempre)
 - `core/` (api, auth, errores, nombres, tema, layout), `shared/` (estados, ui, escaner, formato), `features/<rol>/` y `features/comun/` (pantallas de varios roles).
 - `dev/`: herramientas solo de desarrollo (muestrario de diseño en `/dev`). En producción, `angular.json` reemplaza `dev.routes.ts` por `dev.routes.produccion.ts` (lista vacía) y no llegan al bundle.
+- Escáner de cámara: `shared/escaner/` (`CamaraEscaner` + `mc-escaner-gs1`, cargado con `@defer` desde `mc-campo-codigo`). El detector es el nativo del navegador si lee DataMatrix; si no, `barcode-detector` (ZXing) con el `.wasm` servido desde `/zxing` (asset de `angular.json`): nunca desde un CDN.
+- Accesibilidad de marco: enlace "Saltar al contenido" (`mc-saltar-al-contenido`, `<main id="contenido">`) y foco al título (`proveerFocoEnNavegacion`) en cada cambio de pantalla.
 - `src/testing/`: ayudas compartidas por los tests (por ejemplo, sesiones de prueba). Sin APIs de Vitest y nunca importadas desde la aplicación.
 - Listados: `core/listas/lista-paginada.ts` (`ListaPaginada`: página, tamaño, filtro por estado, error y vacío como signals) + `mat-paginator` en español (`proveerPaginadorEs()`) + `mc-filtro-estado`. Las tablas usan las clases globales `.mc-tabla`, `.mc-acciones` y `.mc-solo-lectores` de `_base.scss`. Cada recurso (listado, mosaico) falla por separado.
 - Acciones que modifican datos: servicios `*.acciones.ts` (providedIn root) que usan `EjecutorAcciones`: con diálogo (`DialogoAccion`: confirma, o pide motivo / fundamento / conclusión, con un selector opcional) o directas ("Tomar"). Un rechazo de la API (404, 409…) se muestra TAL CUAL con su `regla`, dentro del diálogo o en un aviso. Las acciones que se ofrecen salen del estado y del rol solo para mostrar; la API decide.
@@ -46,7 +48,7 @@ Frontend Angular 22 de MediChain: trazabilidad de medicamentos (ANMAT), cadena d
 - Menú lateral de cada rol: solo en `core/layout/navegacion.ts` (un Record por rol). Cada pantalla nueva suma su entrada ahí.
 - Archivo (títulos), Source Sans 3 (texto), JetBrains Mono (hashes y códigos), con @fontsource.
 - Fechas: la API manda UTC con `Z`; se muestran en America/Argentina/Buenos_Aires con `shared/formato/fechas.ts`. Las de solo día (`YYYY-MM-DD`) nunca pasan por `new Date()`. Fecha con hora hacia la API: siempre con offset (`2026-10-08T15:00:00-03:00`); sin offset da 400.
-- Accesibilidad AA: foco visible, contraste, etiqueta en cada campo.
+- Accesibilidad AA: foco visible, contraste, etiqueta en cada campo. Todo lo que no es la pantalla inicial se carga diferido (bundle inicial de ~340 kB: el snackbar de `AvisosService` se importa bajo demanda; no importar Material en `app.config.ts` ni en servicios globales).
 
 ## Seguridad y datos
 - Nada de secretos en el código ni en `environment*.ts`: todo el bundle es público.

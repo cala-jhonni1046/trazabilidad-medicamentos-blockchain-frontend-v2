@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { VerificacionPublicaResponseDto } from '../../../core/api/modelos';
 import { ErrorApi } from '../../../core/errores/error-api';
 import { proveerOpcionesMaterial } from '../../../core/tema/opciones-material';
-import { leerCodigoPegado } from '../../../shared/escaner/parser-gs1';
+import { CampoCodigo, CodigoLeido } from '../../../shared/ui/campo-codigo';
 import { Icono } from '../../../shared/ui/icono';
 import { ErrorApiComponente } from '../../../shared/ui/error-api';
 import { ResultadoVerificacion } from './resultado-verificacion';
@@ -19,12 +19,6 @@ interface DatosCaja {
   serie: string;
 }
 
-/** Resultado de leer el código pegado: confirmación o aviso. */
-interface AvisoPegado {
-  readonly correcto: boolean;
-  readonly texto: string;
-}
-
 /**
  * Verificación pública de una caja por GTIN + serie. No necesita sesión y NO pide ni muestra
  * datos de pacientes (R13). Atajo: "Pegar el código completo" reparte un código GS1 (o
@@ -34,7 +28,7 @@ interface AvisoPegado {
 @Component({
   selector: 'mc-verificar',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ErrorApiComponente, FormField, Icono, MatButtonModule, MatFormFieldModule, MatInputModule, ResultadoVerificacion],
+  imports: [CampoCodigo, ErrorApiComponente, FormField, Icono, MatButtonModule, MatFormFieldModule, MatInputModule, ResultadoVerificacion],
   providers: [VerificarDatos, ...proveerOpcionesMaterial()],
   templateUrl: './verificar.html',
   styleUrl: './verificar.scss',
@@ -60,9 +54,6 @@ export class Verificar {
   /** Error de la API que no corresponde a un campo. */
   protected readonly errorGeneral = signal<ErrorApi | null>(null);
 
-  /** Qué pasó con el último código pegado. */
-  protected readonly avisoPegado = signal<AvisoPegado | null>(null);
-
 
   constructor() {
     // Al aparecer un resultado, el foco pasa a su título: quien usa lector de pantalla lo escucha.
@@ -73,32 +64,9 @@ export class Verificar {
     });
   }
 
-  /** Lee el código pegado o escaneado y, si se reconoce, completa GTIN y serie. */
-  protected leerPegado(evento: Event): void {
-    const entrada = evento.target as HTMLInputElement;
-    const texto = entrada.value;
-    if (texto.trim() === '') {
-      this.avisoPegado.set(null);
-      return;
-    }
-    const leido = leerCodigoPegado(texto);
-    if (leido === null) {
-      this.avisoPegado.set({
-        correcto: false,
-        texto: 'No pudimos leer este código. Completá el GTIN y la serie a mano.',
-      });
-      return;
-    }
-    this.modelo.set({ gtin: leido.gtin, serie: leido.serie });
-    this.avisoPegado.set({ correcto: true, texto: 'Código leído: completamos el GTIN y la serie.' });
-    entrada.value = '';
-  }
-
-  /** Pegar dispara la lectura al instante; al tipear (o escanear) se lee al terminar (change). */
-  protected alEscribir(evento: Event): void {
-    if ((evento as InputEvent).inputType === 'insertFromPaste') {
-      this.leerPegado(evento);
-    }
+  /** Completa GTIN y serie con lo leído de un código (pegado, tipeado o escaneado con la cámara). */
+  protected alLeer(codigo: CodigoLeido): void {
+    this.modelo.set({ gtin: codigo.gtin, serie: codigo.serie });
   }
 
   /** Envía la consulta. */

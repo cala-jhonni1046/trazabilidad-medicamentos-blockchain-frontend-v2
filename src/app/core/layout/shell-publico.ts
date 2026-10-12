@@ -1,14 +1,16 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { SesionService } from '../auth/sesion.service';
+import { SaltarAlContenido } from '../../shared/ui/saltar-al-contenido';
 import { SelectorTema } from '../tema/selector-tema';
 
 /** Marco de las pantallas públicas (ingreso, verificación): marca arriba y tema a la derecha. */
 @Component({
   selector: 'mc-shell-publico',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, SelectorTema],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, SaltarAlContenido, SelectorTema],
   template: `
+    <mc-saltar-al-contenido />
     <header class="barra">
       <a class="marca" routerLink="/" aria-label="MediChain, ir al inicio">Medi<span>Chain</span></a>
       <nav class="enlaces" aria-label="Principal">
@@ -21,7 +23,7 @@ import { SelectorTema } from '../tema/selector-tema';
       </nav>
       <mc-selector-tema />
     </header>
-    <main class="contenido">
+    <main id="contenido" class="contenido" tabindex="-1">
       <router-outlet />
     </main>
   `,
@@ -67,6 +69,10 @@ import { SelectorTema } from '../tema/selector-tema';
     .enlaces a.activo {
       color: var(--mc-primario);
       text-decoration: underline;
+    }
+    .contenido:focus,
+    h1:focus {
+      outline: none;
     }
     .contenido {
       max-width: 1040px;
