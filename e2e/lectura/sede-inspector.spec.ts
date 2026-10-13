@@ -22,7 +22,7 @@ test.describe('Sede', () => {
   test('recorre sus pantallas y cada una carga sin errores', async ({ page }) => {
     await ingresar(page, cuentaSede());
     const menu = page.getByRole('navigation', { name: 'Secciones' });
-    await expect(menu.getByRole('link')).toHaveText(['Tablero', 'Inspectores', 'Empresas', 'Circuitos', 'Cadena y Sepolia', 'Usuarios']);
+    await expect(menu.getByRole('link')).toHaveText(['Tablero', 'Inspectores', 'Empresas', 'Circuitos', 'Cadena y Sepolia', 'Trazabilidad', 'Usuarios']);
 
     for (const [entrada, titulo] of [
       ['Inspectores', 'Inspectores'],
@@ -145,7 +145,7 @@ test.describe('Inspector', () => {
     }
     // Cada entrada puede traer su insignia de pendientes ("3 pendientes"): se compara solo el comienzo.
     await expect(page.getByRole('navigation', { name: 'Secciones' }).getByRole('link')).toHaveText([
-      /^Bandeja/, /^Empresas/, /^Circuitos/, /^Lotes y cuarentenas/, /^Reportes/, /^Cadena y Sepolia/,
+      /^Bandeja/, /^Empresas/, /^Circuitos/, /^Lotes y cuarentenas/, /^Reportes/, /^Cadena y Sepolia/, /^Trazabilidad/,
     ]);
     await sinErroresDeCarga(page);
     await insigniaIgualAlTotal(page, 'Empresas', 'Empresas por habilitar');

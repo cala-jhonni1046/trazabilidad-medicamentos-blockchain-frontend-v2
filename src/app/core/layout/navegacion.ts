@@ -37,6 +37,7 @@ export const MENU_POR_ROL: Record<RolUsuario, readonly ElementoMenu[]> = {
     { texto: 'Empresas', ruta: '/sede/empresas', icono: 'domain' },
     { texto: 'Circuitos', ruta: '/sede/circuitos', icono: 'link' },
     { texto: 'Cadena y Sepolia', ruta: '/sede/cadena', icono: 'verified' },
+    { texto: 'Trazabilidad', ruta: '/sede/trazabilidad', icono: 'search' },
     { texto: 'Usuarios', ruta: '/sede/usuarios', icono: 'person' },
   ],
   INSPECTOR: [
@@ -46,6 +47,7 @@ export const MENU_POR_ROL: Record<RolUsuario, readonly ElementoMenu[]> = {
     { texto: 'Lotes y cuarentenas', ruta: '/inspector/lotes', icono: 'warning', pendientes: ['lotesBiologicos', 'cuarentenas'] },
     { texto: 'Reportes', ruta: '/inspector/reportes', icono: 'report', pendientes: ['reportes'] },
     { texto: 'Cadena y Sepolia', ruta: '/inspector/cadena', icono: 'verified' },
+    { texto: 'Trazabilidad', ruta: '/inspector/trazabilidad', icono: 'search' },
   ],
   LABORATORIO: [
     { texto: 'Circuitos', ruta: RUTA_INICIO_POR_ROL.LABORATORIO, icono: 'link' },
@@ -53,6 +55,7 @@ export const MENU_POR_ROL: Record<RolUsuario, readonly ElementoMenu[]> = {
     { texto: 'Lotes', ruta: '/laboratorio/lotes', icono: 'dashboard' },
     { texto: 'Bultos', ruta: '/laboratorio/bultos', icono: 'inventory_2' },
     { texto: 'Viajes', ruta: '/laboratorio/viajes', icono: 'local_shipping' },
+    { texto: 'Trazabilidad', ruta: '/laboratorio/trazabilidad', icono: 'search' },
     { texto: 'Equipo', ruta: '/laboratorio/equipo', icono: 'person' },
   ],
   DISTRIBUIDOR: [
@@ -60,6 +63,7 @@ export const MENU_POR_ROL: Record<RolUsuario, readonly ElementoMenu[]> = {
     { texto: 'Recibir bultos', ruta: '/distribuidora/recepcion', icono: 'inventory_2' },
     { texto: 'Depósito', ruta: '/distribuidora/deposito', icono: 'domain' },
     { texto: 'Viajes', ruta: '/distribuidora/viajes', icono: 'local_shipping' },
+    { texto: 'Trazabilidad', ruta: '/distribuidora/trazabilidad', icono: 'search' },
     { texto: 'Equipo', ruta: '/distribuidora/equipo', icono: 'person' },
   ],
   FARMACIA: [
@@ -67,6 +71,7 @@ export const MENU_POR_ROL: Record<RolUsuario, readonly ElementoMenu[]> = {
     { texto: 'Por recibir', ruta: '/farmacia/recepcion', icono: 'inventory_2' },
     { texto: 'Stock', ruta: '/farmacia/stock', icono: 'domain' },
     { texto: 'Dispensar', ruta: '/farmacia/dispensar', icono: 'person_check' },
+    { texto: 'Trazabilidad', ruta: '/farmacia/trazabilidad', icono: 'search' },
     { texto: 'Equipo', ruta: '/farmacia/equipo', icono: 'person' },
   ],
   PACIENTE: [

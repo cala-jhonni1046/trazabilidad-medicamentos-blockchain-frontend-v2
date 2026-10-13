@@ -32,4 +32,9 @@ export const rutasInspector: Routes = [
     title: 'Cadena y Sepolia · MediChain',
     loadComponent: () => import('../comun/cadena-sepolia/cadena-sepolia').then((m) => m.CadenaSepolia),
   },
+  {
+    path: 'trazabilidad',
+    title: 'Trazabilidad por código · MediChain',
+    loadComponent: () => import('../comun/trazabilidad/trazabilidad').then((m) => m.Trazabilidad),
+  },
 ];

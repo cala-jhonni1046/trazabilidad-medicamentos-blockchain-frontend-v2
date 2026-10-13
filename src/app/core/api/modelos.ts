@@ -33,6 +33,7 @@ export { MOTIVO_REPORTE } from './generado/models/motivo-reporte-array';
 export { ORIGEN_RECHAZO } from './generado/models/origen-rechazo-array';
 export { PROVINCIA } from './generado/models/provincia-array';
 export { ROL_USUARIO } from './generado/models/rol-usuario-array';
+export { TIPO_CODIGO_BUSCADO } from './generado/models/tipo-codigo-buscado-array';
 export { TIPO_EMPRESA } from './generado/models/tipo-empresa-array';
 export { TIPO_EVENTO } from './generado/models/tipo-evento-array';
 export { TIPO_MEDIDA } from './generado/models/tipo-medida-array';

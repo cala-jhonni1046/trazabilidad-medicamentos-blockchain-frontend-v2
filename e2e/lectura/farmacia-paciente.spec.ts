@@ -19,7 +19,7 @@ test.describe('Farmacia', () => {
   test('aterriza en Circuitos y recorre sus pantallas sin errores', async ({ page }) => {
     await ingresar(page, cuentaFarmacia());
     await expect(page.getByRole('navigation', { name: 'Secciones' }).getByRole('link')).toHaveText([
-      'Circuitos', 'Por recibir', 'Stock', 'Dispensar', 'Equipo',
+      'Circuitos', 'Por recibir', 'Stock', 'Dispensar', 'Trazabilidad', 'Equipo',
     ]);
     await sinErroresDeCarga(page);
     // Solo la entrada de la pantalla actual queda resaltada ("Circuitos" es prefijo de las demás rutas).

@@ -8,7 +8,7 @@
     <div class="mc-tabla" tabindex="0" role="region" [attr.aria-label]="titulo()">
       <table>
         <thead>
-          <tr><th>Medicamento</th><th>Serie</th><th>Lote</th><th>Estado</th><th>Acciones</th></tr>
+          <tr><th>Medicamento</th><th>Serie</th><th>Lote</th><th>Estado</th>@if (devolvible()) { <th>Acciones</th> }</tr>
         </thead>
         <tbody>
           @for (c of lista.elementos(); track c.id) {
@@ -22,13 +22,15 @@
                   <span class="secundario mc-falla">No se puede dispensar: {{ c.mensajeBloqueo }}</span>
                 }
               </td>
-              <td>
-                <div class="mc-acciones">
-                  @if (devolvible() && c.estado === 'EN_STOCK') {
-                    <button mat-stroked-button type="button" [disabled]="ocupada()" (click)="devolver(c)">Devolver<span class="mc-solo-lectores"> la caja {{ c.serie }}</span></button>
-                  }
-                </div>
-              </td>
+              @if (devolvible()) {
+                <td>
+                  <div class="mc-acciones">
+                    @if (c.estado === 'EN_STOCK') {
+                      <button mat-stroked-button type="button" [disabled]="ocupada()" (click)="devolver(c)">Devolver<span class="mc-solo-lectores"> la caja {{ c.serie }}</span></button>
+                    }
+                  </div>
+                </td>
+              }
             </tr>
           }
         </tbody>

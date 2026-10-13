@@ -32,4 +32,9 @@ export const rutasLaboratorio: Routes = [
     title: 'Equipo · MediChain',
     loadComponent: () => import('../comun/equipo/equipo').then((m) => m.Equipo),
   },
+  {
+    path: 'trazabilidad',
+    title: 'Trazabilidad por código · MediChain',
+    loadComponent: () => import('../comun/trazabilidad/trazabilidad').then((m) => m.Trazabilidad),
+  },
 ];

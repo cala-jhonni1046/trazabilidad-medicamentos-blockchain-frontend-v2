@@ -77,6 +77,12 @@ export const cuentaFarmacia = (): Cuenta =>
 export const cuentaPaciente = (): Cuenta =>
   cuentaDemo('PACIENTE', 'paciente@medichain.demo', 'Paciente', '/paciente', 'Verificar un medicamento', 'Verificar un medicamento');
 
+/** Cadena nueva de la demo (B12): Distribuidora del Valle de Uco y Farmacia del Parque (CIR-0003, lote L2026-0010). */
+export const cuentaDistribuidoraValleDeUco = (): Cuenta =>
+  cuentaDemo('DISTRIBUIDOR', 'admin@distribuidora-valleuco.demo', 'Distribuidora', '/distribuidora', 'Circuitos', 'Circuitos');
+export const cuentaFarmaciaDelParque = (): Cuenta =>
+  cuentaDemo('FARMACIA', 'admin@farmacia-parque.demo', 'Farmacia', '/farmacia', 'Circuitos', 'Circuitos');
+
 /** Las seis cuentas, una por rol (como funciones: así la variable se lee recién al usarla). */
 export const CUENTAS_POR_ROL: readonly (() => Cuenta)[] = [
   cuentaSede,

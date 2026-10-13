@@ -110,6 +110,18 @@ for (const modo of MODOS) {
       await sinViolaciones(page);
     });
 
+    test('Trazabilidad por código: formulario y resultado con eventos', async ({ page }) => {
+      await ingresar(page, cuentaLaboratorio());
+      await page.goto('/laboratorio/trazabilidad');
+      await expect(page.getByRole('heading', { level: 1, name: 'Trazabilidad por código' })).toBeVisible();
+      await sinViolaciones(page);
+      await page.getByLabel('Un lote').check();
+      await page.getByLabel('Código del lote').fill('L2026-0001');
+      await page.getByRole('button', { name: 'Buscar' }).click();
+      await expect(page.locator('mc-resultado-recorrido .linea li').first()).toBeVisible({ timeout: 20_000 });
+      await sinViolaciones(page);
+    });
+
     test('Paciente: verificar y reportar', async ({ page }) => {
       await ingresar(page, cuentaPaciente());
       await expect(page.getByRole('heading', { name: 'Reportar un problema con una caja' })).toBeVisible();

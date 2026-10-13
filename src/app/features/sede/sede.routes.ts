@@ -32,4 +32,9 @@ export const rutasSede: Routes = [
     title: 'Usuarios · MediChain',
     loadComponent: () => import('./usuarios/usuarios').then((m) => m.UsuariosSede),
   },
+  {
+    path: 'trazabilidad',
+    title: 'Trazabilidad por código · MediChain',
+    loadComponent: () => import('../comun/trazabilidad/trazabilidad').then((m) => m.Trazabilidad),
+  },
 ];

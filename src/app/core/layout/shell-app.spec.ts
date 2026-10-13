@@ -138,6 +138,7 @@ describe('ShellApp', () => {
       ['Lotes y cuarentenas', '7'],
       ['Reportes', null],
       ['Cadena y Sepolia', null],
+      ['Trazabilidad', null],
     ]);
     expect(raiz.querySelector('.insignia .mc-solo-lectores')?.textContent).toContain('pendientes');
   });
@@ -148,7 +149,7 @@ describe('ShellApp', () => {
     http.expectOne('/api/tablero/bandeja-inspector').flush({ status: 500, message: 'Error interno', regla: null, errors: null }, { status: 500, statusText: 'Server Error' });
     await fixture.whenStable();
 
-    expect(raiz.querySelectorAll('nav a').length).toBe(6);
+    expect(raiz.querySelectorAll('nav a').length).toBe(7);
     expect(raiz.querySelector('.insignia')).toBeNull();
   });
 

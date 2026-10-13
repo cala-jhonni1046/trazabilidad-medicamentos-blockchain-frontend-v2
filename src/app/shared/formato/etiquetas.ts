@@ -1,6 +1,7 @@
 import {
   AlcanceCuarentena,
   EtapaRecorrido,
+  TipoCodigoBuscado,
   MotivoDevolucion,
   MotivoBloqueo,
   MotivoReporte,
@@ -131,6 +132,33 @@ export const ROTULO_ETAPA_RECORRIDO: Record<EtapaRecorrido, string> = {
   RECIBIDO: 'Recibido',
   RECHAZADO: 'Rechazado',
 };
+
+/** Qué encontró la trazabilidad por código. */
+export const ROTULO_TIPO_CODIGO_BUSCADO: Record<TipoCodigoBuscado, string> = {
+  LOTE: 'Lote',
+  BULTO: 'Bulto',
+  CAJA: 'Caja',
+};
+
+/** Sobre qué cosa ocurrió un evento (`entidadTipo` es texto libre en el contrato: lo desconocido se muestra tal cual). */
+const ROTULO_ENTIDAD: Readonly<Record<string, string>> = {
+  Lote: 'Lote',
+  Bulto: 'Bulto',
+  UnidadTrazable: 'Caja',
+  DespachoLogistico: 'Viaje',
+  Cuarentena: 'Medida sanitaria',
+  Empresa: 'Empresa',
+  EnlaceCuit: 'Circuito',
+  InspectorAnmat: 'Inspector',
+  Medicamento: 'Medicamento',
+  Dispensacion: 'Dispensación',
+  ReporteCiudadano: 'Reporte ciudadano',
+};
+
+/** Texto de la entidad de un evento ("DespachoLogistico" → "Viaje"). */
+export function rotuloEntidad(entidadTipo: string): string {
+  return ROTULO_ENTIDAD[entidadTipo] ?? entidadTipo;
+}
 
 /** Tramo de un viaje. */
 export const ROTULO_TRAMO: Record<TramoDespacho, string> = {

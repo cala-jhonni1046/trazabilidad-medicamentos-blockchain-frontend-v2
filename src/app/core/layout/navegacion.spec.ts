@@ -26,4 +26,16 @@ describe('navegación', () => {
     expect(resaltarSoloSiEsExacta(menu[0], menu)).toBe(true);
     expect(resaltarSoloSiEsExacta(menu[2], menu)).toBe(false);
   });
+
+  it('todos los roles que operan la trazabilidad tienen su entrada "Trazabilidad", y el paciente no', () => {
+    for (const rol of ROL_USUARIO) {
+      const entradas = MENU_POR_ROL[rol].filter((e) => e.texto === 'Trazabilidad');
+      if (rol === 'PACIENTE') {
+        expect(entradas).toEqual([]);
+      } else {
+        expect(entradas.length, rol).toBe(1);
+        expect(entradas[0].ruta).toMatch(/^\/[a-z]+\/trazabilidad$/);
+      }
+    }
+  });
 });

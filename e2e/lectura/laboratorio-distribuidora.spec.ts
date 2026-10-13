@@ -18,7 +18,7 @@ test.describe('Laboratorio', () => {
   test('aterriza en Circuitos y recorre sus pantallas sin errores', async ({ page }) => {
     await ingresar(page, cuentaLaboratorio());
     const menu = page.getByRole('navigation', { name: 'Secciones' });
-    await expect(menu.getByRole('link')).toHaveText(['Circuitos', 'Medicamentos', 'Lotes', 'Bultos', 'Viajes', 'Equipo']);
+    await expect(menu.getByRole('link')).toHaveText(['Circuitos', 'Medicamentos', 'Lotes', 'Bultos', 'Viajes', 'Trazabilidad', 'Equipo']);
     await expect(page.getByRole('heading', { level: 1, name: 'Circuitos' })).toBeVisible();
     await sinErroresDeCarga(page);
 
@@ -95,7 +95,7 @@ test.describe('Distribuidora', () => {
   test('aterriza en Circuitos y recorre sus pantallas sin errores', async ({ page }) => {
     await ingresar(page, cuentaDistribuidora());
     const menu = page.getByRole('navigation', { name: 'Secciones' });
-    await expect(menu.getByRole('link')).toHaveText(['Circuitos', 'Recibir bultos', 'Depósito', 'Viajes', 'Equipo']);
+    await expect(menu.getByRole('link')).toHaveText(['Circuitos', 'Recibir bultos', 'Depósito', 'Viajes', 'Trazabilidad', 'Equipo']);
     await sinErroresDeCarga(page);
 
     for (const [entrada, titulo] of [

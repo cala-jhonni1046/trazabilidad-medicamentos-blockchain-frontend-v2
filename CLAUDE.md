@@ -20,6 +20,7 @@ Frontend Angular 22 de MediChain: trazabilidad de medicamentos (ANMAT), cadena d
 - El cliente generado usa `rootUrl = ''` (URLs relativas `/api/...`); nunca el `servers` del contrato.
 - Pedidos al backend (paso B12, ya resuelto casi todo): `docs/pedidos-b12.md` dice qué se hizo y qué sigue pendiente. Un rodeo del frontend por algo que el contrato aún no resuelve se marca `// TODO B12: …` y se anota ahí.
 - Los DTO traen los nombres junto al id (razón social, nombre del inspector, código del lote, medicamento…): las pantallas los muestran directo, sin pedir cada nombre aparte. Ojo: `BultoResponseDto.destinoId` es el id del CIRCUITO; para mostrar el destino usá `circuitoCodigo`, `distribuidorRazonSocial` y `farmaciaRazonSocial`.
+- Trazabilidad por código (`features/comun/trazabilidad`, entrada "Trazabilidad" de todos los roles menos el paciente): lote, bulto o caja (GTIN + serie) → eventos en orden (`GET /api/eventos-trazabilidad/recorrido`). El alcance lo resuelve la API (lo ajeno, 404). R13: de cada evento se muestran solo número, tipo, entidad, fecha y hash; nunca `datosJson` ni los ids de actor.
 - Los filtros `?estado=` (cajas, viajes, bultos…) los aplica la API dentro de lo que cada rol ve: el cliente los pide, no filtra a mano.
 - Los campos que pueden venir `null` se generan como opcionales pero llegan como `null`: comparar con `== null` o `??`, nunca `=== undefined`.
 
