@@ -11,7 +11,7 @@ const MOSAICOS = [
   'Circuitos aprobados',
   'Cuarentenas activas',
   'Eventos en la cadena',
-  'Anclajes en Sepolia',
+  'Anclajes confirmados en Sepolia',
 ];
 
 test.describe('tablero de la Sede', () => {

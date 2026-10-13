@@ -1,28 +1,22 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
-import { forkJoin, map, of, switchMap } from 'rxjs';
+import { map } from 'rxjs';
 import { ViajesService } from '../../../core/api/generado/services/viajes.service';
 import { DespachoLogisticoResponseDto } from '../../../core/api/modelos';
 import { TAMANO_PAGINA_MAXIMO } from '../../../core/api/pagina';
 import { SesionService } from '../../../core/auth/sesion.service';
 import { ErrorApi, parsearErrorApi } from '../../../core/errores/error-api';
-import { NombresService } from '../../../core/nombres/nombres.service';
 import { ROTULO_TRAMO } from '../../../shared/formato/etiquetas';
 import { FechaHoraPipe } from '../../../shared/formato/pipes-fechas';
 import { Tarjeta } from '../../../shared/ui/tarjeta';
 import { HttpErrorResponse } from '@angular/common/http';
 
-/** Un viaje en tránsito hacia la empresa, con el nombre de su origen. */
-interface ViajeEntrante {
-  readonly viaje: DespachoLogisticoResponseDto;
-  readonly origen: string;
-}
-
 /**
- * "En camino hacia vos": los viajes en tránsito que tienen como destino a la empresa.
- * TODO B12: `listarViajes` no filtra por estado (se pide hasta 100 y se filtra acá) y no dice qué
- * bultos del viaje son de esta empresa (docs/pedidos-b12.md, punto 8).
+ * "En camino hacia vos": los viajes EN_TRANSITO (se piden con `?estado=`) que no origina la propia empresa.
+ * Cada viaje trae el nombre de su origen. La API no dice qué bultos de un viaje con varias paradas son de
+ * esta empresa: se muestran los códigos del viaje tal como vienen (ver "fuga de alcance de las paradas" en
+ * docs/pedidos-b12.md).
  */
 @Component({
   selector: 'mc-viajes-en-camino',
@@ -40,12 +34,12 @@ interface ViajeEntrante {
         <p class="mc-vacio">No hay viajes en camino.</p>
       } @else {
         <ul class="viajes">
-          @for (e of entrantes(); track e.viaje.id) {
+          @for (viaje of entrantes(); track viaje.id) {
             <li>
-              <strong>{{ e.viaje.codigo }}</strong> · {{ rotuloTramo[e.viaje.tramo] }}
+              <strong>{{ viaje.codigo }}</strong> · {{ rotuloTramo[viaje.tramo] }}
               <span class="secundario">
-                sale de {{ e.origen }} · llega aprox. {{ e.viaje.fechaEstimadaEntrega | fechaHora }} · bultos
-                @for (c of e.viaje.bultoCodigos; track c) { <code>{{ c }}</code>{{ $last ? '' : ' ' }} }
+                sale de {{ viaje.origenRazonSocial }} · llega aprox. {{ viaje.fechaEstimadaEntrega | fechaHora }} · bultos
+                @for (c of viaje.bultoCodigos; track c) { <code>{{ c }}</code>{{ $last ? '' : ' ' }} }
               </span>
             </li>
           }
@@ -70,20 +64,14 @@ interface ViajeEntrante {
 })
 export class ViajesEnCamino {
   private readonly api = inject(ViajesService);
-  private readonly nombres = inject(NombresService);
   private readonly sesion = inject(SesionService);
   protected readonly rotuloTramo = ROTULO_TRAMO;
 
-  protected readonly recurso = rxResource<ViajeEntrante[], undefined>({
+  protected readonly recurso = rxResource<DespachoLogisticoResponseDto[], undefined>({
     stream: () =>
-      this.api.listarViajes({ size: TAMANO_PAGINA_MAXIMO }).pipe(
-        map((p) => p.content.filter((v) => v.estado === 'EN_TRANSITO' && v.origenId !== this.sesion.sesion()?.empresaId)),
-        switchMap((viajes) =>
-          viajes.length === 0
-            ? of<ViajeEntrante[]>([])
-            : forkJoin(viajes.map((viaje) => this.nombres.empresa(viaje.origenId).pipe(map((e): ViajeEntrante => ({ viaje, origen: e?.razonSocial ?? '(sin datos)' }))))),
-        ),
-      ),
+      this.api
+        .listarViajes({ estado: 'EN_TRANSITO', size: TAMANO_PAGINA_MAXIMO })
+        .pipe(map((p) => p.content.filter((v) => v.origenId !== this.sesion.sesion()?.empresaId))),
   });
 
   protected readonly entrantes = computed(() => (this.recurso.hasValue() ? this.recurso.value() : []));

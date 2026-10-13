@@ -25,6 +25,9 @@
           ariaCurrentWhenActive="page"
         >
           <mc-icono [nombre]="elemento.icono" />{{ elemento.texto }}
+          @if ((elemento.cantidad ?? 0) > 0) {
+            <span class="insignia">{{ elemento.cantidad }}<span class="mc-solo-lectores"> pendientes</span></span>
+          }
         </a>
       }
     </nav>

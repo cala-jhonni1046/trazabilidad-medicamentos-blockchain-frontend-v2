@@ -79,15 +79,13 @@ export class EmpresasAcciones {
 
   /** Descarga el PDF de habilitación (se guarda como archivo). */
   async descargarDocumento(empresa: EmpresaResponseDto): Promise<void> {
-    const resultado: Resultado<unknown> = await aResultado(this.empresas.descargarDocumentoEmpresa({ id: empresa.id }));
+    const resultado: Resultado<Blob> = await aResultado(this.empresas.descargarDocumentoEmpresa({ id: empresa.id }));
     if (!resultado.ok) {
       this.avisos.mostrarError(resultado.error.mensaje);
       return;
     }
-    // TODO B12: el contrato declara el PDF como `string` (format: byte); en realidad llega un Blob
-    // (docs/pedidos-b12.md, punto 4).
-    const archivo = resultado.valor as Blob;
-    const direccion = URL.createObjectURL(new Blob([archivo], { type: 'application/pdf' }));
+    // El contrato declara el PDF como binario (format: binary): el cliente generado lo tipa Blob.
+    const direccion = URL.createObjectURL(new Blob([resultado.valor], { type: 'application/pdf' }));
     const enlace = document.createElement('a');
     enlace.href = direccion;
     enlace.download = empresa.documentoNombre ?? `habilitacion-${empresa.cuit}.pdf`;

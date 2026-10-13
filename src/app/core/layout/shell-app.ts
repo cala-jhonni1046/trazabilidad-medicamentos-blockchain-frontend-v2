@@ -8,6 +8,7 @@ import { SelectorTema } from '../tema/selector-tema';
 import { AvisoEmpresa } from './aviso-empresa';
 import { EmpresaPropiaDatos } from './empresa-propia.datos';
 import { ElementoMenu, MENU_POR_ROL, ROTULO_ROL, resaltarSoloSiEsExacta } from './navegacion';
+import { PendientesInspector } from './pendientes-inspector';
 
 /**
  * Marco de las pantallas de una persona con sesión: barra lateral con el menú de su rol,
@@ -17,20 +18,28 @@ import { ElementoMenu, MENU_POR_ROL, ROTULO_ROL, resaltarSoloSiEsExacta } from '
   selector: 'mc-shell-app',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [AvisoEmpresa, Icono, RouterLink, RouterLinkActive, RouterOutlet, SaltarAlContenido, SelectorTema],
-  providers: [EmpresaPropiaDatos],
+  providers: [EmpresaPropiaDatos, PendientesInspector],
   templateUrl: './shell-app.html',
   styleUrl: './shell-app.scss',
 })
 export class ShellApp {
   private readonly servicioSesion = inject(SesionService);
   protected readonly datosEmpresa = inject(EmpresaPropiaDatos);
+  private readonly pendientes = inject(PendientesInspector);
 
   protected readonly sesion = this.servicioSesion.sesion;
-  /** Menú del rol, con la marca de qué entradas se resaltan solo con la ruta exacta (ver `resaltarSoloSiEsExacta`). */
-  protected readonly menu = computed((): readonly (ElementoMenu & { readonly exacta: boolean })[] => {
+  /**
+   * Menú del rol, con la marca de qué entradas se resaltan solo con la ruta exacta (ver `resaltarSoloSiEsExacta`)
+   * y, para el inspector, cuántos pendientes tiene cada una (`cantidad`, null si no aplica o todavía no hay datos).
+   */
+  protected readonly menu = computed((): readonly (ElementoMenu & { readonly exacta: boolean; readonly cantidad: number | null })[] => {
     const sesion = this.sesion();
     const entradas = sesion === null ? [] : MENU_POR_ROL[sesion.rol];
-    return entradas.map((elemento) => ({ ...elemento, exacta: resaltarSoloSiEsExacta(elemento, entradas) }));
+    return entradas.map((elemento) => ({
+      ...elemento,
+      exacta: resaltarSoloSiEsExacta(elemento, entradas),
+      cantidad: elemento.pendientes === undefined ? null : this.pendientes.total(elemento.pendientes),
+    }));
   });
   protected readonly rotuloRol = computed(() => {
     const sesion = this.sesion();

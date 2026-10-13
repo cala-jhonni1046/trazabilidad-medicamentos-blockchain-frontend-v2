@@ -62,12 +62,9 @@ export class DialogoAsignar implements OnInit {
     this.cargando.set(false);
   }
 
-  /** Texto de una opción: "Laura Gómez (L-001) · Mendoza" o, sin nombre, "L-001 · Mendoza". */
+  /** Texto de una opción: "Laura Gómez (L-001) · Mendoza". */
   protected etiqueta(inspector: OpcionInspector): string {
-    const provincia = ROTULO_PROVINCIA[inspector.provincia];
-    return inspector.nombre === null
-      ? `${inspector.legajo} · ${provincia}`
-      : `${inspector.nombre} (${inspector.legajo}) · ${provincia}`;
+    return `${inspector.nombre} (${inspector.legajo}) · ${ROTULO_PROVINCIA[inspector.provincia]}`;
   }
 
   /** Confirma la asignación. */

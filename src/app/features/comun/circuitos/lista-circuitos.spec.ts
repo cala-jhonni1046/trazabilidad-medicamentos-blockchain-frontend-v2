@@ -4,15 +4,13 @@ import { ListaCircuitos } from './lista-circuitos';
 
 const circuito = (cambios: object = {}) => ({
   id: 'c1', codigo: 'CIR-0003', estado: 'PENDIENTE_INSPECTOR', laboratorioId: 'l1', distribuidorId: 'd1', farmaciaId: 'f1',
+  laboratorioRazonSocial: 'Lab Andino', distribuidorRazonSocial: 'Distribuidora Pie de Monte', farmaciaRazonSocial: 'Farmacia Cerro Arco',
   fechaPropuesta: '2026-10-08T18:00:00Z', inspectorRevisorId: null, fechaAceptacionDistribuidor: null, fechaAceptacionFarmacia: null, ...cambios,
 });
 
-/** Responde el listado y los nombres de las tres empresas. */
+/** Responde el listado (los nombres de las empresas vienen en cada circuito). */
 async function cargar(p: ReturnType<typeof crearPantalla<ListaCircuitos>>, url: string, filas: object[]) {
   p.responder(url, pagina(filas));
-  for (const [id, razonSocial] of [['l1', 'Lab Andino'], ['d1', 'Distribuidora Pie de Monte'], ['f1', 'Farmacia Cerro Arco']]) {
-    await vi.waitFor(() => p.http.expectOne(`/api/empresas/${id}`).flush({ id, razonSocial, provincia: 'MENDOZA' }));
-  }
   await p.esperar(() => expect(p.raiz.querySelector('tbody tr')).not.toBeNull());
 }
 

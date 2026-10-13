@@ -10,7 +10,7 @@ import { OpcionInspector } from './tablero.datos';
 
 const INSPECTORES: readonly OpcionInspector[] = [
   { id: 'i1', legajo: 'L-001', provincia: 'MENDOZA', nombre: 'Laura Gómez' },
-  { id: 'i2', legajo: 'L-002', provincia: 'SAN_JUAN', nombre: null },
+  { id: 'i2', legajo: 'L-002', provincia: 'SAN_JUAN', nombre: 'Pablo Funes' },
 ];
 
 async function crear(cambios: Partial<DatosDialogoAsignar> = {}) {
@@ -39,7 +39,7 @@ function enviar(raiz: HTMLElement): void {
 }
 
 describe('DialogoAsignar', () => {
-  it('muestra el título y el detalle, y ofrece los inspectores (con nombre o, sin nombre, por legajo)', async () => {
+  it('muestra el título y el detalle, y ofrece los inspectores con su nombre, legajo y provincia', async () => {
     const { raiz, cargador } = await crear();
 
     expect(raiz.querySelector('h2')?.textContent).toBe('Asignar solicitud de habilitación');
@@ -49,7 +49,7 @@ describe('DialogoAsignar', () => {
     const opciones = await select.getOptions();
     expect(await Promise.all(opciones.map((o) => o.getText()))).toEqual([
       'Laura Gómez (L-001) · Mendoza',
-      'L-002 · San Juan',
+      'Pablo Funes (L-002) · San Juan',
     ]);
   });
 

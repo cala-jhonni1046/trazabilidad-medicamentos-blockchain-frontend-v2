@@ -1,0 +1,39 @@
+<mc-tarjeta [titulo]="titulo()" [detalle]="lista.total() + ' en total'">
+  @if (lista.error(); as error) {
+    <mc-error-api [error]="error" />
+    <div><button mat-stroked-button type="button" (click)="lista.recargar()">Reintentar</button></div>
+  } @else if (lista.vacia()) {
+    <p class="mc-vacio">{{ textoVacio() }}</p>
+  } @else {
+    <div class="mc-tabla" tabindex="0" role="region" [attr.aria-label]="titulo()">
+      <table>
+        <thead>
+          <tr><th>Medicamento</th><th>Serie</th><th>Lote</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          @for (c of lista.elementos(); track c.id) {
+            <tr>
+              <td>{{ c.medicamentoNombre }}<span class="secundario">GTIN {{ c.gtin }}</span></td>
+              <td><code>{{ c.serie }}</code></td>
+              <td><code>{{ c.loteCodigo }}</code></td>
+              <td>
+                <mc-estado [presentacion]="presentacion[c.estado]" />
+                @if (c.bloqueado) {
+                  <span class="secundario mc-falla">No se puede dispensar: {{ c.mensajeBloqueo }}</span>
+                }
+              </td>
+              <td>
+                <div class="mc-acciones">
+                  @if (devolvible() && c.estado === 'EN_STOCK') {
+                    <button mat-stroked-button type="button" [disabled]="ocupada()" (click)="devolver(c)">Devolver<span class="mc-solo-lectores"> la caja {{ c.serie }}</span></button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <mat-paginator [length]="lista.total()" [pageSize]="lista.tamano()" [pageIndex]="lista.paginaActual()" [pageSizeOptions]="[10, 20, 50]" (page)="cambiarPagina($event)" [attr.aria-label]="'Página de ' + titulo().toLowerCase()" />
+  }
+</mc-tarjeta>

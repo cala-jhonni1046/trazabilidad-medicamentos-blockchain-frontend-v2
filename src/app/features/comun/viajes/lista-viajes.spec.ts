@@ -2,14 +2,13 @@ import { boton, botones, crearPantalla, enviarDialogo, errorApi, limpiarOverlays
 import { ListaViajes } from './lista-viajes';
 
 const viaje = (cambios: object = {}) => ({
-  id: 'v1', codigo: 'VJ-0001', tramo: 'LAB_A_DISTRIBUIDOR', estado: 'PROGRAMADO', origenId: 'l1', patente: 'AB123CD', chofer: 'Juan Camión',
+  id: 'v1', codigo: 'VJ-0001', tramo: 'LAB_A_DISTRIBUIDOR', estado: 'PROGRAMADO', origenId: 'l1', origenRazonSocial: 'Lab Andino', patente: 'AB123CD', chofer: 'Juan Camión',
   fechaEstimadaEntrega: '2026-10-09T18:00:00Z', fechaSalida: null, bultoCodigos: ['BUL-0001', 'BUL-0002'], ...cambios,
 });
 
 async function cargar(rol: 'LABORATORIO' | 'DISTRIBUIDOR', filas: object[]) {
   const p = crearPantalla(ListaViajes, rol, { sesion: { empresaId: rol === 'LABORATORIO' ? 'l1' : 'd1' } });
   p.responder('/api/viajes', pagina(filas));
-  await vi.waitFor(() => p.http.match((r) => r.url === '/api/empresas/l1').forEach((r) => r.flush({ id: 'l1', razonSocial: 'Lab Andino' })));
   await p.esperar(() => expect(p.raiz.querySelector('tbody tr')).not.toBeNull());
   return p;
 }
@@ -30,6 +29,16 @@ describe('ListaViajes', () => {
   it('en tránsito: el origen puede reportar robo y ver la temperatura; la receptora solo ve la temperatura', async () => {
     const origen = await cargar('LABORATORIO', [viaje({ estado: 'EN_TRANSITO', fechaSalida: '2026-10-08T12:00:00Z' })]);
     expect(botones(origen.raiz.querySelector('tbody tr') as Element)).toEqual(['Reportar robo', 'Temperatura']);
+  });
+
+  it('filtrar por estado pide ?estado= a la API (la API lo aplica dentro de lo que el rol ya ve)', async () => {
+    const p = await cargar('DISTRIBUIDOR', [viaje()]);
+
+    p.fixture.componentInstance['lista'].filtrarPor('EN_TRANSITO');
+    p.fixture.detectChanges();
+    const pedido = p.http.expectOne((r) => r.url === '/api/viajes' && r.params.get('estado') === 'EN_TRANSITO');
+    pedido.flush(pagina([viaje({ estado: 'EN_TRANSITO' })]));
+    await p.esperar(() => expect(p.raiz.querySelector('tbody tr')?.textContent).toContain('En tránsito'));
   });
 
   it('la distribuidora que recibe no ve acciones del origen', async () => {

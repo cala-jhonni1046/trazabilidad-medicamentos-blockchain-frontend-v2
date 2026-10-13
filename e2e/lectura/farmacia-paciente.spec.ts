@@ -39,12 +39,16 @@ test.describe('Farmacia', () => {
     }
   });
 
-  test('Stock: muestra las cajas con su estado (o que no hay) y nunca el texto crudo de un enum', async ({ page }) => {
+  test('Stock: dos tarjetas, "En stock" y "En camino", cada una con sus cajas (o que no hay) y nunca el texto crudo de un enum', async ({ page }) => {
     await ingresar(page, cuentaFarmacia());
     await irA(page, 'Stock');
 
-    await expect(page.locator('tbody tr, .mc-vacio').first()).toBeVisible({ timeout: 20_000 });
-    await expect(page.locator('main')).not.toContainText(/EN_STOCK|DISPENSADA|EN_DEPOSITO/);
+    for (const titulo of ['En stock', 'En camino']) {
+      const tarjeta = page.locator('mc-lista-cajas', { has: page.getByRole('heading', { name: titulo }) });
+      await expect(tarjeta.locator('tbody tr, .mc-vacio').first()).toBeVisible({ timeout: 20_000 });
+      await expect(tarjeta).toContainText(/\d+ en total/);
+    }
+    await expect(page.locator('main')).not.toContainText(/EN_STOCK|EN_TRANSITO|DISPENSADA|EN_DEPOSITO/);
   });
 
   test('Dispensar: sin completar pide GTIN, serie y receta; no pide ni muestra datos de pacientes salvo el DNI opcional', async ({ page }) => {

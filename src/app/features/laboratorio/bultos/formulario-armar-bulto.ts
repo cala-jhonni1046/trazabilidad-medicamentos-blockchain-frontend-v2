@@ -4,7 +4,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { forkJoin, map, of, switchMap } from 'rxjs';
 import { BultosService } from '../../../core/api/generado/services/bultos.service';
 import { CircuitosService } from '../../../core/api/generado/services/circuitos.service';
 import { LotesService } from '../../../core/api/generado/services/lotes.service';
@@ -12,7 +11,6 @@ import { EnlaceCuitResponseDto, LoteResponseDto } from '../../../core/api/modelo
 import { TAMANO_PAGINA_MAXIMO } from '../../../core/api/pagina';
 import { aResultado } from '../../../core/api/resultado';
 import { ErrorApi } from '../../../core/errores/error-api';
-import { NombresService } from '../../../core/nombres/nombres.service';
 import { proveerOpcionesMaterial } from '../../../core/tema/opciones-material';
 import { ErrorApiComponente } from '../../../shared/ui/error-api';
 import { Tarjeta } from '../../../shared/ui/tarjeta';
@@ -22,12 +20,6 @@ interface DatosBulto {
   circuitoId: string;
   precinto: string;
   cantidad: string;
-}
-
-/** Un circuito aprobado con el nombre de su farmacia, para elegirlo. */
-interface OpcionCircuito {
-  readonly circuito: EnlaceCuitResponseDto;
-  readonly texto: string;
 }
 
 const CAMPOS: readonly string[] = ['loteId', 'circuitoId', 'precinto', 'cantidad'];
@@ -65,7 +57,7 @@ const CAMPOS: readonly string[] = ['loteId', 'circuitoId', 'precinto', 'cantidad
             <mat-form-field>
               <mat-label>Circuito (farmacia de destino)</mat-label>
               <mat-select [formField]="formulario.circuitoId">
-                @for (c of circuitos(); track c.circuito.id) { <mat-option [value]="c.circuito.id">{{ c.texto }}</mat-option> }
+                @for (c of circuitos(); track c.id) { <mat-option [value]="c.id">{{ c.codigo }} · {{ c.farmaciaRazonSocial }} vía {{ c.distribuidorRazonSocial }}</mat-option> }
               </mat-select>
               @for (e of formulario.circuitoId().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
             </mat-form-field>
@@ -104,7 +96,6 @@ export class FormularioArmarBulto {
   private readonly bultos = inject(BultosService);
   private readonly lotesApi = inject(LotesService);
   private readonly circuitosApi = inject(CircuitosService);
-  private readonly nombres = inject(NombresService);
 
   /** Se emite el bulto armado, para que la pantalla recargue su listado. */
   readonly armado = output<void>();
@@ -119,7 +110,7 @@ export class FormularioArmarBulto {
   });
 
   protected readonly lotes = signal<readonly LoteResponseDto[]>([]);
-  protected readonly circuitos = signal<readonly OpcionCircuito[]>([]);
+  protected readonly circuitos = signal<readonly EnlaceCuitResponseDto[]>([]);
   protected readonly cargando = signal(true);
   protected readonly errorGeneral = signal<ErrorApi | null>(null);
 
@@ -132,24 +123,7 @@ export class FormularioArmarBulto {
     // Las dos búsquedas van en paralelo.
     const [lotes, circuitos] = await Promise.all([
       aResultado(this.lotesApi.listarLotes({ estado: 'LIBERADO', size: TAMANO_PAGINA_MAXIMO })),
-      aResultado(
-      this.circuitosApi.listarCircuitos({ estado: 'APROBADO', size: TAMANO_PAGINA_MAXIMO }).pipe(
-        switchMap((pagina) =>
-          pagina.content.length === 0
-            ? of<OpcionCircuito[]>([])
-            : forkJoin(
-                pagina.content.map((circuito) =>
-                  forkJoin({ farmacia: this.nombres.empresa(circuito.farmaciaId), distribuidor: this.nombres.empresa(circuito.distribuidorId) }).pipe(
-                    map((n): OpcionCircuito => ({
-                      circuito,
-                      texto: `${circuito.codigo} · ${n.farmacia?.razonSocial ?? '(sin datos)'} vía ${n.distribuidor?.razonSocial ?? '(sin datos)'}`,
-                    })),
-                  ),
-                ),
-              ),
-        ),
-      ),
-      ),
+      aResultado(this.circuitosApi.listarCircuitos({ estado: 'APROBADO', size: TAMANO_PAGINA_MAXIMO })),
     ]);
     if (lotes.ok) {
       this.lotes.set(lotes.valor.content);
@@ -157,7 +131,7 @@ export class FormularioArmarBulto {
       this.errorGeneral.set(lotes.error);
     }
     if (circuitos.ok) {
-      this.circuitos.set(circuitos.valor);
+      this.circuitos.set(circuitos.valor.content);
     } else {
       this.errorGeneral.set(circuitos.error);
     }

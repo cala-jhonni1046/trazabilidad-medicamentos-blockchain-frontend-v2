@@ -119,6 +119,22 @@ test.describe('Sede', () => {
   });
 });
 
+/**
+ * La insignia del menú (GET /api/tablero/bandeja-inspector) es el mismo número que "N en total" (o "N pendientes") de la tarjeta de
+ * esa bandeja; con cero pendientes no hay insignia.
+ */
+async function insigniaIgualAlTotal(page: Page, entrada: string, tarjeta: string): Promise<void> {
+  const enlace = page.getByRole('navigation', { name: 'Secciones' }).getByRole('link', { name: new RegExp(`^${entrada}`) });
+  const detalle = await page.locator('mc-tarjeta', { has: page.getByRole('heading', { name: tarjeta }) }).textContent();
+  const total = Number(/(\d[\d.]*) (?:en total|pendientes)/.exec(detalle ?? '')?.[1]?.replaceAll('.', '') ?? NaN);
+  expect(Number.isNaN(total), `la tarjeta "${tarjeta}" dice cuántos hay`).toBe(false);
+  if (total === 0) {
+    await expect(enlace.locator('.insignia')).toHaveCount(0);
+  } else {
+    await expect(enlace.locator('.insignia')).toContainText(String(total));
+  }
+}
+
 test.describe('Inspector', () => {
   test('aterriza en su bandeja con los cinco listados y recorre sus pantallas', async ({ page }) => {
     await ingresar(page, cuentaInspector());
@@ -127,10 +143,14 @@ test.describe('Inspector', () => {
     for (const titulo of ['Empresas por habilitar', 'Circuitos por aprobar', 'Biológicos por liberar', 'Cuarentenas por revisar', 'Reportes ciudadanos']) {
       await expect(page.locator('mc-tarjeta').getByRole('heading', { name: titulo })).toBeVisible();
     }
+    // Cada entrada puede traer su insignia de pendientes ("3 pendientes"): se compara solo el comienzo.
     await expect(page.getByRole('navigation', { name: 'Secciones' }).getByRole('link')).toHaveText([
-      'Bandeja', 'Empresas', 'Circuitos', 'Lotes y cuarentenas', 'Reportes', 'Cadena y Sepolia',
+      /^Bandeja/, /^Empresas/, /^Circuitos/, /^Lotes y cuarentenas/, /^Reportes/, /^Cadena y Sepolia/,
     ]);
     await sinErroresDeCarga(page);
+    await insigniaIgualAlTotal(page, 'Empresas', 'Empresas por habilitar');
+    await insigniaIgualAlTotal(page, 'Circuitos', 'Circuitos por aprobar');
+    await insigniaIgualAlTotal(page, 'Reportes', 'Reportes ciudadanos');
 
     for (const [entrada, titulo] of [
       ['Empresas', 'Empresas'],

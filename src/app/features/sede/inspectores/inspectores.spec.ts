@@ -2,13 +2,12 @@ import { boton, botones, crearPantalla, enviarDialogo, errorApi, limpiarOverlays
 import { Inspectores } from './inspectores';
 
 const inspector = (cambios: object = {}) => ({
-  id: 'i1', usuarioId: 'u1', legajo: 'L-001', dni: '20111222', provincia: 'MENDOZA', estado: 'ACTIVO', fechaAlta: '2026-10-01T12:00:00Z', ...cambios,
+  id: 'i1', usuarioId: 'u1', nombre: 'Laura', apellido: 'Gómez', legajo: 'L-001', dni: '20111222', provincia: 'MENDOZA', estado: 'ACTIVO', fechaAlta: '2026-10-01T12:00:00Z', ...cambios,
 });
 
 async function cargar(filas: object[]) {
   const p = crearPantalla(Inspectores, 'SEDE_CENTRAL');
   p.responder('/api/inspectores-anmat', pagina(filas));
-  await vi.waitFor(() => p.http.match((r) => r.url === '/api/usuarios/u1').forEach((r) => r.flush({ nombre: 'Laura', apellido: 'Gómez' })));
   await p.esperar(() => expect(p.raiz.querySelector('tbody tr')).not.toBeNull());
   return p;
 }
@@ -22,15 +21,6 @@ describe('Inspectores', () => {
     expect(p.raiz.querySelector('tbody tr')?.textContent).toContain('Laura Gómez');
     expect(p.raiz.querySelector('tbody tr')?.textContent).toContain('Mendoza');
     expect(Array.from(p.raiz.querySelectorAll('tbody tr')).map((f) => botones(f))).toEqual([['Dar de baja'], ['Reactivar']]);
-  });
-
-  it('si no se puede leer el nombre, lo dice y no falla', async () => {
-    const p = crearPantalla(Inspectores, 'SEDE_CENTRAL');
-    p.responder('/api/inspectores-anmat', pagina([inspector()]));
-    await vi.waitFor(() => p.http.expectOne('/api/usuarios/u1').flush(...errorApi(404, 'No encontrado')));
-    await p.esperar(() => expect(p.raiz.querySelector('tbody tr')).not.toBeNull());
-
-    expect(p.raiz.querySelector('tbody tr')?.textContent).toContain('Sin nombre disponible');
   });
 
   it('dar de baja confirma y llama a la API; un 409 se ve en el diálogo', async () => {

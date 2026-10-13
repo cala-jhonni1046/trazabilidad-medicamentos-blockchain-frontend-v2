@@ -3,7 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { EmpresaResponseDto } from '../../../core/api/modelos';
+import { EmpresaResponseDto, EnlaceCuitResponseDto } from '../../../core/api/modelos';
 import { AvisosService } from '../../../core/errores/avisos.service';
 import { ROTULO_PROVINCIA, ROTULO_TIPO_EMPRESA } from '../../../shared/formato/etiquetas';
 import { FechaHoraPipe } from '../../../shared/formato/pipes-fechas';
@@ -11,7 +11,7 @@ import { Icono } from '../../../shared/ui/icono';
 import { Mosaico } from '../../../shared/ui/mosaico';
 import { Tarjeta } from '../../../shared/ui/tarjeta';
 import { DatosDialogoAsignar, DialogoAsignar } from './dialogo-asignar';
-import { CircuitoPendiente, TableroDatos } from './tablero.datos';
+import { TableroDatos } from './tablero.datos';
 
 /**
  * Tablero de la Sede Central: resumen en mosaicos y lo que la Sede tiene que asignar a mano
@@ -43,11 +43,11 @@ export class Tablero {
   }
 
   /** Abre el diálogo para asignar un circuito. */
-  protected asignarCircuito(pendiente: CircuitoPendiente): Promise<void> {
+  protected asignarCircuito(circuito: EnlaceCuitResponseDto): Promise<void> {
     return this.abrirDialogo({
       titulo: 'Asignar circuito',
-      detalle: `${pendiente.circuito.codigo} · ${pendiente.laboratorio} → ${pendiente.distribuidor} → ${pendiente.farmacia}`,
-      asignar: (inspectorId) => this.datos.asignarCircuito(pendiente.circuito.id, inspectorId),
+      detalle: `${circuito.codigo} · ${circuito.laboratorioRazonSocial} → ${circuito.distribuidorRazonSocial} → ${circuito.farmaciaRazonSocial}`,
+      asignar: (inspectorId) => this.datos.asignarCircuito(circuito.id, inspectorId),
     });
   }
 

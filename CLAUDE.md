@@ -18,11 +18,13 @@ Frontend Angular 22 de MediChain: trazabilidad de medicamentos (ANMAT), cadena d
 - Código generado en `src/app/core/api/generado/` (fuera de Git): no se edita. `npm run api:generar` corre solo antes de start, build y test.
 - Cambio de contrato: `npm run api:descargar` → revisar `git diff api/openapi.json` → `npm run api:generar` → build (un valor nuevo de enum hace fallar el catálogo de estados hasta mapearlo) → tests → commit del contrato aparte.
 - El cliente generado usa `rootUrl = ''` (URLs relativas `/api/...`); nunca el `servers` del contrato.
-- Pedidos pendientes al backend (paso B12): `docs/pedidos-b12.md`. Un rodeo del frontend por algo que el contrato aún no resuelve se marca `// TODO B12: …` y se anota ahí.
+- Pedidos al backend (paso B12, ya resuelto casi todo): `docs/pedidos-b12.md` dice qué se hizo y qué sigue pendiente. Un rodeo del frontend por algo que el contrato aún no resuelve se marca `// TODO B12: …` y se anota ahí.
+- Los DTO traen los nombres junto al id (razón social, nombre del inspector, código del lote, medicamento…): las pantallas los muestran directo, sin pedir cada nombre aparte. Ojo: `BultoResponseDto.destinoId` es el id del CIRCUITO; para mostrar el destino usá `circuitoCodigo`, `distribuidorRazonSocial` y `farmaciaRazonSocial`.
+- Los filtros `?estado=` (cajas, viajes, bultos…) los aplica la API dentro de lo que cada rol ve: el cliente los pide, no filtra a mano.
 - Los campos que pueden venir `null` se generan como opcionales pero llegan como `null`: comparar con `== null` o `??`, nunca `=== undefined`.
 
 ## Arquitectura (conservar siempre)
-- `core/` (api, auth, errores, nombres, tema, layout), `shared/` (estados, ui, escaner, formato), `features/<rol>/` y `features/comun/` (pantallas de varios roles).
+- `core/` (api, auth, errores, listas, tema, layout), `shared/` (estados, ui, escaner, formato), `features/<rol>/` y `features/comun/` (pantallas de varios roles).
 - `dev/`: herramientas solo de desarrollo (muestrario de diseño en `/dev`). En producción, `angular.json` reemplaza `dev.routes.ts` por `dev.routes.produccion.ts` (lista vacía) y no llegan al bundle.
 - Escáner de cámara: `shared/escaner/` (`CamaraEscaner` + `mc-escaner-gs1`, cargado con `@defer` desde `mc-campo-codigo`). El detector es el nativo del navegador si lee DataMatrix; si no, `barcode-detector` (ZXing) con el `.wasm` servido desde `/zxing` (asset de `angular.json`): nunca desde un CDN.
 - Accesibilidad de marco: enlace "Saltar al contenido" (`mc-saltar-al-contenido`, `<main id="contenido">`) y foco al título (`proveerFocoEnNavegacion`) en cada cambio de pantalla.

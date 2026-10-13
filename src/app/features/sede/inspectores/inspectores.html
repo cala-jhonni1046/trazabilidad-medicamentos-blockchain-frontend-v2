@@ -20,11 +20,10 @@
           <tr><th>Inspector</th><th>Legajo</th><th>Provincia</th><th>Alta</th><th>Estado</th><th>Acciones</th></tr>
         </thead>
         <tbody>
-          @for (v of lista.elementos(); track v.inspector.id) {
-            @let i = v.inspector;
+          @for (i of lista.elementos(); track i.id) {
             <tr>
               <td>
-                <strong>{{ v.nombre ?? 'Sin nombre disponible' }}</strong>
+                <strong>{{ i.nombre }} {{ i.apellido }}</strong>
                 <span class="secundario">DNI {{ i.dni }}</span>
               </td>
               <td><code>{{ i.legajo }}</code></td>
@@ -34,9 +33,9 @@
               <td>
                 <div class="mc-acciones">
                   @if (i.estado === 'ACTIVO') {
-                    <button mat-stroked-button type="button" [disabled]="ocupada()" (click)="baja(v)">Dar de baja<span class="mc-solo-lectores"> {{ i.legajo }}</span></button>
+                    <button mat-stroked-button type="button" [disabled]="ocupada()" (click)="baja(i)">Dar de baja<span class="mc-solo-lectores"> {{ i.legajo }}</span></button>
                   } @else {
-                    <button mat-flat-button type="button" [disabled]="ocupada()" (click)="reactivar(v)">Reactivar<span class="mc-solo-lectores"> {{ i.legajo }}</span></button>
+                    <button mat-flat-button type="button" [disabled]="ocupada()" (click)="reactivar(i)">Reactivar<span class="mc-solo-lectores"> {{ i.legajo }}</span></button>
                   }
                 </div>
               </td>

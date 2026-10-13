@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { Observable, forkJoin, map, of, switchMap } from 'rxjs';
+
 import { CircuitosService } from '../../../core/api/generado/services/circuitos.service';
 import { ESTADO_ENLACE_CUIT, EnlaceCuitResponseDto, EstadoEnlaceCuit } from '../../../core/api/modelos';
-import { Pagina } from '../../../core/api/pagina';
+
 import { SesionService } from '../../../core/auth/sesion.service';
 import { ListaPaginada } from '../../../core/listas/lista-paginada';
-import { NombresService } from '../../../core/nombres/nombres.service';
 import { proveerPaginadorEs } from '../../../core/tema/paginador-es';
 import { PRESENTACION_ESTADO_CIRCUITO, opcionesDeEstado } from '../../../shared/estados/catalogo-estados';
 import { Estado } from '../../../shared/estados/estado';
@@ -19,16 +18,6 @@ import { CircuitosAcciones } from './circuitos.acciones';
 
 /** Qué circuitos lista: los que ve el usuario, la bandeja del inspector o los que esperan la aceptación de su empresa. */
 export type ModoListaCircuitos = 'todos' | 'bandeja' | 'por-aceptar';
-
-/** Un circuito con los nombres de sus tres empresas. */
-export interface CircuitoVista {
-  readonly circuito: EnlaceCuitResponseDto;
-  readonly laboratorio: string;
-  readonly distribuidor: string;
-  readonly farmacia: string;
-}
-
-const SIN_NOMBRE = 'Empresa (sin datos)';
 
 /**
  * Listado de circuitos con las acciones de cada rol: el inspector toma, aprueba, rechaza,
@@ -44,7 +33,6 @@ const SIN_NOMBRE = 'Empresa (sin datos)';
 })
 export class ListaCircuitos {
   private readonly api = inject(CircuitosService);
-  private readonly nombres = inject(NombresService);
   private readonly acciones = inject(CircuitosAcciones);
   private readonly sesion = inject(SesionService);
 
@@ -57,7 +45,7 @@ export class ListaCircuitos {
   protected readonly rol = computed(() => this.sesion.sesion()?.rol ?? null);
   protected readonly esAdminEmpresa = computed(() => this.sesion.sesion()?.esAdminEmpresa === true);
 
-  protected readonly lista = new ListaPaginada<CircuitoVista, EstadoEnlaceCuit | null>(null, ({ pagina, tamano, filtro }) => {
+  protected readonly lista = new ListaPaginada<EnlaceCuitResponseDto, EstadoEnlaceCuit | null>(null, ({ pagina, tamano, filtro }) => {
     const parametros = { page: pagina, size: tamano };
     const origen =
       this.modo() === 'bandeja'
@@ -65,7 +53,7 @@ export class ListaCircuitos {
         : this.modo() === 'por-aceptar'
           ? this.api.listarCircuitosPendientesDeAceptacion(parametros)
           : this.api.listarCircuitos({ ...parametros, ...(filtro === null ? {} : { estado: filtro }) });
-    return origen.pipe(switchMap((p) => this.completar(p)));
+    return origen;
   });
 
   protected readonly ocupada = signal(false);
@@ -99,29 +87,4 @@ export class ListaCircuitos {
   protected rehabilitar = (c: EnlaceCuitResponseDto) => this.ejecutar(this.acciones.rehabilitar(c));
   protected aceptar = (c: EnlaceCuitResponseDto) => this.ejecutar(this.acciones.aceptar(c));
   protected rechazarPorEmpresa = (c: EnlaceCuitResponseDto) => this.ejecutar(this.acciones.rechazarPorEmpresa(c));
-
-  /** Agrega los nombres de las tres empresas (con caché) a cada circuito de la página. */
-  private completar(pagina: Pagina<EnlaceCuitResponseDto>): Observable<Pagina<CircuitoVista>> {
-    if (pagina.content.length === 0) {
-      return of({ content: [], page: pagina.page });
-    }
-    return forkJoin(
-      pagina.content.map((circuito) =>
-        forkJoin({
-          laboratorio: this.nombres.empresa(circuito.laboratorioId),
-          distribuidor: this.nombres.empresa(circuito.distribuidorId),
-          farmacia: this.nombres.empresa(circuito.farmaciaId),
-        }).pipe(
-          map(
-            (e): CircuitoVista => ({
-              circuito,
-              laboratorio: e.laboratorio?.razonSocial ?? SIN_NOMBRE,
-              distribuidor: e.distribuidor?.razonSocial ?? SIN_NOMBRE,
-              farmacia: e.farmacia?.razonSocial ?? SIN_NOMBRE,
-            }),
-          ),
-        ),
-      ),
-    ).pipe(map((content) => ({ content, page: pagina.page })));
-  }
 }

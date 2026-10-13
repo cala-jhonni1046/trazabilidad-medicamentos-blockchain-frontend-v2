@@ -3,13 +3,11 @@ import { ListaLotes } from './lista-lotes';
 
 const lote = (cambios: object = {}) => ({
   id: 'lo1', codigo: 'L2026-0002', estado: 'PENDIENTE_LIBERACION', cantidad: 10, fechaVencimiento: '2027-12-31',
-  medicamentoId: 'm1', laboratorioId: 'l1', bloqueado: false, mensajeBloqueo: null, ...cambios,
+  medicamentoId: 'm1', laboratorioId: 'l1', medicamentoNombre: 'Vacuna AVX', laboratorioRazonSocial: 'Cuyo Bio S.A.', bloqueado: false, mensajeBloqueo: null, ...cambios,
 });
 
 async function cargar(p: ReturnType<typeof crearPantalla<ListaLotes>>, url: string, filas: object[]) {
   p.responder(url, pagina(filas));
-  await vi.waitFor(() => p.http.expectOne('/api/medicamentos/m1').flush({ id: 'm1', nombreComercial: 'Vacuna AVX' }));
-  await vi.waitFor(() => p.http.expectOne('/api/empresas/l1').flush({ id: 'l1', razonSocial: 'Cuyo Bio S.A.' }));
   await p.esperar(() => expect(p.raiz.querySelector('tbody tr')).not.toBeNull());
 }
 

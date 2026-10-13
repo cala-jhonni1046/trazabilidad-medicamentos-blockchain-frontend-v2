@@ -15,29 +15,19 @@ export function pedidosA(http: HttpTestingController, url: string, estado?: stri
   return http.match((p) => p.url === url && (estado === undefined || p.params.get('estado') === estado));
 }
 
-/** Responde los 7 conteos del resumen con los números dados (por clave de mosaico). */
+/** Responde el resumen de la Sede (UN pedido) con los números dados; con `fallar`, con un 500. */
 export function responderMosaicos(
   http: HttpTestingController,
-  totales: Partial<Record<string, number>> = {},
-  fallar: readonly string[] = [],
+  totales: Partial<Record<'empresas' | 'empresasPendientes' | 'inspectoresActivos' | 'circuitosAprobados' | 'cuarentenasActivas' | 'eventos' | 'anclajesConfirmados', number>> = {},
+  fallar = false,
 ): void {
-  const rutas: [string, string, string | undefined][] = [
-    ['empresas', '/api/empresas', undefined],
-    ['empresas-pendientes', '/api/empresas', 'PENDIENTE'],
-    ['inspectores-activos', '/api/inspectores-anmat', 'ACTIVO'],
-    ['circuitos-aprobados', '/api/circuitos', 'APROBADO'],
-    ['cuarentenas-activas', '/api/cuarentenas', 'ACTIVA'],
-    ['eventos', '/api/eventos-trazabilidad', undefined],
-    ['anclajes', '/api/registros-blockchain', undefined],
-  ];
-  for (const [clave, url, estado] of rutas) {
-    const pedido = http.match(
-      (p) => p.url === url && p.params.get('size') === '1' && (estado === undefined ? !p.params.has('estado') : p.params.get('estado') === estado),
-    )[0];
-    if (fallar.includes(clave)) {
-      pedido.flush({ status: 500, message: 'Error interno', regla: null, errors: null }, { status: 500, statusText: 'Server Error' });
-    } else {
-      pedido.flush({ content: [], page: { number: 0, size: 1, totalElements: totales[clave] ?? 0, totalPages: 0 } });
-    }
+  const pedido = http.match((p) => p.url === '/api/tablero/resumen')[0];
+  if (fallar) {
+    pedido.flush({ status: 500, message: 'Error interno', regla: null, errors: null }, { status: 500, statusText: 'Server Error' });
+    return;
   }
+  pedido.flush({
+    empresas: 0, empresasPendientes: 0, inspectoresActivos: 0, circuitosAprobados: 0, cuarentenasActivas: 0, eventos: 0, anclajesConfirmados: 0,
+    ...totales,
+  });
 }

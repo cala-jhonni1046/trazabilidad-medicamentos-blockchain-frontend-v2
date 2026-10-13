@@ -3,12 +3,11 @@ import { ListaMedidas } from './lista-medidas';
 
 const medida = (cambios: object = {}) => ({
   id: 'q1', alcance: 'LOTE', tipo: 'CUARENTENA', motivo: 'DEFECTO_CALIDAD', estado: 'ACTIVA', automatica: false, provincia: 'MENDOZA',
-  fechaInicio: '2026-10-08T18:00:00Z', loteId: 'lo1', bultoIds: [], inspectorRevisorId: null, descripcion: 'Partículas', ...cambios,
+  fechaInicio: '2026-10-08T18:00:00Z', loteId: 'lo1', loteCodigo: 'L2026-0001', bultoIds: [], inspectorRevisorId: null, descripcion: 'Partículas', ...cambios,
 });
 
 async function cargar(p: ReturnType<typeof crearPantalla<ListaMedidas>>, filas: object[]) {
   p.responder('/api/cuarentenas', pagina(filas));
-  await vi.waitFor(() => p.http.match((r) => r.url === '/api/lotes/lo1').forEach((r) => r.flush({ id: 'lo1', codigo: 'L2026-0001' })));
   await p.esperar(() => expect(p.raiz.querySelector('tbody tr')).not.toBeNull());
 }
 

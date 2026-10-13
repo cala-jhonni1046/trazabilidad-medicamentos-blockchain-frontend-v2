@@ -5,10 +5,6 @@ async function iniciar(lotes: object[], circuitos: object[]) {
   const p = crearPantalla(FormularioArmarBulto, 'LABORATORIO');
   await vi.waitFor(() => p.responder('/api/lotes', pagina(lotes)));
   await vi.waitFor(() => p.responder('/api/circuitos', pagina(circuitos)));
-  if (circuitos.length > 0) {
-    await vi.waitFor(() => p.http.match((r) => r.url === '/api/empresas/f1').forEach((r) => r.flush({ id: 'f1', razonSocial: 'Farmacia Centro' })));
-    await vi.waitFor(() => p.http.match((r) => r.url === '/api/empresas/d1').forEach((r) => r.flush({ id: 'd1', razonSocial: 'Distribuidora Pie de Monte' })));
-  }
   return p;
 }
 
@@ -30,7 +26,7 @@ describe('FormularioArmarBulto', () => {
   it('un 409 R6/R10 de la API se muestra tal cual arriba del formulario', async () => {
     const p = await iniciar(
       [{ id: 'lo1', codigo: 'L2026-0001', cantidad: 400 }],
-      [{ id: 'c1', codigo: 'CIR-0001', farmaciaId: 'f1', distribuidorId: 'd1' }],
+      [{ id: 'c1', codigo: 'CIR-0001', farmaciaId: 'f1', distribuidorId: 'd1', farmaciaRazonSocial: 'Farmacia Centro', distribuidorRazonSocial: 'Distribuidora Pie de Monte' }],
     );
     await p.esperar(() => expect(p.raiz.querySelector('form')).not.toBeNull());
 

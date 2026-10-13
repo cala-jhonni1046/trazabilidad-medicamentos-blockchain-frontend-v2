@@ -17,11 +17,10 @@
           <tr><th>Lote</th><th>Medicamento</th><th>Vence</th><th>Cajas</th><th>Estado</th><th>Acciones</th></tr>
         </thead>
         <tbody>
-          @for (v of lista.elementos(); track v.lote.id) {
-            @let l = v.lote;
+          @for (l of lista.elementos(); track l.id) {
             <tr>
-              <td><code>{{ l.codigo }}</code><span class="secundario">{{ v.laboratorio }}</span></td>
-              <td>{{ v.medicamento }}</td>
+              <td><code>{{ l.codigo }}</code><span class="secundario">{{ l.laboratorioRazonSocial }}</span></td>
+              <td>{{ l.medicamentoNombre }}</td>
               <td>{{ l.fechaVencimiento | dia }}</td>
               <td>{{ l.cantidad }}</td>
               <td>

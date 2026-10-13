@@ -1,9 +1,13 @@
 <mc-tarjeta titulo="Viajes" [detalle]="lista.total() + ' en total'">
+  <div class="mc-barra">
+    <mc-filtro-estado [opciones]="opciones" [valor]="lista.filtro()" (cambio)="lista.filtrarPor($event)" />
+  </div>
+
   @if (lista.error(); as error) {
     <mc-error-api [error]="error" />
     <div><button mat-stroked-button type="button" (click)="lista.recargar()">Reintentar</button></div>
   } @else if (lista.vacia()) {
-    <p class="mc-vacio">Todavía no hay viajes.</p>
+    <p class="mc-vacio">{{ lista.filtro() === null ? 'Todavía no hay viajes.' : 'No hay viajes con ese filtro.' }}</p>
   } @else {
     <div class="mc-tabla" tabindex="0" role="region" aria-label="Viajes">
       <table>
@@ -11,12 +15,11 @@
           <tr><th>Viaje</th><th>Bultos</th><th>Camión</th><th>Entrega estimada</th><th>Estado</th><th>Acciones</th></tr>
         </thead>
         <tbody>
-          @for (v of lista.elementos(); track v.viaje.id) {
-            @let viaje = v.viaje;
+          @for (viaje of lista.elementos(); track viaje.id) {
             <tr>
               <td>
                 <strong>{{ viaje.codigo }}</strong>
-                <span class="secundario">{{ rotuloTramo[viaje.tramo] }} · sale de {{ v.origen }}</span>
+                <span class="secundario">{{ rotuloTramo[viaje.tramo] }} · sale de {{ viaje.origenRazonSocial }}</span>
               </td>
               <td>
                 @for (codigo of viaje.bultoCodigos; track codigo) {
@@ -33,15 +36,15 @@
               <td><mc-estado [presentacion]="presentacion[viaje.estado]" /></td>
               <td>
                 <div class="mc-acciones">
-                  @if (esOrigen(v) && viaje.estado === 'PROGRAMADO') {
-                    <button mat-flat-button type="button" [disabled]="ocupado()" (click)="salida(v)">Registrar salida<span class="mc-solo-lectores"> {{ viaje.codigo }}</span></button>
-                    <button mat-stroked-button type="button" [disabled]="ocupado()" (click)="cancelar(v)">Cancelar<span class="mc-solo-lectores"> {{ viaje.codigo }}</span></button>
+                  @if (esOrigen(viaje) && viaje.estado === 'PROGRAMADO') {
+                    <button mat-flat-button type="button" [disabled]="ocupado()" (click)="salida(viaje)">Registrar salida<span class="mc-solo-lectores"> {{ viaje.codigo }}</span></button>
+                    <button mat-stroked-button type="button" [disabled]="ocupado()" (click)="cancelar(viaje)">Cancelar<span class="mc-solo-lectores"> {{ viaje.codigo }}</span></button>
                   }
-                  @if (esOrigen(v) && viaje.estado === 'EN_TRANSITO') {
-                    <button mat-stroked-button type="button" [disabled]="ocupado()" (click)="robo(v)">Reportar robo<span class="mc-solo-lectores"> del viaje {{ viaje.codigo }}</span></button>
+                  @if (esOrigen(viaje) && viaje.estado === 'EN_TRANSITO') {
+                    <button mat-stroked-button type="button" [disabled]="ocupado()" (click)="robo(viaje)">Reportar robo<span class="mc-solo-lectores"> del viaje {{ viaje.codigo }}</span></button>
                   }
                   @if (viaje.estado !== 'PROGRAMADO' && viaje.estado !== 'CANCELADO') {
-                    <button mat-stroked-button type="button" (click)="verTemperaturas(v)">
+                    <button mat-stroked-button type="button" (click)="verTemperaturas(viaje)">
                       {{ temperaturas()?.id === viaje.id ? 'Ocultar temperatura' : 'Temperatura' }}<span class="mc-solo-lectores"> {{ viaje.codigo }}</span>
                     </button>
                   }

@@ -12,10 +12,10 @@
       <fieldset class="bultos-conjunto">
         <legend>Bultos del viaje</legend>
         <ul class="bultos">
-          @for (e of elegibles(); track e.bulto.id) {
+          @for (b of elegibles(); track b.id) {
             <li>
-              <mat-checkbox [checked]="elegidos().has(e.bulto.codigo)" (change)="alternar(e.bulto.codigo, $event.checked)">
-                <code>{{ e.bulto.codigo }}</code> · {{ e.bulto.cantidad }} cajas · para {{ e.destino }}
+              <mat-checkbox [checked]="elegidos().has(b.codigo)" (change)="alternar(b.codigo, $event.checked)">
+                <code>{{ b.codigo }}</code> · {{ b.cantidad }} cajas · {{ b.distribuidorRazonSocial }} → {{ b.farmaciaRazonSocial }}
               </mat-checkbox>
             </li>
           }

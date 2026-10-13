@@ -17,12 +17,11 @@
           <tr><th>Circuito</th><th>Recorrido</th><th>Estado</th><th>Propuesto</th><th>Acciones</th></tr>
         </thead>
         <tbody>
-          @for (v of lista.elementos(); track v.circuito.id) {
-            @let c = v.circuito;
+          @for (c of lista.elementos(); track c.id) {
             <tr>
               <td><strong>{{ c.codigo }}</strong></td>
               <td>
-                {{ v.laboratorio }} → {{ v.distribuidor }} → {{ v.farmacia }}
+                {{ c.laboratorioRazonSocial }} → {{ c.distribuidorRazonSocial }} → {{ c.farmaciaRazonSocial }}
               </td>
               <td>
                 <mc-estado [presentacion]="presentacion[c.estado]" />

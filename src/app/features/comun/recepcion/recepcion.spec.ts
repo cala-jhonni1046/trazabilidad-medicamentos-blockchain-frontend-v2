@@ -67,17 +67,17 @@ describe('Recepcion', () => {
 
   it('muestra solo los viajes en tránsito que vienen hacia la empresa', async () => {
     const p = crearPantalla(Recepcion, 'FARMACIA', { sesion: { empresaId: 'f1' } });
-    p.responder('/api/viajes', pagina([
-      { id: 'v1', codigo: 'VJ-0005', tramo: 'DISTRIBUIDOR_A_FARMACIA', estado: 'EN_TRANSITO', origenId: 'd1', fechaEstimadaEntrega: '2026-10-09T18:00:00Z', bultoCodigos: ['BUL-0003'] },
-      { id: 'v2', codigo: 'VJ-0006', tramo: 'DISTRIBUIDOR_A_FARMACIA', estado: 'FINALIZADO', origenId: 'd1', fechaEstimadaEntrega: '2026-10-08T18:00:00Z', bultoCodigos: ['BUL-0001'] },
+    const pedido = p.responder('/api/viajes', pagina([
+      { id: 'v1', codigo: 'VJ-0005', tramo: 'DISTRIBUIDOR_A_FARMACIA', estado: 'EN_TRANSITO', origenId: 'd1', origenRazonSocial: 'Distribuidora Pie de Monte', fechaEstimadaEntrega: '2026-10-09T18:00:00Z', bultoCodigos: ['BUL-0003'] },
+      { id: 'v3', codigo: 'VJ-0007', tramo: 'DISTRIBUIDOR_A_FARMACIA', estado: 'EN_TRANSITO', origenId: 'f1', origenRazonSocial: 'Mi propia empresa', fechaEstimadaEntrega: '2026-10-09T18:00:00Z', bultoCodigos: ['BUL-0009'] },
     ]));
     p.responder('/api/recepciones', PAGINA_VACIA);
-    await vi.waitFor(() => p.http.match((r) => r.url === '/api/empresas/d1').forEach((r) => r.flush({ id: 'd1', razonSocial: 'Distribuidora Pie de Monte' })));
 
     await p.esperar(() => expect(p.raiz.querySelector('mc-viajes-en-camino .viajes')).not.toBeNull());
     const texto = p.raiz.querySelector('mc-viajes-en-camino')?.textContent ?? '';
+    expect(pedido.request.params.get('estado')).toBe('EN_TRANSITO');
     expect(texto).toContain('VJ-0005');
     expect(texto).toContain('Distribuidora Pie de Monte');
-    expect(texto).not.toContain('VJ-0006');
+    expect(texto).not.toContain('VJ-0007');
   });
 });

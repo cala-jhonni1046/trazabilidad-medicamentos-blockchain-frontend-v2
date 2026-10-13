@@ -4,14 +4,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { forkJoin, map, of, switchMap } from 'rxjs';
+import { map } from 'rxjs';
 import { BultosService } from '../../../core/api/generado/services/bultos.service';
 import { ViajesService } from '../../../core/api/generado/services/viajes.service';
 import { BultoResponseDto, EstadoBulto } from '../../../core/api/modelos';
 import { TAMANO_PAGINA_MAXIMO } from '../../../core/api/pagina';
 import { aResultado } from '../../../core/api/resultado';
 import { ErrorApi } from '../../../core/errores/error-api';
-import { NombresService } from '../../../core/nombres/nombres.service';
 import { proveerOpcionesMaterial } from '../../../core/tema/opciones-material';
 import { conOffsetArgentina } from '../../../shared/formato/fechas';
 import { ErrorApiComponente } from '../../../shared/ui/error-api';
@@ -21,12 +20,6 @@ interface DatosViaje {
   patente: string;
   chofer: string;
   fechaEstimada: string;
-}
-
-/** Un bulto que se puede sumar al viaje, con el nombre de su destino. */
-interface BultoElegible {
-  readonly bulto: BultoResponseDto;
-  readonly destino: string;
 }
 
 const CAMPOS: readonly string[] = ['patente', 'chofer', 'fechaEstimadaEntrega'];
@@ -77,7 +70,6 @@ const CAMPOS: readonly string[] = ['patente', 'chofer', 'fechaEstimadaEntrega'];
 export class FormularioNuevoViaje {
   private readonly bultosApi = inject(BultosService);
   private readonly viajes = inject(ViajesService);
-  private readonly nombres = inject(NombresService);
 
   /** Estado de los bultos que se ofrecen: ARMADO (laboratorio) o EN_DEPOSITO (distribuidora). */
   readonly estadoBultos = input.required<Extract<EstadoBulto, 'ARMADO' | 'EN_DEPOSITO'>>();
@@ -93,7 +85,7 @@ export class FormularioNuevoViaje {
     required(c.fechaEstimada, { message: 'Elegí la fecha y hora estimada de entrega.' });
   });
 
-  protected readonly elegibles = signal<readonly BultoElegible[]>([]);
+  protected readonly elegibles = signal<readonly BultoResponseDto[]>([]);
   protected readonly elegidos = signal<ReadonlySet<string>>(new Set());
   protected readonly cargando = signal(true);
   protected readonly errorGeneral = signal<ErrorApi | null>(null);
@@ -110,22 +102,10 @@ export class FormularioNuevoViaje {
 
   /** Los bultos que se pueden despachar (hasta 100). */
   private async cargarBultos(estado: Extract<EstadoBulto, 'ARMADO' | 'EN_DEPOSITO'> = this.estadoBultos()): Promise<void> {
-    const resultado = await aResultado(
-      this.bultosApi.listarBultos({ estado, size: TAMANO_PAGINA_MAXIMO }).pipe(
-        switchMap((pagina) =>
-          pagina.content.length === 0
-            ? of<BultoElegible[]>([])
-            : forkJoin(
-                pagina.content.map((bulto) =>
-                  this.nombres.empresa(bulto.destinoId).pipe(map((e): BultoElegible => ({ bulto, destino: e?.razonSocial ?? '(sin datos)' }))),
-                ),
-              ),
-        ),
-      ),
-    );
+    const resultado = await aResultado(this.bultosApi.listarBultos({ estado, size: TAMANO_PAGINA_MAXIMO }).pipe(map((pagina) => pagina.content)));
     if (resultado.ok) {
       // Un bulto que ya tiene viaje no se ofrece.
-      this.elegibles.set(resultado.valor.filter((e) => (e.bulto.viajeActualId ?? null) === null));
+      this.elegibles.set(resultado.valor.filter((bulto) => (bulto.viajeActualId ?? null) === null));
     } else {
       this.errorGeneral.set(resultado.error);
     }

@@ -1,12 +1,15 @@
 import { RolUsuario } from '../api/modelos';
 import { RUTA_INICIO_POR_ROL } from '../auth/rutas-sesion';
 import { NombreIcono } from '../../shared/ui/iconos';
+import type { ClavePendientes } from './pendientes-inspector';
 
 /** Una entrada del menú lateral. */
 export interface ElementoMenu {
   readonly texto: string;
   readonly ruta: string;
   readonly icono: NombreIcono;
+  /** Qué contadores de la bandeja del inspector suma la insignia de esta entrada (si tiene). */
+  readonly pendientes?: readonly ClavePendientes[];
 }
 
 /** Nombre de cada rol para mostrar. */
@@ -18,6 +21,9 @@ export const ROTULO_ROL: Record<RolUsuario, string> = {
   FARMACIA: 'Farmacia',
   PACIENTE: 'Paciente',
 };
+
+/** Las cinco bandejas del inspector (la entrada de inicio las suma todas). */
+const TODAS_LAS_BANDEJAS: readonly ClavePendientes[] = ['empresas', 'circuitos', 'lotesBiologicos', 'cuarentenas', 'reportes'];
 
 /**
  * Menú lateral de cada rol: el ÚNICO lugar donde se define. Es un Record: un rol nuevo del
@@ -34,11 +40,11 @@ export const MENU_POR_ROL: Record<RolUsuario, readonly ElementoMenu[]> = {
     { texto: 'Usuarios', ruta: '/sede/usuarios', icono: 'person' },
   ],
   INSPECTOR: [
-    { texto: 'Bandeja', ruta: RUTA_INICIO_POR_ROL.INSPECTOR, icono: 'dashboard' },
-    { texto: 'Empresas', ruta: '/inspector/empresas', icono: 'domain' },
-    { texto: 'Circuitos', ruta: '/inspector/circuitos', icono: 'link' },
-    { texto: 'Lotes y cuarentenas', ruta: '/inspector/lotes', icono: 'warning' },
-    { texto: 'Reportes', ruta: '/inspector/reportes', icono: 'report' },
+    { texto: 'Bandeja', ruta: RUTA_INICIO_POR_ROL.INSPECTOR, icono: 'dashboard', pendientes: TODAS_LAS_BANDEJAS },
+    { texto: 'Empresas', ruta: '/inspector/empresas', icono: 'domain', pendientes: ['empresas'] },
+    { texto: 'Circuitos', ruta: '/inspector/circuitos', icono: 'link', pendientes: ['circuitos'] },
+    { texto: 'Lotes y cuarentenas', ruta: '/inspector/lotes', icono: 'warning', pendientes: ['lotesBiologicos', 'cuarentenas'] },
+    { texto: 'Reportes', ruta: '/inspector/reportes', icono: 'report', pendientes: ['reportes'] },
     { texto: 'Cadena y Sepolia', ruta: '/inspector/cadena', icono: 'verified' },
   ],
   LABORATORIO: [

@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { Observable, forkJoin, map, of, switchMap } from 'rxjs';
+import { map } from 'rxjs';
 import { CuarentenasService } from '../../../core/api/generado/services/cuarentenas.service';
 import { CuarentenaResponseDto, ESTADO_CUARENTENA, EstadoCuarentena } from '../../../core/api/modelos';
 import { Pagina } from '../../../core/api/pagina';
 import { SesionService } from '../../../core/auth/sesion.service';
 import { ListaPaginada } from '../../../core/listas/lista-paginada';
-import { NombresService } from '../../../core/nombres/nombres.service';
 import { proveerPaginadorEs } from '../../../core/tema/paginador-es';
 import { PRESENTACION_ESTADO_CUARENTENA, opcionesDeEstado } from '../../../shared/estados/catalogo-estados';
 import { Estado } from '../../../shared/estados/estado';
@@ -21,7 +20,7 @@ import { MedidasAcciones } from './medidas.acciones';
 /** Qué medidas lista: las que ve el usuario, o la bandeja del inspector. */
 export type ModoListaMedidas = 'todas' | 'bandeja';
 
-/** Una medida con el código del lote al que apunta (si es de alcance LOTE). */
+/** Una medida con una descripción corta de a qué apunta. */
 export interface MedidaVista {
   readonly medida: CuarentenaResponseDto;
   /** "Lote L2026-0001", "Viaje" o "3 bultos". */
@@ -38,7 +37,6 @@ export interface MedidaVista {
 })
 export class ListaMedidas {
   private readonly api = inject(CuarentenasService);
-  private readonly nombres = inject(NombresService);
   private readonly acciones = inject(MedidasAcciones);
   private readonly sesion = inject(SesionService);
 
@@ -58,7 +56,7 @@ export class ListaMedidas {
       this.modo() === 'bandeja'
         ? this.api.bandejaCuarentenas(parametros)
         : this.api.listarCuarentenas({ ...parametros, ...(filtro === null ? {} : { estado: filtro }) });
-    return origen.pipe(switchMap((p) => this.completar(p)));
+    return origen.pipe(map((p): Pagina<MedidaVista> => ({ content: p.content.map(describir), page: p.page })));
   });
 
   protected readonly ocupada = signal(false);
@@ -78,22 +76,13 @@ export class ListaMedidas {
   protected tomar = (v: MedidaVista) => this.ejecutar(this.acciones.tomar(v.medida));
   protected levantar = (v: MedidaVista) => this.ejecutar(this.acciones.levantar(v.medida, v.objetivo));
   protected recall = (v: MedidaVista) => this.ejecutar(this.acciones.recall(v.medida, v.objetivo));
+}
 
-  /** Busca el código del lote de las medidas de alcance LOTE (con caché). */
-  private completar(pagina: Pagina<CuarentenaResponseDto>): Observable<Pagina<MedidaVista>> {
-    if (pagina.content.length === 0) {
-      return of({ content: [], page: pagina.page });
-    }
-    return forkJoin(
-      pagina.content.map((medida) => {
-        if (medida.alcance === 'LOTE' && medida.loteId != null) {
-          return this.nombres.lote(medida.loteId).pipe(
-            map((lote): MedidaVista => ({ medida, objetivo: `Lote ${lote?.codigo ?? '(sin datos)'}` })),
-          );
-        }
-        const n = medida.bultoIds.length;
-        return of<MedidaVista>({ medida, objetivo: medida.alcance === 'DESPACHO' ? `Viaje (${n} bultos)` : `${n} bulto${n === 1 ? '' : 's'}` });
-      }),
-    ).pipe(map((content) => ({ content, page: pagina.page })));
+/** A qué apunta la medida: el lote por su código (viene en la respuesta), el viaje o los bultos. */
+function describir(medida: CuarentenaResponseDto): MedidaVista {
+  if (medida.alcance === 'LOTE') {
+    return { medida, objetivo: `Lote ${medida.loteCodigo ?? '(sin datos)'}` };
   }
+  const n = medida.bultoIds.length;
+  return { medida, objetivo: medida.alcance === 'DESPACHO' ? `Viaje (${n} bultos)` : `${n} bulto${n === 1 ? '' : 's'}` };
 }

@@ -1,7 +1,7 @@
 import { PAGINA_VACIA, crearPantalla, errorApi, pagina } from '../../../../testing/entorno';
 import { FormularioNuevoViaje } from './formulario-nuevo-viaje';
 
-const bulto = (id: string, codigo: string, cambios: object = {}) => ({ id, codigo, cantidad: 100, destinoId: 'f1', estado: 'ARMADO', viajeActualId: null, ...cambios });
+const bulto = (id: string, codigo: string, cambios: object = {}) => ({ id, codigo, cantidad: 100, destinoId: 'c1', circuitoCodigo: 'CIR-0001', distribuidorRazonSocial: 'Distribuidora Pie de Monte', farmaciaRazonSocial: 'Farmacia Sur', estado: 'ARMADO', viajeActualId: null, ...cambios });
 
 function escribir(raiz: HTMLElement, etiqueta: string, valor: string) {
   const campo = Array.from(raiz.querySelectorAll('mat-form-field')).find((f) => f.querySelector('mat-label')?.textContent?.startsWith(etiqueta))?.querySelector('input') as HTMLInputElement;
@@ -26,18 +26,17 @@ describe('FormularioNuevoViaje', () => {
   it('no ofrece bultos que ya tienen viaje', async () => {
     const p = crearPantalla(FormularioNuevoViaje, 'LABORATORIO', { entradas: { estadoBultos: 'ARMADO' } });
     await vi.waitFor(() => p.responder('/api/bultos', pagina([bulto('b1', 'BUL-0001'), bulto('b2', 'BUL-0002', { viajeActualId: 'v9' })])));
-    await vi.waitFor(() => p.http.match((r) => r.url === '/api/empresas/f1').forEach((r) => r.flush({ id: 'f1', razonSocial: 'Farmacia Sur' })));
 
     await p.esperar(() => expect(p.raiz.querySelector('form')).not.toBeNull());
     expect(p.raiz.querySelectorAll('mat-checkbox').length).toBe(1);
     expect(p.raiz.textContent).toContain('BUL-0001');
+    expect(p.raiz.textContent).toContain('Distribuidora Pie de Monte → Farmacia Sur');
     expect(p.raiz.textContent).not.toContain('BUL-0002');
   });
 
   it('sin elegir bultos avisa y no llama a la API', async () => {
     const p = crearPantalla(FormularioNuevoViaje, 'LABORATORIO', { entradas: { estadoBultos: 'ARMADO' } });
     await vi.waitFor(() => p.responder('/api/bultos', pagina([bulto('b1', 'BUL-0001')])));
-    await vi.waitFor(() => p.http.match((r) => r.url === '/api/empresas/f1').forEach((r) => r.flush({ id: 'f1', razonSocial: 'Farmacia Sur' })));
     await p.esperar(() => expect(p.raiz.querySelector('form')).not.toBeNull());
 
     escribir(p.raiz, 'Patente', 'AB123CD');
@@ -52,7 +51,6 @@ describe('FormularioNuevoViaje', () => {
   it('crea el viaje mandando los códigos de los bultos y la fecha con offset de Argentina', async () => {
     const p = crearPantalla(FormularioNuevoViaje, 'LABORATORIO', { entradas: { estadoBultos: 'ARMADO' } });
     await vi.waitFor(() => p.responder('/api/bultos', pagina([bulto('b1', 'BUL-0001')])));
-    await vi.waitFor(() => p.http.match((r) => r.url === '/api/empresas/f1').forEach((r) => r.flush({ id: 'f1', razonSocial: 'Farmacia Sur' })));
     await p.esperar(() => expect(p.raiz.querySelector('form')).not.toBeNull());
 
     (p.raiz.querySelector('mat-checkbox input') as HTMLInputElement).click();

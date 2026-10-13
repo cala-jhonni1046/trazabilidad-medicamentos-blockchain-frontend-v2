@@ -48,7 +48,7 @@ describe('Tablero', () => {
   it('muestra los 7 mosaicos con sus números y resalta lo pendiente', async () => {
     const { fixture, http, raiz } = await crear();
 
-    responderMosaicos(http, { empresas: 12, 'empresas-pendientes': 2, eventos: 1500 });
+    responderMosaicos(http, { empresas: 12, empresasPendientes: 2, eventos: 1500 });
     http.match((p) => p.url === '/api/empresas/sin-inspector')[0].flush(PAGINA_VACIA);
     http.match((p) => p.url === '/api/circuitos/sin-inspector')[0].flush(PAGINA_VACIA);
     await vi.waitFor(() => {
@@ -70,10 +70,10 @@ describe('Tablero', () => {
     expect(raiz.textContent).toContain('No hay circuitos sin inspector.');
   });
 
-  it('un mosaico caído no tumba a los demás ni a las listas', async () => {
+  it('si falla el resumen, los 7 mosaicos muestran "—" y las listas de pendientes siguen', async () => {
     const { fixture, http, raiz } = await crear();
 
-    responderMosaicos(http, { empresas: 3 }, ['cuarentenas-activas']);
+    responderMosaicos(http, {}, true);
     http.match((p) => p.url === '/api/empresas/sin-inspector')[0].flush(pagina([EMPRESA]));
     http.match((p) => p.url === '/api/circuitos/sin-inspector')[0].flush(PAGINA_VACIA);
     await vi.waitFor(() => {
@@ -83,11 +83,9 @@ describe('Tablero', () => {
       expect(raiz.textContent).toContain('Farmacia Salteña S.R.L.');
     });
 
-    const texto = (etiqueta: string) =>
-      Array.from(raiz.querySelectorAll('mc-mosaico')).find((m) => m.querySelector('.etiqueta')?.textContent === etiqueta)
-        ?.querySelector('.valor')?.textContent;
-    expect(texto('Cuarentenas activas')).toContain('—');
-    expect(texto('Empresas')?.trim()).toBe('3');
+    const valores = Array.from(raiz.querySelectorAll('mc-mosaico .valor')).map((v) => v.textContent?.trim());
+    expect(valores.length).toBe(7);
+    expect(valores.every((v) => v?.startsWith('—'))).toBe(true);
   });
 
   it('una solicitud pendiente muestra razón social, tipo, ubicación, CUIT y fecha en hora de Argentina', async () => {
@@ -150,8 +148,7 @@ describe('Tablero', () => {
     expect(await (await dialogo.host()).text()).toContain('Farmacia Salteña S.R.L. · Farmacia · Salta');
     http
       .expectOne((p) => p.url === '/api/inspectores-anmat' && p.params.get('size') === '100')
-      .flush(pagina([{ id: 'i1', legajo: 'L-001', provincia: 'MENDOZA', usuarioId: 'u1' }]));
-    await vi.waitFor(() => http.expectOne('/api/usuarios/u1').flush({ nombre: 'Laura', apellido: 'Gómez' }));
+      .flush(pagina([{ id: 'i1', legajo: 'L-001', provincia: 'MENDOZA', usuarioId: 'u1', nombre: 'Laura', apellido: 'Gómez' }]));
     // El selector aparece cuando termina de cargar la lista de inspectores.
     const select = await vi.waitFor(async () => {
       const encontrado = await raizDocumento.getHarnessOrNull(MatSelectHarness);

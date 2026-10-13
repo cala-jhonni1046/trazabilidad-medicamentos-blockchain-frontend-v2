@@ -17,13 +17,12 @@
           <tr><th>Bulto</th><th>Lote</th><th>Cajas</th><th>Farmacia de destino</th><th>Estado</th>@if (esLaboratorio()) { <th>Acciones</th> }</tr>
         </thead>
         <tbody>
-          @for (v of lista.elementos(); track v.bulto.id) {
-            @let b = v.bulto;
+          @for (b of lista.elementos(); track b.id) {
             <tr>
               <td><code>{{ b.codigo }}</code><span class="secundario">Precinto {{ b.precinto }}</span></td>
-              <td><code>{{ v.lote }}</code></td>
+              <td><code>{{ b.loteCodigo }}</code></td>
               <td>{{ b.cantidad }}</td>
-              <td>{{ v.destino }}</td>
+              <td>{{ b.farmaciaRazonSocial }}<span class="secundario">Circuito <code>{{ b.circuitoCodigo }}</code> · vía {{ b.distribuidorRazonSocial }}</span></td>
               <td>
                 <mc-estado [presentacion]="presentacion[b.estado]" />
                 @if (b.bloqueado && b.mensajeBloqueo) {
@@ -34,7 +33,7 @@
                 <td>
                   <div class="mc-acciones">
                     @if (b.estado === 'ARMADO' && (b.viajeActualId ?? null) === null) {
-                      <button mat-stroked-button type="button" [disabled]="ocupada()" (click)="desarmar(v)">Desarmar<span class="mc-solo-lectores"> {{ b.codigo }}</span></button>
+                      <button mat-stroked-button type="button" [disabled]="ocupada()" (click)="desarmar(b)">Desarmar<span class="mc-solo-lectores"> {{ b.codigo }}</span></button>
                     }
                   </div>
                 </td>

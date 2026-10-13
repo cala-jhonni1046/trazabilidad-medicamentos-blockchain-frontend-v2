@@ -3,7 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { firstValueFrom } from 'rxjs';
-import { ESTADO_INSPECTOR, EstadoInspector } from '../../../core/api/modelos';
+import { ESTADO_INSPECTOR, EstadoInspector, InspectorAnmatResponseDto } from '../../../core/api/modelos';
 import { AvisosService } from '../../../core/errores/avisos.service';
 import { ListaPaginada } from '../../../core/listas/lista-paginada';
 import { proveerPaginadorEs } from '../../../core/tema/paginador-es';
@@ -17,7 +17,7 @@ import { FiltroEstado } from '../../../shared/ui/filtro-estado';
 import { Icono } from '../../../shared/ui/icono';
 import { Tarjeta } from '../../../shared/ui/tarjeta';
 import { DialogoNuevoInspector } from './dialogo-nuevo-inspector';
-import { InspectorVista, InspectoresDatos } from './inspectores.datos';
+import { InspectoresDatos } from './inspectores.datos';
 
 /** Pantalla "Inspectores" de la Sede: alta, baja y reactivación (solo la Sede puede, R1). */
 @Component({
@@ -37,7 +37,7 @@ export class Inspectores {
   protected readonly opciones = opcionesDeEstado(ESTADO_INSPECTOR, PRESENTACION_ESTADO_INSPECTOR);
   protected readonly rotuloProvincia = ROTULO_PROVINCIA;
 
-  protected readonly lista = new ListaPaginada<InspectorVista, EstadoInspector | null>(null, ({ pagina, tamano, filtro }) =>
+  protected readonly lista = new ListaPaginada<InspectorAnmatResponseDto, EstadoInspector | null>(null, ({ pagina, tamano, filtro }) =>
     this.datos.listar({ page: pagina, size: tamano, ...(filtro === null ? {} : { estado: filtro }) }),
   );
 
@@ -55,15 +55,15 @@ export class Inspectores {
     }
   }
 
-  protected async baja(v: InspectorVista): Promise<void> {
+  protected async baja(inspector: InspectorAnmatResponseDto): Promise<void> {
     this.ocupada.set(true);
     const hecho = await this.ejecutor.conDialogo(
       {
         titulo: 'Dar de baja al inspector',
-        detalle: `${v.nombre ?? v.inspector.legajo} · ${v.inspector.legajo}`,
+        detalle: `${inspector.nombre} ${inspector.apellido} · ${inspector.legajo}`,
         aviso: 'Su cuenta queda inactiva y sus solicitudes tomadas vuelven a la bandeja.',
         boton: 'Dar de baja',
-        accion: () => this.datos.darDeBaja(v.inspector.id),
+        accion: () => this.datos.darDeBaja(inspector.id),
       },
       'Inspector dado de baja.',
     );
@@ -73,15 +73,15 @@ export class Inspectores {
     this.ocupada.set(false);
   }
 
-  protected async reactivar(v: InspectorVista): Promise<void> {
+  protected async reactivar(inspector: InspectorAnmatResponseDto): Promise<void> {
     this.ocupada.set(true);
     const hecho = await this.ejecutor.conDialogo(
       {
         titulo: 'Reactivar al inspector',
-        detalle: `${v.nombre ?? v.inspector.legajo} · ${v.inspector.legajo}`,
+        detalle: `${inspector.nombre} ${inspector.apellido} · ${inspector.legajo}`,
         aviso: 'Su cuenta vuelve a estar activa, pero no recupera las solicitudes que tenía.',
         boton: 'Reactivar',
-        accion: () => this.datos.reactivar(v.inspector.id),
+        accion: () => this.datos.reactivar(inspector.id),
       },
       'Inspector reactivado.',
     );

@@ -2,14 +2,13 @@ import { PAGINA_VACIA, boton, botones, crearPantalla, enviarDialogo, errorApi, l
 import { ListaBultos } from './lista-bultos';
 
 const bulto = (cambios: object = {}) => ({
-  id: 'b1', codigo: 'BUL-0001', precinto: 'P-77', cantidad: 200, estado: 'ARMADO', loteId: 'lo1', destinoId: 'f1', viajeActualId: null, bloqueado: false, ...cambios,
+  id: 'b1', codigo: 'BUL-0001', precinto: 'P-77', cantidad: 200, estado: 'ARMADO', loteId: 'lo1', destinoId: 'c1', loteCodigo: 'L2026-0001', circuitoCodigo: 'CIR-0001',
+  distribuidorRazonSocial: 'Distribuidora Pie de Monte', farmaciaRazonSocial: 'Farmacia Centro', viajeActualId: null, bloqueado: false, ...cambios,
 });
 
 async function cargar(rol: 'LABORATORIO' | 'DISTRIBUIDOR', modo: 'laboratorio' | 'deposito', filas: object[]) {
   const p = crearPantalla(ListaBultos, rol, { entradas: { modo } });
   p.responder('/api/bultos', pagina(filas));
-  await vi.waitFor(() => p.http.match((r) => r.url === '/api/lotes/lo1').forEach((r) => r.flush({ id: 'lo1', codigo: 'L2026-0001' })));
-  await vi.waitFor(() => p.http.match((r) => r.url === '/api/empresas/f1').forEach((r) => r.flush({ id: 'f1', razonSocial: 'Farmacia Centro' })));
   await p.esperar(() => expect(p.raiz.querySelector('tbody tr')).not.toBeNull());
   return p;
 }
@@ -23,6 +22,8 @@ describe('ListaBultos', () => {
     const fila = p.raiz.querySelector('tbody tr')?.textContent ?? '';
     expect(fila).toContain('L2026-0001');
     expect(fila).toContain('Farmacia Centro');
+    expect(fila).toContain('CIR-0001');
+    expect(fila).toContain('vía Distribuidora Pie de Monte');
     expect(fila).toContain('Precinto P-77');
     expect(fila).toContain('Robado');
     expect(fila).toContain('Bloqueado: Bulto con medida vigente');

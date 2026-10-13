@@ -2,8 +2,8 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { proveerClienteApi } from '../../../core/api/api.providers';
-import { PAGINA_VACIA, pagina, pedidosA, responderMosaicos } from './soporte-pruebas';
-import { MAXIMO_NOMBRES_INSPECTORES, TableroDatos } from './tablero.datos';
+import { PAGINA_VACIA, pagina, responderMosaicos } from './soporte-pruebas';
+import { TableroDatos } from './tablero.datos';
 
 function crear() {
   TestBed.configureTestingModule({
@@ -24,84 +24,52 @@ async function esperarMosaicos(datos: TableroDatos): Promise<void> {
 }
 
 describe('TableroDatos', () => {
-  it('pide los 7 conteos con size=1 y los filtros por estado correctos', () => {
+  it('pide el resumen con UN solo pedido a /api/tablero/resumen (ya no son 7 conteos)', () => {
     const { http } = crear();
 
-    expect(pedidosA(http, '/api/empresas', 'PENDIENTE').length).toBe(1);
-    expect(pedidosA(http, '/api/inspectores-anmat', 'ACTIVO').length).toBe(1);
-    expect(pedidosA(http, '/api/circuitos', 'APROBADO').length).toBe(1);
-    expect(pedidosA(http, '/api/cuarentenas', 'ACTIVA').length).toBe(1);
-    expect(http.match((p) => p.url === '/api/eventos-trazabilidad').length).toBe(1);
-    expect(http.match((p) => p.url === '/api/registros-blockchain').length).toBe(1);
-    // Empresas sin filtro + pendientes con filtro, ambas size=1 (las 2 de /api/empresas restantes son una).
-    expect(http.match((p) => p.url === '/api/empresas' && !p.params.has('estado')).length).toBe(1);
+    expect(http.match((p) => p.url === '/api/tablero/resumen').length).toBe(1);
+    expect(http.match((p) => p.url === '/api/empresas' || p.url === '/api/inspectores-anmat' || p.url === '/api/circuitos').length).toBe(0);
+    expect(http.match((p) => p.url === '/api/eventos-trazabilidad' || p.url === '/api/registros-blockchain' || p.url === '/api/cuarentenas').length).toBe(0);
   });
 
   it('muestra los totales y resalta con atención lo pendiente y las cuarentenas activas', async () => {
     const { datos, http } = crear();
     expect(datos.mosaicos().every((m) => m.estado === 'cargando')).toBe(true);
 
-    responderMosaicos(http, { empresas: 9, 'empresas-pendientes': 2, 'inspectores-activos': 3, 'cuarentenas-activas': 0 });
+    responderMosaicos(http, { empresas: 9, empresasPendientes: 2, inspectoresActivos: 3, cuarentenasActivas: 0, anclajesConfirmados: 4 });
     await esperarMosaicos(datos);
 
     const por = Object.fromEntries(datos.mosaicos().map((m) => [m.clave, m]));
     expect(por['empresas']).toMatchObject({ valor: 9, estado: 'listo', tono: null });
-    expect(por['empresas-pendientes']).toMatchObject({ valor: 2, tono: 'atencion' });
-    expect(por['inspectores-activos'].valor).toBe(3);
-    expect(por['cuarentenas-activas']).toMatchObject({ valor: 0, tono: null });
+    expect(por['empresasPendientes']).toMatchObject({ valor: 2, tono: 'atencion' });
+    expect(por['inspectoresActivos'].valor).toBe(3);
+    expect(por['cuarentenasActivas']).toMatchObject({ valor: 0, tono: null });
+    expect(por['anclajesConfirmados']).toMatchObject({ valor: 4, etiqueta: 'Anclajes confirmados en Sepolia' });
   });
 
-  it('un mosaico que falla se marca "error" y NO afecta a los demás', async () => {
+  it('si falla el resumen, los 7 mosaicos se marcan "error" (y las listas de pendientes no dependen de él)', async () => {
     const { datos, http } = crear();
 
-    responderMosaicos(http, { empresas: 5, eventos: 40 }, ['circuitos-aprobados']);
+    responderMosaicos(http, {}, true);
+    http.match((p) => p.url === '/api/empresas/sin-inspector')[0].flush(pagina([], 0));
     await esperarMosaicos(datos);
 
-    const por = Object.fromEntries(datos.mosaicos().map((m) => [m.clave, m]));
-    expect(por['circuitos-aprobados']).toMatchObject({ estado: 'error', valor: null });
-    expect(por['empresas']).toMatchObject({ estado: 'listo', valor: 5 });
-    expect(por['eventos']).toMatchObject({ estado: 'listo', valor: 40 });
+    expect(datos.mosaicos().map((m) => m.estado)).toEqual(Array(7).fill('error'));
+    await vi.waitFor(() => expect(datos.empresasSinInspector.hasValue()).toBe(true));
   });
 
-  it('los circuitos sin inspector llevan los nombres de sus tres empresas y la provincia de la farmacia', async () => {
+  it('los circuitos sin inspector traen las razones sociales de sus tres empresas (sin pedirlas aparte)', async () => {
     const { datos, http } = crear();
-    const circuito = { id: 'c1', codigo: 'CIR-0007', laboratorioId: 'l1', distribuidorId: 'd1', farmaciaId: 'f1', fechaPropuesta: '2026-10-08T18:00:00Z' };
+    const circuito = {
+      id: 'c1', codigo: 'CIR-0007', laboratorioRazonSocial: 'Lab Andino', distribuidorRazonSocial: 'Distribuidora Pie de Monte',
+      farmaciaRazonSocial: 'Farmacia Salteña', fechaPropuesta: '2026-10-08T18:00:00Z',
+    };
 
     http.match((p) => p.url === '/api/circuitos/sin-inspector')[0].flush(pagina([circuito], 1));
-    for (const [id, nombre, provincia] of [['l1', 'Lab Andino', 'MENDOZA'], ['d1', 'Distribuidora Pie de Monte', 'MENDOZA'], ['f1', 'Farmacia Salteña', 'SALTA']]) {
-      await vi.waitFor(() => http.expectOne(`/api/empresas/${id}`).flush({ id, razonSocial: nombre, provincia }));
-    }
-    TestBed.tick();
 
     await vi.waitFor(() => expect(datos.circuitosSinInspector.hasValue()).toBe(true));
-    const [pendiente] = datos.circuitosSinInspector.value()?.elementos ?? [];
-    expect(pendiente).toMatchObject({
-      laboratorio: 'Lab Andino',
-      distribuidor: 'Distribuidora Pie de Monte',
-      farmacia: 'Farmacia Salteña',
-      provinciaFarmacia: 'SALTA',
-    });
-  });
-
-  it('si no se puede leer una empresa del circuito, usa un texto neutro y no falla', async () => {
-    const { datos, http } = crear();
-    const circuito = { id: 'c1', codigo: 'CIR-0008', laboratorioId: 'l1', distribuidorId: 'd1', farmaciaId: 'f1' };
-
-    http.match((p) => p.url === '/api/circuitos/sin-inspector')[0].flush(pagina([circuito], 1));
-    for (const id of ['l1', 'd1', 'f1']) {
-      await vi.waitFor(() =>
-        http.expectOne(`/api/empresas/${id}`).flush(
-          { status: 404, message: 'No encontrada', regla: null, errors: null },
-          { status: 404, statusText: 'Not Found' },
-        ),
-      );
-    }
-
-    await vi.waitFor(() => expect(datos.circuitosSinInspector.hasValue()).toBe(true));
-    expect(datos.circuitosSinInspector.value()?.elementos[0]).toMatchObject({
-      farmacia: 'Empresa (sin datos)',
-      provinciaFarmacia: null,
-    });
+    expect(datos.circuitosSinInspector.value()?.elementos[0]).toMatchObject({ farmaciaRazonSocial: 'Farmacia Salteña' });
+    http.expectNone((p) => p.url.startsWith('/api/empresas/') && p.url !== '/api/empresas/sin-inspector');
   });
 
   it('una lista de circuitos vacía no deja el recurso colgado', async () => {
@@ -113,31 +81,27 @@ describe('TableroDatos', () => {
     expect(datos.circuitosSinInspector.value()).toEqual({ elementos: [], total: 0 });
   });
 
-  it('cargarInspectores pide los ACTIVO (máx. 100) y busca el nombre solo de los primeros 30', async () => {
+  it('cargarInspectores pide los ACTIVO (máx. 100) y arma "Nombre Apellido" con lo que trae cada inspector', async () => {
     const { datos, http } = crear();
-    const inspectores = Array.from({ length: MAXIMO_NOMBRES_INSPECTORES + 5 }, (_, i) => ({
-      id: `i${i}`,
-      legajo: `L-${i}`,
-      provincia: 'MENDOZA',
-      usuarioId: `u${i}`,
-    }));
+    const inspectores = [
+      { id: 'i0', legajo: 'L-0', provincia: 'MENDOZA', usuarioId: 'u0', nombre: 'Laura', apellido: 'Gómez' },
+      { id: 'i1', legajo: 'L-1', provincia: 'SAN_JUAN', usuarioId: 'u1', nombre: 'Pablo', apellido: 'Funes' },
+    ];
 
     const promesa = datos.cargarInspectores();
     const pedido = http.expectOne((p) => p.url === '/api/inspectores-anmat' && p.params.get('size') === '100');
     expect(pedido.request.params.get('estado')).toBe('ACTIVO');
     pedido.flush(pagina(inspectores));
-    for (let i = 0; i < MAXIMO_NOMBRES_INSPECTORES; i++) {
-      await vi.waitFor(() => http.expectOne(`/api/usuarios/u${i}`).flush({ nombre: `Nombre${i}`, apellido: 'Apellido' }));
-    }
     const resultado = await promesa;
 
-    expect(resultado.ok).toBe(true);
-    if (resultado.ok) {
-      expect(resultado.valor.length).toBe(MAXIMO_NOMBRES_INSPECTORES + 5);
-      expect(resultado.valor[0].nombre).toBe('Nombre0 Apellido');
-      expect(resultado.valor[MAXIMO_NOMBRES_INSPECTORES].nombre).toBeNull();
-    }
-    http.expectNone((p) => p.url === `/api/usuarios/u${MAXIMO_NOMBRES_INSPECTORES}`);
+    expect(resultado).toEqual({
+      ok: true,
+      valor: [
+        { id: 'i0', legajo: 'L-0', provincia: 'MENDOZA', nombre: 'Laura Gómez' },
+        { id: 'i1', legajo: 'L-1', provincia: 'SAN_JUAN', nombre: 'Pablo Funes' },
+      ],
+    });
+    http.expectNone((p) => p.url.startsWith('/api/usuarios/'));
   });
 
   it('cargarInspectores guarda el resultado, pero no un fallo', async () => {
@@ -193,7 +157,7 @@ describe('TableroDatos', () => {
     }
   });
 
-  it('recargar() vuelve a pedir los mosaicos y las listas', async () => {
+  it('recargar() vuelve a pedir el resumen y las listas', async () => {
     const { datos, http } = crear();
     responderMosaicos(http);
     http.match((p) => p.url === '/api/empresas/sin-inspector')[0].flush(PAGINA_VACIA);
@@ -204,7 +168,7 @@ describe('TableroDatos', () => {
 
     await vi.waitFor(() => {
       TestBed.tick();
-      expect(http.match((p) => p.url === '/api/registros-blockchain').length).toBe(1);
+      expect(http.match((p) => p.url === '/api/tablero/resumen').length).toBe(1);
     });
     expect(http.match((p) => p.url === '/api/empresas/sin-inspector').length).toBe(1);
     expect(http.match((p) => p.url === '/api/circuitos/sin-inspector').length).toBe(1);
