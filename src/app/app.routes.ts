@@ -26,6 +26,18 @@ export const routes: Routes = [
         loadComponent: () => import('./features/publico/ingresar/ingresar').then((modulo) => modulo.Ingresar),
       },
       {
+        path: 'registrar-empresa',
+        title: 'Registrar una empresa · MediChain',
+        canMatch: [invitadoGuard],
+        loadComponent: () => import('./features/publico/registro/registrar-empresa').then((modulo) => modulo.RegistrarEmpresa),
+      },
+      {
+        path: 'registrar-paciente',
+        title: 'Crear mi cuenta · MediChain',
+        canMatch: [invitadoGuard],
+        loadComponent: () => import('./features/publico/registro/registrar-paciente').then((modulo) => modulo.RegistrarPaciente),
+      },
+      {
         path: 'verificar',
         title: 'Verificar un medicamento · MediChain',
         loadComponent: () => import('./features/publico/verificar/verificar').then((modulo) => modulo.Verificar),

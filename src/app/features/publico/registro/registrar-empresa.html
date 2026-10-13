@@ -1,0 +1,135 @@
+<section class="registro">
+  <header>
+    <h1>Registrar una empresa</h1>
+    <p class="secundario">
+      Laboratorios, distribuidoras y farmacias. Tu solicitud queda pendiente hasta que un inspector de tu provincia
+      revise el PDF de la habilitación y la apruebe.
+    </p>
+  </header>
+
+  @if (registrada(); as r) {
+    <div class="listo" role="status">
+      <h2>Solicitud enviada</h2>
+      <p>{{ r.mensaje }}</p>
+      <p>Identificador: <code>{{ r.identificador }}</code> · Estado: <strong>{{ r.estado === 'PENDIENTE' ? 'Pendiente de revisión' : r.estado }}</strong></p>
+      <p class="secundario">Cuando la habiliten vas a poder ingresar con el correo y la contraseña que elegiste.</p>
+      <p><a routerLink="/ingresar">Ir a ingresar</a></p>
+    </div>
+  } @else {
+    <form class="tarjeta" novalidate (submit)="enviar($event)">
+      <mc-error-api [error]="errorGeneral()" />
+
+      <fieldset>
+        <legend>La empresa</legend>
+        <div class="campos">
+          <mat-form-field>
+            <mat-label>Tipo de empresa</mat-label>
+            <mat-select [formField]="formulario.tipo">
+              @for (t of tipos; track t.valor) { <mat-option [value]="t.valor">{{ t.texto }}</mat-option> }
+            </mat-select>
+            @for (e of formulario.tipo().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Razón social</mat-label>
+            <input matInput autocomplete="organization" [formField]="formulario.razonSocial" />
+            @for (e of formulario.razonSocial().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>CUIT</mat-label>
+            <input matInput inputmode="numeric" autocomplete="off" [formField]="formulario.cuit" />
+            <mat-hint>Con o sin guiones</mat-hint>
+            @for (e of formulario.cuit().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>GLN</mat-label>
+            <input matInput inputmode="numeric" autocomplete="off" [formField]="formulario.gln" />
+            <mat-hint>13 dígitos</mat-hint>
+            @for (e of formulario.gln().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Provincia</mat-label>
+            <mat-select [formField]="formulario.provincia">
+              @for (p of provincias; track p.valor) { <mat-option [value]="p.valor">{{ p.texto }}</mat-option> }
+            </mat-select>
+            <mat-hint>Define qué inspectores reciben la solicitud</mat-hint>
+            @for (e of formulario.provincia().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Localidad</mat-label>
+            <input matInput autocomplete="address-level2" [formField]="formulario.localidad" />
+            @for (e of formulario.localidad().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Domicilio</mat-label>
+            <input matInput autocomplete="street-address" [formField]="formulario.domicilio" />
+            @for (e of formulario.domicilio().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Número de habilitación (opcional)</mat-label>
+            <input matInput autocomplete="off" [formField]="formulario.numeroHabilitacion" />
+            @for (e of formulario.numeroHabilitacion().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Director técnico (opcional)</mat-label>
+            <input matInput autocomplete="off" [formField]="formulario.directorTecnico" />
+            <mat-hint>Como figura en la habilitación</mat-hint>
+            @for (e of formulario.directorTecnico().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+          </mat-form-field>
+        </div>
+        <div class="archivo">
+          <label for="documento-habilitacion">PDF de la habilitación</label>
+          <input id="documento-habilitacion" type="file" accept="application/pdf" (change)="elegirArchivo($event)" [attr.aria-describedby]="errorDocumento() ? 'error-documento' : null" />
+          <span class="secundario">Un PDF real, de hasta 5 MB.</span>
+          @if (errorDocumento(); as mensaje) {
+            <span id="error-documento" class="error" role="alert">{{ mensaje }}</span>
+          }
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Quién administra la cuenta</legend>
+        <div class="campos">
+          <mat-form-field>
+            <mat-label>Nombre</mat-label>
+            <input matInput autocomplete="given-name" [formField]="formulario.adminNombre" />
+            @for (e of formulario.adminNombre().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Apellido</mat-label>
+            <input matInput autocomplete="family-name" [formField]="formulario.adminApellido" />
+            @for (e of formulario.adminApellido().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>DNI</mat-label>
+            <input matInput inputmode="numeric" autocomplete="off" [formField]="formulario.adminDni" />
+            <mat-hint>8 dígitos, sin puntos</mat-hint>
+            @for (e of formulario.adminDni().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Correo electrónico</mat-label>
+            <input matInput type="email" autocomplete="email" [formField]="formulario.adminEmail" />
+            <mat-hint>Con él vas a ingresar</mat-hint>
+            @for (e of formulario.adminEmail().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Contraseña</mat-label>
+            <input matInput type="password" autocomplete="new-password" [formField]="formulario.adminPassword" />
+            <mat-hint>De 8 a 72 caracteres</mat-hint>
+            @for (e of formulario.adminPassword().errors(); track $index) { <mat-error>{{ e.message }}</mat-error> }
+          </mat-form-field>
+        </div>
+        @if (esLaboratorio()) {
+          <mat-checkbox [formField]="formulario.adminEsDirectorTecnico">Esta persona es también la directora o el director técnico</mat-checkbox>
+        }
+      </fieldset>
+
+      <div>
+        <button mat-flat-button type="submit" [disabled]="formulario().submitting()">
+          {{ formulario().submitting() ? 'Enviando…' : 'Enviar la solicitud' }}
+        </button>
+      </div>
+    </form>
+
+    <p class="secundario">¿Ya tenés cuenta? <a routerLink="/ingresar">Ingresá</a>.</p>
+  }
+</section>
