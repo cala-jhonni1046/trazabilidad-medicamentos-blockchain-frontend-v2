@@ -41,7 +41,8 @@ la demo en `.env.e2e` (plantilla: `.env.e2e.ejemplo`; ese archivo nunca va a Git
 ## Más información
 
 - `CLAUDE.md`: arquitectura, estilo, diseño, seguridad, Git y reglas de trabajo.
-- `docs/pedidos-b12.md`: lo que el frontend resuelve con un rodeo y se le pide al backend (paso B12).
+- `docs/pedidos-b12.md`: qué se resolvió con el backend nuevo (paso B12) y qué sigue pendiente.
+- `docs/guion-demo.md`: el recorrido de la demo, paso a paso por rol, con las cuentas y el significado de cada estado.
 - `referencia/prototipo-medichain-v3.html`: prototipo anterior, solo referencia visual.
 
 ## Seguridad

@@ -1,63 +1,36 @@
-# Pedidos al backend para el paso B12
+# Pedidos al backend (paso B12): qué se hizo y qué sigue
 
-Cosas que el frontend necesita o que mejorarían el contrato (`api/openapi.json`). El frontend
-las resuelve mientras tanto con un rodeo, marcado en el código con `// TODO B12: …`.
-Al cerrar B12, buscar `TODO B12` y quitar cada rodeo.
+El backend cerró B12 (`~/con-blockchain`, commits B12a a B12g) y el frontend adoptó el contrato nuevo (`Paso F14` a `F16`).
+Los rodeos marcados `// TODO B12` se quitaron. Esto queda como registro y como lista de lo que todavía se pide.
 
-## Contrato (tipos)
-1. **`AnclajeDTO.estado` como enum.** Hoy es `string` libre (valores vistos: `NO_DISPONIBLE`, y
-   posiblemente los de `EstadoAnclaje`). Rodeo: `presentarEstadoAnclaje()` tolera cualquier valor
-   (neutro, con el texto tal cual).
-2. **`EtapaRecorridoDTO.etapa` como enum.** Hoy es `string` libre (valores vistos: `FABRICADO`,
-   `LIBERADO`). Rodeo: se capitaliza el código para mostrarlo.
-3. **Campos que pueden venir `null` declarados con `anyOf: [$ref, null]`** (hoy `{"type":"null","$ref":…}`),
-   para que el generador los tipee como `T | null`. Rodeo: comparar con `== null`.
-4. **`GET /api/empresas/{id}/documento` con `format: binary`** (hoy `format: byte`, que el generador
-   tipea como `string`). Rodeo: conversión explícita del `Blob`.
-5. **Tamaño máximo de página (100) declarado** (`maximum: 100`) en el parámetro `size`.
-   Hoy está en `TAMANO_PAGINA_MAXIMO` tomado del CLAUDE.md del backend.
+## Hecho
 
-## Datos que faltan en los DTO
-6. **Nombre del inspector** (nombre y apellido) en `InspectorAnmatResponseDTO`: para "asignar a…"
-   y "revisor". Rodeo: caché de nombres con `obtenerUsuario`.
-7. **Nombres en lugar de ids** (razón social, nombre comercial) en los DTO de listados. Rodeo:
-   `NombresService` con caché.
+| # | Pedido | Resultado |
+|---|---|---|
+| 1 | `AnclajeDTO.estado` como enum | `EstadoAnclajeCaja`; catálogo exhaustivo `PRESENTACION_ESTADO_ANCLAJE_CAJA` |
+| 2 | `EtapaRecorridoDTO.etapa` como enum | `EtapaRecorrido`; `ROTULO_ETAPA_RECORRIDO` |
+| 3 | Nulables como `anyOf [$ref, null]` | El cliente los tipa `T \| null` |
+| 4 | PDF con `format: binary` | El cliente devuelve `Blob`; se quitó la conversión |
+| 5 | Tamaño máximo de página (100) | `maximum: 100` en cada `size` (más de 100 no da 400: se recorta) |
+| 6 | Nombre del inspector | `nombre` y `apellido` en el DTO; ya no se pide el usuario |
+| 7 | Nombres en lugar de ids | Razones sociales, código del lote, medicamento…; se borró `NombresService` |
+| 8 | `?estado=` en cajas y viajes | Stock en dos tarjetas (En stock / En camino); filtro en Viajes; "En camino hacia vos" |
+| 9 | Trazabilidad por código | Pantalla **Trazabilidad** para todos los roles menos el paciente |
+| 10 | Resumen del tablero | `GET /api/tablero/resumen`: un pedido en lugar de siete |
+| 11 | Códigos y nombres en medidas, lotes, cajas, bultos | Vienen en los DTO (los eventos no traen nombre de actor y no se muestran ids: R13) |
+| 12 | Contadores de la bandeja del inspector | `GET /api/tablero/bandeja-inspector`: insignias en el menú del inspector |
+| 14 | `EmpresaResumenDTO` con campos obligatorios | Hecho en el contrato |
+| 15c, 16 | Búsqueda por código de lote/bulto y por serie | El backend ya tiene `?codigo=` (lotes y bultos) y `?serie=` (cajas). **El frontend todavía no lo usa** en los formularios de armado y de viaje ni en Stock (se siguen ofreciendo hasta 100 elegibles). |
+| — | `destinoId` del bulto es el id del **circuito** | Se muestran `circuitoCodigo`, `distribuidorRazonSocial` y `farmaciaRazonSocial` |
 
-## Endpoints y filtros
-8. **`?estado=` en `listarCajas` y `listarViajes`** (stock EN_STOCK, viajes EN_TRANSITO que llegan).
-   Rodeo: recorrer las páginas.
-9. **Trazabilidad por código** (lote, bulto o serie, con sus eventos). Sin esto no hay pantalla
-   de trazabilidad.
+## Pendiente (backend)
 
-## Agregados durante el Lote A (Sede e inspector)
-10. **Resumen para el tablero de la Sede** (un endpoint con los totales: empresas, pendientes, inspectores
-    activos, circuitos aprobados, cuarentenas activas, eventos y anclajes). Hoy son 7 pedidos `size=1` que
-    leen `page.totalElements` (`TableroDatos`).
-11. **Códigos y nombres en medidas, lotes y eventos:** `CuarentenaResponseDTO` solo trae `loteId`/`bultoIds`
-    (el listado busca el código del lote con `NombresService.lote`) y `EventoTrazabilidadResponseDTO` solo
-    trae ids de actor y entidad (no se muestran). Va junto con los puntos 6 y 7.
-12. **Contadores de la bandeja del inspector** (cuántas empresas, circuitos, biológicos, cuarentenas y
-    reportes tiene pendientes) para mostrarlos en el menú. Hoy cada listado muestra su propio total y el
-    menú no tiene insignias.
-13. **`EtapaRecorridoDTO`, `AnclajeDTO.estado` y `ErrorResponseDTO.regla`:** que `regla` sea un enum
-    documentado (R1–R15 y los códigos no-R). Hoy es `string` y el frontend lo muestra tal cual.
-
-## Agregados durante el Lote B (laboratorio y distribuidora)
-14. **`EmpresaResumenDTO` con campos obligatorios** (`razonSocial`, `provincia`, `id`, `cuit`, `tipo`): hoy
-    ninguno es `required` y el generador los tipea opcionales (el formulario de circuitos los trata como tales).
-15. **Viajes y recepción:** (a) `listarViajes` sin `?estado=` y sin saber cuáles bultos del viaje son de MI
-    farmacia (punto 8): "En camino hacia vos" muestra todos los códigos del viaje; (b) las temperaturas del
-    viaje se piden hasta 100 por página (un viaje largo puede tener más); (c) `listarBultos` y `listarLotes`
-    sin búsqueda por código para los formularios de armado y de viaje (se ofrecen hasta 100 elegibles).
-
-## Agregados durante el Lote C (farmacia y paciente)
-16. **Stock de la farmacia:** `listarCajas` sin `?estado=` (punto 8) ni búsqueda por serie; además cada caja trae solo
-    `loteId` y hay que pedir el lote y su medicamento para mostrar el nombre (2 pedidos con caché por caja distinta).
-    La pantalla "Stock" muestra la página con el estado de cada caja; no puede pedir "solo en stock".
-17. **Dispensaciones y reportes del paciente:** el listado de dispensaciones no tiene búsqueda ni filtro de anuladas;
-    "Mis reportes" reutiliza el listado del inspector (el paciente nunca ve la conclusión porque la API no se la manda).
-
-## Agregado durante el Lote D (escáner y pulido)
-18. **Política de seguridad (CSP) para el Docker final:** el escáner usa un binario WebAssembly (`/zxing/zxing_reader.wasm`),
-    que exige `'wasm-unsafe-eval'` en `script-src` del servidor web que sirva el frontend; la API y el resto no necesitan nada más.
-    Anotado acá para no olvidarlo cuando se haga la imagen (el Docker se hace al final del proyecto).
+- **13. `regla` como enum.** `ErrorResponseDTO.regla` es texto (R1–R15 y los códigos que no son R); está documentado, no es un enum.
+- **15a. Bultos de un viaje con varias paradas.** Una farmacia con una parada ve todos los códigos de bulto del viaje y las
+  demás paradas (el backend lo anotó como posible fuga de alcance, sin decidir). El frontend muestra lo que llega.
+- **15b. Más de 100 lecturas de temperatura de un viaje.** Se piden de a 100 por página; un viaje largo podría tener más.
+- **17. Dispensaciones:** sin búsqueda ni filtro de anuladas. "Mis reportes" del paciente reutiliza el listado del inspector.
+- **Provincia de la farmacia en el circuito sin inspector.** El tablero de la Sede ya no muestra "Farmacia en <provincia>" porque el
+  DTO del circuito no la trae (antes salía de pedir la empresa). Si se quiere, pedir `farmaciaProvincia` en `EnlaceCuitResponseDTO`.
+- **18. CSP para el Docker final.** El escáner usa WebAssembly (`/zxing/zxing_reader.wasm`): el servidor web que sirva el
+  frontend necesita `'wasm-unsafe-eval'` en `script-src`. (El Docker se hace al final.)
