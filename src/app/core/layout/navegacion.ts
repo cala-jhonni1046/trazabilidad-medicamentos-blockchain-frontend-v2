@@ -68,3 +68,13 @@ export const MENU_POR_ROL: Record<RolUsuario, readonly ElementoMenu[]> = {
     { texto: 'Mis reportes', ruta: '/paciente/reportes', icono: 'report' },
   ],
 };
+
+/**
+ * Si la entrada del menú debe resaltarse SOLO cuando la URL es exactamente su ruta. Pasa cuando su ruta es el
+ * comienzo de la de otra entrada del mismo menú: el inicio del rol ("/farmacia") es prefijo de "/farmacia/stock",
+ * y `routerLinkActive` (que por defecto compara por prefijo) resaltaría las dos a la vez. Las demás entradas
+ * conservan la coincidencia por prefijo: una pantalla dentro de su sección (un detalle) las sigue resaltando.
+ */
+export function resaltarSoloSiEsExacta(elemento: ElementoMenu, menu: readonly ElementoMenu[]): boolean {
+  return menu.some((otro) => otro.ruta.startsWith(`${elemento.ruta}/`));
+}

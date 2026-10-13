@@ -18,7 +18,12 @@
 
     <nav class="menu" aria-label="Secciones">
       @for (elemento of menu(); track elemento.ruta) {
-        <a [routerLink]="elemento.ruta" routerLinkActive="activo" ariaCurrentWhenActive="page">
+        <a
+          [routerLink]="elemento.ruta"
+          routerLinkActive="activo"
+          [routerLinkActiveOptions]="{ exact: elemento.exacta }"
+          ariaCurrentWhenActive="page"
+        >
           <mc-icono [nombre]="elemento.icono" />{{ elemento.texto }}
         </a>
       }

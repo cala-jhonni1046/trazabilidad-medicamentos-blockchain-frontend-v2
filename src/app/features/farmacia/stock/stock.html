@@ -1,12 +1,12 @@
 <h1>Stock</h1>
-<mc-tarjeta titulo="Cajas en tu farmacia" [detalle]="lista.total() + ' en total'">
+<mc-tarjeta titulo="Cajas de tu farmacia y en camino" [detalle]="lista.total() + ' en total'">
   @if (lista.error(); as error) {
     <mc-error-api [error]="error" />
     <div><button mat-stroked-button type="button" (click)="lista.recargar()">Reintentar</button></div>
   } @else if (lista.vacia()) {
-    <p class="mc-vacio">No tenés cajas recibidas todavía.</p>
+    <p class="mc-vacio">No hay cajas en tu farmacia ni en camino todavía.</p>
   } @else {
-    <div class="mc-tabla" tabindex="0" role="region" aria-label="Cajas en tu farmacia">
+    <div class="mc-tabla" tabindex="0" role="region" aria-label="Cajas de tu farmacia y en camino">
       <table>
         <thead>
           <tr><th>Medicamento</th><th>Serie</th><th>Lote</th><th>Estado</th><th>Acciones</th></tr>

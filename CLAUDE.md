@@ -45,7 +45,7 @@ Frontend Angular 22 de MediChain: trazabilidad de medicamentos (ANMAT), cadena d
 - Modo claro, oscuro y sistema: atributo `data-theme` en `<html>`.
 - Cada estado = color + ícono + texto, únicamente desde `shared/estados/catalogo-estados.ts` (un Record exhaustivo por enum) y mostrado con `<mc-estado>`. Nunca solo color.
 - Íconos: Material Symbols registrados de a uno en `shared/ui/iconos.ts` (SVG importados como texto) y mostrados con `<mc-icono nombre="…" />`. Para uno nuevo: importar su SVG y sumarlo a `ICONOS`.
-- Menú lateral de cada rol: solo en `core/layout/navegacion.ts` (un Record por rol). Cada pantalla nueva suma su entrada ahí.
+- Menú lateral de cada rol: solo en `core/layout/navegacion.ts` (un Record por rol). Cada pantalla nueva suma su entrada ahí. El resaltado usa `routerLinkActive` por prefijo, salvo la entrada que es prefijo de otra del mismo menú (el inicio del rol, `/farmacia` y `/farmacia/stock`): esa se resalta solo con la ruta exacta (`resaltarSoloSiEsExacta`); `shell-app.spec.ts` comprueba, para cada rol y cada entrada, que se resalta UNA sola.
 - Archivo (títulos), Source Sans 3 (texto), JetBrains Mono (hashes y códigos), con @fontsource.
 - Fechas: la API manda UTC con `Z`; se muestran en America/Argentina/Buenos_Aires con `shared/formato/fechas.ts`. Las de solo día (`YYYY-MM-DD`) nunca pasan por `new Date()`. Fecha con hora hacia la API: siempre con offset (`2026-10-08T15:00:00-03:00`); sin offset da 400.
 - Accesibilidad AA: foco visible, contraste, etiqueta en cada campo. Todo lo que no es la pantalla inicial se carga diferido (bundle inicial de ~340 kB: el snackbar de `AvisosService` se importa bajo demanda; no importar Material en `app.config.ts` ni en servicios globales).

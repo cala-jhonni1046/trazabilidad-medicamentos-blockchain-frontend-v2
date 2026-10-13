@@ -22,6 +22,9 @@ test.describe('Farmacia', () => {
       'Circuitos', 'Por recibir', 'Stock', 'Dispensar', 'Equipo',
     ]);
     await sinErroresDeCarga(page);
+    // Solo la entrada de la pantalla actual queda resaltada ("Circuitos" es prefijo de las demás rutas).
+    const actual = page.getByRole('navigation', { name: 'Secciones' }).locator('a[aria-current="page"]');
+    await expect(actual).toHaveText(['Circuitos']);
 
     for (const [entrada, titulo] of [
       ['Por recibir', 'Por recibir'],
@@ -31,6 +34,7 @@ test.describe('Farmacia', () => {
     ]) {
       await irA(page, entrada);
       await expect(page.getByRole('heading', { level: 1, name: titulo })).toBeVisible();
+      await expect(actual).toHaveText([entrada]);
       await sinErroresDeCarga(page);
     }
   });

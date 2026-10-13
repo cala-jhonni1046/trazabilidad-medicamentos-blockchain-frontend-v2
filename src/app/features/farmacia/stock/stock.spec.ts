@@ -33,6 +33,17 @@ describe('Stock', () => {
     expect(Array.from(p.raiz.querySelectorAll('tbody tr')).map((f) => botones(f))).toEqual([['Devolver'], [], []]);
   });
 
+  it('el título no dice que todas están en la farmacia: incluye las que vienen en camino, cada una con su estado, y solo las EN_STOCK se devuelven', async () => {
+    const p = await cargar([caja(), caja({ id: 'c2', serie: 'L20260001S000002', estado: 'EN_TRANSITO' })]);
+
+    expect(p.raiz.querySelector('mc-tarjeta')?.textContent).toContain('Cajas de tu farmacia y en camino');
+    expect(p.raiz.textContent).not.toContain('Cajas en tu farmacia');
+    const filas = Array.from(p.raiz.querySelectorAll('tbody tr'));
+    expect(filas[0].textContent).toContain('En stock');
+    expect(filas[1].textContent).toContain('En tránsito');
+    expect(filas.map((f) => botones(f))).toEqual([['Devolver'], []]);
+  });
+
   it('devolver manda GTIN, serie, motivo elegido y observación; un 409 R14 se ve en el diálogo', async () => {
     const p = await cargar([caja()]);
 
@@ -58,6 +69,6 @@ describe('Stock', () => {
     const p = crearPantalla(Stock, 'FARMACIA');
     p.responder('/api/unidades-trazables', PAGINA_VACIA);
 
-    await p.esperar(() => expect(p.raiz.textContent).toContain('No tenés cajas recibidas todavía.'));
+    await p.esperar(() => expect(p.raiz.textContent).toContain('No hay cajas en tu farmacia ni en camino todavía.'));
   });
 });

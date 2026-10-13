@@ -26,8 +26,10 @@ interface CajaVista {
 const SIN_NOMBRE = '(sin datos)';
 
 /**
- * "Stock" de la farmacia: las cajas que ve (en stock, dispensadas, devueltas…) con el estado y
- * el bloqueo R10 tal como los calcula el backend, y la devolución de una caja EN_STOCK.
+ * "Stock" de la farmacia: las cajas que ve con el estado y el bloqueo R10 tal como los calcula el
+ * backend, y la devolución de una caja EN_STOCK. Son las que ya tiene (en stock, dispensadas,
+ * devueltas…) y también las que vienen hacia ella (EN_TRANSITO, todavía no recibidas): por eso el
+ * título lo dice y cada fila trae su estado; la pantalla no decide cuál es cuál.
  * TODO B12: `listarCajas` no filtra por estado (docs/pedidos-b12.md, punto 8): se muestra la
  * página con su estado y no se puede pedir "solo en stock".
  */

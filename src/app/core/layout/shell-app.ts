@@ -7,7 +7,7 @@ import { SesionService } from '../auth/sesion.service';
 import { SelectorTema } from '../tema/selector-tema';
 import { AvisoEmpresa } from './aviso-empresa';
 import { EmpresaPropiaDatos } from './empresa-propia.datos';
-import { MENU_POR_ROL, ROTULO_ROL } from './navegacion';
+import { ElementoMenu, MENU_POR_ROL, ROTULO_ROL, resaltarSoloSiEsExacta } from './navegacion';
 
 /**
  * Marco de las pantallas de una persona con sesión: barra lateral con el menú de su rol,
@@ -26,9 +26,11 @@ export class ShellApp {
   protected readonly datosEmpresa = inject(EmpresaPropiaDatos);
 
   protected readonly sesion = this.servicioSesion.sesion;
-  protected readonly menu = computed(() => {
+  /** Menú del rol, con la marca de qué entradas se resaltan solo con la ruta exacta (ver `resaltarSoloSiEsExacta`). */
+  protected readonly menu = computed((): readonly (ElementoMenu & { readonly exacta: boolean })[] => {
     const sesion = this.sesion();
-    return sesion === null ? [] : MENU_POR_ROL[sesion.rol];
+    const entradas = sesion === null ? [] : MENU_POR_ROL[sesion.rol];
+    return entradas.map((elemento) => ({ ...elemento, exacta: resaltarSoloSiEsExacta(elemento, entradas) }));
   });
   protected readonly rotuloRol = computed(() => {
     const sesion = this.sesion();
