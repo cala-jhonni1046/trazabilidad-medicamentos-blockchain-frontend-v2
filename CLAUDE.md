@@ -78,6 +78,7 @@ Frontend Angular 22 de MediChain: trazabilidad de medicamentos (ANMAT), cadena d
 - `lectura` (no modifica datos): los puede correr el agente SOLO si existe `.env.e2e` en la raíz del frontend; si no existe, los corre el autor.
 - `flujo` (modifica datos): los corre SOLO el autor, a mano, con `npm run e2e:flujo`. El agente los escribe pero NUNCA los corre, y nunca corre `npm run e2e` (corre `lectura` Y `flujo`): usa siempre `npm run e2e:lectura`. Tampoco corre `reset-demo.sh`.
   - Cada test de flujo dice en su cabecera qué deja en la base. Los de asignación (`e2e/flujo/asignacion.spec.ts`) **dejan una empresa pendiente (con su cuenta de administrador) por corrida**: registran una farmacia por la API pública con CUIT, GLN, email y contraseña únicos de esa corrida (generados en `e2e/soporte/identificadores.ts`; nada es un secreto) y la asignan desde la pantalla. No necesitan `reset-demo.sh`, pero la base se va llenando: antes de la demo final, el autor corre `~/con-blockchain/reset-demo.sh`.
+  - `e2e/flujo/devolucion-farmacia.spec.ts` usa la cadena nueva de la demo (Farmacia del Parque, lote L2026-0010): **devuelve una caja EN_STOCK por corrida** (la demo trae 4; después hace falta `~/con-blockchain/reset-demo.sh` y reiniciar el backend). Aborta con un mensaje claro si no quedan cajas.
   - Si un flujo necesita datos deterministas (base recién reseteada), debe abortar con un mensaje claro si no los encuentra.
 - Credenciales: variables de entorno (valores del `.env` del backend; nunca en el código ni en Git):
 
