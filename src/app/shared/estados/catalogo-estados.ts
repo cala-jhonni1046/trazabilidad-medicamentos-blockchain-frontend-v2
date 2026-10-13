@@ -1,6 +1,6 @@
 import {
-  ESTADO_ANCLAJE,
   EstadoAnclaje,
+  EstadoAnclajeCaja,
   EstadoAuditoria,
   EstadoBulto,
   EstadoDespacho,
@@ -61,24 +61,17 @@ export const PRESENTACION_ESTADO_ANCLAJE: Record<EstadoAnclaje, PresentacionEsta
   FALLIDO: { texto: 'Fallido', tono: 'critico', icono: 'error' },
 };
 
-/** Valor que la verificación pública informa cuando el anclaje no está disponible (no es un EstadoAnclaje). */
-const ANCLAJE_NO_DISPONIBLE = 'NO_DISPONIBLE';
-
 /**
- * Presentación del `anclaje.estado` de la verificación pública. El contrato lo declara como
- * texto libre (pedido para B12: que sea un enum), así que acá se tolera cualquier valor:
- * los de {@link EstadoAnclaje} usan su presentación; NO_DISPONIBLE y cualquier valor
- * desconocido se muestran en neutro, con el texto tal cual vino (nunca rompen la pantalla).
+ * Anclaje que cubre el recorrido de una caja en la verificación pública. CONFIRMADO correcto; ENVIADO
+ * y PENDIENTE (todavía no se ancló) esperan; NO_DISPONIBLE (el anclaje está apagado en el servidor) neutro.
+ * No es EstadoAnclaje (el ciclo de vida de un registro de anclaje, con FALLIDO).
  */
-export function presentarEstadoAnclaje(valor: string): PresentacionEstado {
-  if ((ESTADO_ANCLAJE as readonly string[]).includes(valor)) {
-    return PRESENTACION_ESTADO_ANCLAJE[valor as EstadoAnclaje];
-  }
-  if (valor === ANCLAJE_NO_DISPONIBLE) {
-    return { texto: 'No disponible', tono: 'neutro', icono: 'help' };
-  }
-  return { texto: valor === '' ? 'Estado desconocido' : valor, tono: 'neutro', icono: 'help' };
-}
+export const PRESENTACION_ESTADO_ANCLAJE_CAJA: Record<EstadoAnclajeCaja, PresentacionEstado> = {
+  CONFIRMADO: { texto: 'Confirmado', tono: 'correcto', icono: 'verified' },
+  ENVIADO: { texto: 'Enviado, esperando confirmaciones', tono: 'blockchain', icono: 'schedule' },
+  PENDIENTE: { texto: 'Pendiente de anclaje', tono: 'blockchain', icono: 'schedule' },
+  NO_DISPONIBLE: { texto: 'No disponible', tono: 'neutro', icono: 'help' },
+};
 
 /** Circuito: los dos pendientes en atención; APROBADO correcto; RECHAZADO y SUSPENDIDO críticos. */
 export const PRESENTACION_ESTADO_CIRCUITO: Record<EstadoEnlaceCuit, PresentacionEstado> = {

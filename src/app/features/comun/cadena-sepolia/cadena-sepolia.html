@@ -68,10 +68,10 @@
     </dl>
     <div class="anclajes-estado">
       @if (e.anclajeEnCurso; as enCurso) {
-        <div><strong>En curso:</strong> {{ rango(enCurso) }} <mc-estado [presentacion]="presentarAnclaje(enCurso.estado)" /></div>
+        <div><strong>En curso:</strong> {{ rango(enCurso) }} <mc-estado [presentacion]="presentarAnclaje[enCurso.estado]" /></div>
       }
       @if (e.ultimoAnclaje; as ultimo) {
-        <div><strong>Último:</strong> {{ rango(ultimo) }} <mc-estado [presentacion]="presentarAnclaje(ultimo.estado)" /></div>
+        <div><strong>Último:</strong> {{ rango(ultimo) }} <mc-estado [presentacion]="presentarAnclaje[ultimo.estado]" /></div>
       }
     </div>
   }
@@ -86,7 +86,7 @@
   @if (datos.anclajeEnSeguimiento(); as seguido) {
     <div class="seguimiento" aria-live="polite">
       <strong>Anclaje enviado {{ rango(seguido) }}:</strong>
-      <mc-estado [presentacion]="presentarAnclaje(seguido.estado)" />
+      <mc-estado [presentacion]="presentarAnclaje[seguido.estado]" />
       <span>{{ seguido.confirmaciones }} confirmaciones</span>
       @if (seguido.transactionHash) {
         <mc-hash [valor]="seguido.transactionHash" etiqueta="el hash de la transacción" />
@@ -186,7 +186,7 @@
               <td>{{ a.bloque ?? '—' }}</td>
               <td>{{ a.fechaCreacion | fechaHora }}</td>
               <td>
-                <mc-estado [presentacion]="presentarAnclaje(a.estado)" />
+                <mc-estado [presentacion]="presentarAnclaje[a.estado]" />
                 @if (a.estado === 'FALLIDO' && a.ultimoError) {
                   <span class="causa">{{ a.ultimoError }}</span>
                 }

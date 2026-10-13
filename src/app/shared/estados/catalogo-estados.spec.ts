@@ -1,5 +1,7 @@
 import {
   ESTADO_ANCLAJE,
+  ESTADO_ANCLAJE_CAJA,
+  ETAPA_RECORRIDO,
   ESTADO_AUDITORIA,
   ESTADO_BULTO,
   ESTADO_DESPACHO,
@@ -13,8 +15,10 @@ import {
   ESTADO_VERIFICACION_BLOCKCHAIN,
 } from '../../core/api/modelos';
 import { ICONOS } from '../ui/iconos';
+import { ROTULO_ETAPA_RECORRIDO } from '../formato/etiquetas';
 import {
   PRESENTACION_ESTADO_ANCLAJE,
+  PRESENTACION_ESTADO_ANCLAJE_CAJA,
   PRESENTACION_DISPENSACION,
   PRESENTACION_ESTADO_BULTO,
   PRESENTACION_ESTADO_UNIDAD,
@@ -29,7 +33,6 @@ import {
   opcionesDeEstado,
   PRESENTACION_ESTADO_HABILITACION,
   PRESENTACION_ESTADO_VERIFICACION,
-  presentarEstadoAnclaje,
 } from './catalogo-estados';
 
 describe('catálogo de estados', () => {
@@ -75,19 +78,24 @@ describe('catálogo: anclaje', () => {
     expect(ICONOS[presentacion.icono]).toContain('<svg');
   });
 
-  it('presentarEstadoAnclaje usa el catálogo para los valores conocidos', () => {
-    expect(presentarEstadoAnclaje('CONFIRMADO')).toBe(PRESENTACION_ESTADO_ANCLAJE.CONFIRMADO);
-    expect(presentarEstadoAnclaje('FALLIDO').tono).toBe('critico');
+  it.each([...ESTADO_ANCLAJE_CAJA])('EstadoAnclajeCaja %s tiene texto, tono e ícono existente', (estado) => {
+    const presentacion = PRESENTACION_ESTADO_ANCLAJE_CAJA[estado];
+
+    expect(presentacion.texto.length).toBeGreaterThan(0);
+    expect(ICONOS[presentacion.icono]).toContain('<svg');
   });
 
-  it('NO_DISPONIBLE y cualquier valor desconocido caen en neutro, sin romper', () => {
-    expect(presentarEstadoAnclaje('NO_DISPONIBLE')).toEqual({ texto: 'No disponible', tono: 'neutro', icono: 'help' });
-    expect(presentarEstadoAnclaje('VALOR_NUEVO_DEL_BACKEND')).toEqual({
-      texto: 'VALOR_NUEVO_DEL_BACKEND',
-      tono: 'neutro',
-      icono: 'help',
-    });
-    expect(presentarEstadoAnclaje('').texto).toBe('Estado desconocido');
+  it('en la verificación pública: CONFIRMADO correcto; NO_DISPONIBLE neutro (anclaje apagado); lo que espera, en blockchain', () => {
+    expect(PRESENTACION_ESTADO_ANCLAJE_CAJA.CONFIRMADO.tono).toBe('correcto');
+    expect(PRESENTACION_ESTADO_ANCLAJE_CAJA.NO_DISPONIBLE).toEqual({ texto: 'No disponible', tono: 'neutro', icono: 'help' });
+    expect(PRESENTACION_ESTADO_ANCLAJE_CAJA.PENDIENTE.tono).toBe('blockchain');
+    expect(PRESENTACION_ESTADO_ANCLAJE_CAJA.ENVIADO.tono).toBe('blockchain');
+  });
+});
+
+describe('etiquetas: etapa del recorrido', () => {
+  it.each([...ETAPA_RECORRIDO])('EtapaRecorrido %s tiene su texto', (etapa) => {
+    expect(ROTULO_ETAPA_RECORRIDO[etapa].length).toBeGreaterThan(0);
   });
 });
 

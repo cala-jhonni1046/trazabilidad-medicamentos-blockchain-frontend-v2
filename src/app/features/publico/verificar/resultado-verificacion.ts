@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { VerificacionPublicaResponseDto } from '../../../core/api/modelos';
+import { ROTULO_ETAPA_RECORRIDO } from '../../../shared/formato/etiquetas';
 import { DiaPipe } from '../../../shared/formato/pipes-fechas';
 import {
   PRESENTACION_ESTADO_VERIFICACION,
-  presentarEstadoAnclaje,
+  PRESENTACION_ESTADO_ANCLAJE_CAJA,
 } from '../../../shared/estados/catalogo-estados';
 import { Estado } from '../../../shared/estados/estado';
 import { Icono } from '../../../shared/ui/icono';
@@ -32,7 +33,7 @@ export class ResultadoVerificacion {
   /** Presentación del anclaje, o null si la respuesta no lo trae. */
   protected readonly anclaje = computed(() => {
     const anclaje = this.resultado().anclaje;
-    return anclaje == null ? null : { datos: anclaje, estado: presentarEstadoAnclaje(anclaje.estado) };
+    return anclaje == null ? null : { datos: anclaje, estado: PRESENTACION_ESTADO_ANCLAJE_CAJA[anclaje.estado] };
   });
 
   /**
@@ -44,9 +45,6 @@ export class ResultadoVerificacion {
     return enlace != null && enlace.startsWith('https://') ? enlace : null;
   });
 
-  /** "FABRICADO" → "Fabricado". La etapa llega como código en mayúsculas (texto libre en el contrato). */
-  protected legible(etapa: string): string {
-    const minusculas = etapa.replaceAll('_', ' ').toLowerCase();
-    return minusculas.charAt(0).toUpperCase() + minusculas.slice(1);
-  }
+  /** Texto de cada hito del recorrido (catálogo exhaustivo de EtapaRecorrido). */
+  protected readonly rotuloEtapa = ROTULO_ETAPA_RECORRIDO;
 }

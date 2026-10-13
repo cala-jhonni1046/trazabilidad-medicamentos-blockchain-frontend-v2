@@ -96,6 +96,10 @@
     {
       "description": "Anclaje del último hash de la cadena en Ethereum Sepolia (R15).",
       "name": "Registros blockchain"
+    },
+    {
+      "description": "Totales para el tablero de la Sede y los pendientes de la bandeja del inspector.",
+      "name": "Tablero"
     }
   ],
   "paths": {
@@ -154,7 +158,7 @@
     },
     "/api/bultos": {
       "get": {
-        "description": "Devuelve una página de bultos. Filtro opcional ?estado=ARMADO, EN_TRANSITO, EN_DEPOSITO, RECIBIDO, RECHAZADO, ROBADO o DESARMADO (una sola por consulta; lo ajeno sigue sin verse). Incluye el indicador de bloqueo R10 (bloqueado, motivoBloqueo, mensajeBloqueo). Roles: SEDE_CENTRAL, INSPECTOR, LABORATORIO, DISTRIBUIDOR, FARMACIA. Reglas: R10.",
+        "description": "Devuelve una página de bultos. Filtros opcionales: ?estado=ARMADO, EN_TRANSITO, EN_DEPOSITO, RECIBIDO, RECHAZADO, ROBADO o DESARMADO (una sola por consulta) y ?codigo= (el código del bulto contiene el texto, sin distinguir mayúsculas); lo ajeno sigue sin verse. Incluye el indicador de bloqueo R10 (bloqueado, motivoBloqueo, mensajeBloqueo). Roles: SEDE_CENTRAL, INSPECTOR, LABORATORIO, DISTRIBUIDOR, FARMACIA. Reglas: R10.",
         "operationId": "listarBultos",
         "parameters": [
           {
@@ -164,6 +168,17 @@
             "required": false,
             "schema": {
               "$ref": "#/components/schemas/EstadoBulto"
+            }
+          },
+          {
+            "description": "Código del bulto (opcional): lo contiene, sin distinguir mayúsculas",
+            "in": "query",
+            "name": "codigo",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 50,
+              "minLength": 0
             }
           },
           {
@@ -178,13 +193,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -514,13 +530,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -675,13 +692,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -766,13 +784,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -857,13 +876,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -1734,13 +1754,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -1905,13 +1926,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -2338,13 +2360,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -2684,13 +2707,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -2775,13 +2799,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -2946,13 +2971,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -3207,11 +3233,11 @@
               "application/pdf": {
                 "schema": {
                   "type": "string",
-                  "format": "byte"
+                  "format": "binary"
                 }
               }
             },
-            "description": "OK"
+            "description": "El PDF de habilitación"
           },
           "400": {
             "content": {
@@ -3697,9 +3723,19 @@
     },
     "/api/eventos-trazabilidad": {
       "get": {
-        "description": "Devuelve una página de eventos de trazabilidad, del más reciente al más antiguo. Roles: SEDE_CENTRAL, INSPECTOR. Reglas: R15.",
+        "description": "Devuelve una página de eventos de trazabilidad, del más reciente al más antiguo. Filtro opcional ?entidadId= (los eventos de esa entidad: lote, bulto, viaje, empresa…). Roles: SEDE_CENTRAL, INSPECTOR. Reglas: R15.",
         "operationId": "listarEventos",
         "parameters": [
+          {
+            "description": "Id de la entidad (opcional): solo los eventos de esa entidad",
+            "in": "query",
+            "name": "entidadId",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
           {
             "description": "Zero-based page index (0..N)",
             "in": "query",
@@ -3712,13 +3748,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -3781,6 +3818,124 @@
           }
         },
         "summary": "Listar eventos",
+        "tags": [
+          "Eventos de trazabilidad"
+        ]
+      }
+    },
+    "/api/eventos-trazabilidad/recorrido": {
+      "get": {
+        "description": "Busca UNO de: ?lote= (código; con ?laboratorioId= opcional, porque el código solo es único por laboratorio), ?bulto= (código) o ?gtin= y ?serie= (una caja), y devuelve por cada coincidencia sus eventos (los del lote, bulto o caja y los de lo que lo rodea: medidas, viajes, el lote y el bulto de una caja), del más viejo al más nuevo, con el laboratorio de cada resultado. Solo lo que ya ves de cada entidad (la Sede y los inspectores, todo; cada empresa, lo suyo): lo ajeno responde 404. Roles: SEDE_CENTRAL, INSPECTOR, LABORATORIO, DISTRIBUIDOR, FARMACIA. Reglas: R15.",
+        "operationId": "buscarRecorridoPorCodigo",
+        "parameters": [
+          {
+            "description": "Código del lote",
+            "in": "query",
+            "name": "lote",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 50,
+              "minLength": 0
+            }
+          },
+          {
+            "description": "Laboratorio del lote (opcional, solo con lote)",
+            "in": "query",
+            "name": "laboratorioId",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "description": "Código del bulto",
+            "in": "query",
+            "name": "bulto",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 50,
+              "minLength": 0
+            }
+          },
+          {
+            "description": "GTIN de la caja (con serie)",
+            "in": "query",
+            "name": "gtin",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 14,
+              "minLength": 0
+            }
+          },
+          {
+            "description": "Serie de la caja (con gtin)",
+            "in": "query",
+            "name": "serie",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 20,
+              "minLength": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecorridoCodigoResponseDTO"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Datos inválidos: campo obligatorio, formato o parámetro mal formado. En la validación, 'errors' trae un elemento por campo."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "No autenticado: falta el token, no es válido, venció o la cuenta está desactivada (en el login: credenciales incorrectas)."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Tu rol (o tu marca de administrador o director técnico) no permite esta acción."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "No existe o no es visible para tu empresa o provincia (lo ajeno responde 404, no 403)."
+          }
+        },
+        "summary": "Trazabilidad por código",
         "tags": [
           "Eventos de trazabilidad"
         ]
@@ -3927,13 +4082,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -4312,7 +4468,7 @@
     },
     "/api/lotes": {
       "get": {
-        "description": "SEDE e INSPECTOR ven todos; el laboratorio, los suyos. Filtro opcional ?estado=PENDIENTE_LIBERACION, LIBERADO, CUARENTENA o RECALL (una sola por consulta; lo ajeno sigue sin verse). Incluye el indicador de bloqueo R10 (bloqueado, motivoBloqueo, mensajeBloqueo). Roles: SEDE_CENTRAL, INSPECTOR, LABORATORIO, DISTRIBUIDOR, FARMACIA. Reglas: R10.",
+        "description": "SEDE e INSPECTOR ven todos; el laboratorio, los suyos. Filtros opcionales: ?estado=PENDIENTE_LIBERACION, LIBERADO, CUARENTENA o RECALL (una sola por consulta) y ?codigo= (el código del lote contiene el texto, sin distinguir mayúsculas); lo ajeno sigue sin verse. Incluye el indicador de bloqueo R10 (bloqueado, motivoBloqueo, mensajeBloqueo). Roles: SEDE_CENTRAL, INSPECTOR, LABORATORIO, DISTRIBUIDOR, FARMACIA. Reglas: R10.",
         "operationId": "listarLotes",
         "parameters": [
           {
@@ -4322,6 +4478,17 @@
             "required": false,
             "schema": {
               "$ref": "#/components/schemas/EstadoLote"
+            }
+          },
+          {
+            "description": "Código del lote (opcional): lo contiene, sin distinguir mayúsculas",
+            "in": "query",
+            "name": "codigo",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 50,
+              "minLength": 0
             }
           },
           {
@@ -4336,13 +4503,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -4507,13 +4675,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -4763,13 +4932,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 50,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -4864,13 +5034,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -5098,13 +5269,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -5447,13 +5619,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -5724,13 +5897,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -5885,13 +6059,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -6208,6 +6383,90 @@
         ]
       }
     },
+    "/api/tablero/bandeja-inspector": {
+      "get": {
+        "description": "Cuántos pendientes tiene el inspector en cada bandeja (empresas, circuitos, lotes biológicos, cuarentenas y reportes): el mismo total que cada listado de bandeja, para mostrar insignias sin pedir las cinco listas. Roles: INSPECTOR. Reglas: R12.",
+        "operationId": "obtenerBandejaInspector",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BandejaInspectorResponseDTO"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "No autenticado: falta el token, no es válido, venció o la cuenta está desactivada (en el login: credenciales incorrectas)."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Tu rol (o tu marca de administrador o director técnico) no permite esta acción."
+          }
+        },
+        "summary": "Pendientes de la bandeja del inspector",
+        "tags": [
+          "Tablero"
+        ]
+      }
+    },
+    "/api/tablero/resumen": {
+      "get": {
+        "description": "Totales de todo el sistema: empresas, empresas pendientes, inspectores activos, circuitos aprobados, cuarentenas activas, eventos de la cadena y anclajes CONFIRMADO. Roles: SEDE_CENTRAL.",
+        "operationId": "obtenerResumenTablero",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableroResumenResponseDTO"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "No autenticado: falta el token, no es válido, venció o la cuenta está desactivada (en el login: credenciales incorrectas)."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Tu rol (o tu marca de administrador o director técnico) no permite esta acción."
+          }
+        },
+        "summary": "Resumen del tablero de la Sede",
+        "tags": [
+          "Tablero"
+        ]
+      }
+    },
     "/api/telemetria-gps": {
       "get": {
         "description": "Devuelve una página de lecturas GPS. Roles: SEDE_CENTRAL, INSPECTOR, LABORATORIO, DISTRIBUIDOR.",
@@ -6225,13 +6484,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -6469,13 +6729,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -6698,9 +6959,29 @@
     },
     "/api/unidades-trazables": {
       "get": {
-        "description": "Devuelve una página de unidades trazables. Incluye el indicador de bloqueo R10 (bloqueado, motivoBloqueo, mensajeBloqueo). Roles: SEDE_CENTRAL, INSPECTOR, LABORATORIO, DISTRIBUIDOR, FARMACIA. Reglas: R10.",
+        "description": "Devuelve una página de unidades trazables. Filtros opcionales: ?estado=EN_LABORATORIO, EN_TRANSITO, EN_DEPOSITO, EN_STOCK, DISPENSADA, DEVUELTA, ROBADA o RECHAZADA (una sola por consulta) y ?serie= (la serie contiene el texto, sin distinguir mayúsculas); lo ajeno sigue sin verse. Incluye el indicador de bloqueo R10 (bloqueado, motivoBloqueo, mensajeBloqueo). Roles: SEDE_CENTRAL, INSPECTOR, LABORATORIO, DISTRIBUIDOR, FARMACIA. Reglas: R10.",
         "operationId": "listarCajas",
         "parameters": [
+          {
+            "description": "Estado (opcional): EN_LABORATORIO, EN_TRANSITO, EN_DEPOSITO, EN_STOCK, DISPENSADA, DEVUELTA, ROBADA o RECHAZADA",
+            "in": "query",
+            "name": "estado",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/EstadoUnidad"
+            }
+          },
+          {
+            "description": "Serie (opcional): la contiene, sin distinguir mayúsculas",
+            "in": "query",
+            "name": "serie",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 50,
+              "minLength": 0
+            }
+          },
           {
             "description": "Zero-based page index (0..N)",
             "in": "query",
@@ -6713,13 +6994,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -6959,13 +7241,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -7226,9 +7509,18 @@
     },
     "/api/viajes": {
       "get": {
-        "description": "SEDE e INSPECTOR ven todos; LABORATORIO los que origina; DISTRIBUIDOR los que origina y los del tramo 1 que vienen a su depósito; FARMACIA los del tramo 2 con parada en ella. Roles: SEDE_CENTRAL, INSPECTOR, LABORATORIO, DISTRIBUIDOR, FARMACIA.",
+        "description": "Filtro opcional ?estado=PROGRAMADO, EN_TRANSITO, FINALIZADO, ROBADO o CANCELADO (una sola por consulta; lo ajeno sigue sin verse). SEDE e INSPECTOR ven todos; LABORATORIO los que origina; DISTRIBUIDOR los que origina y los del tramo 1 que vienen a su depósito; FARMACIA los del tramo 2 con parada en ella. Roles: SEDE_CENTRAL, INSPECTOR, LABORATORIO, DISTRIBUIDOR, FARMACIA.",
         "operationId": "listarViajes",
         "parameters": [
+          {
+            "description": "Estado (opcional): PROGRAMADO, EN_TRANSITO, FINALIZADO, ROBADO o CANCELADO",
+            "in": "query",
+            "name": "estado",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/EstadoDespacho"
+            }
+          },
           {
             "description": "Zero-based page index (0..N)",
             "in": "query",
@@ -7241,13 +7533,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 20,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -7763,13 +8056,14 @@
             }
           },
           {
-            "description": "The size of the page to be returned",
+            "description": "Tamaño de la página: de 1 a 100. Un valor mayor no da error: se recorta a 100.",
             "in": "query",
             "name": "size",
             "required": false,
             "schema": {
               "type": "integer",
               "default": 100,
+              "maximum": 100,
               "minimum": 1
             }
           },
@@ -7876,7 +8170,7 @@
             ]
           },
           "estado": {
-            "type": "string"
+            "$ref": "#/components/schemas/EstadoAnclajeCaja"
           },
           "red": {
             "type": [
@@ -7906,6 +8200,48 @@
         },
         "required": [
           "inspectorId"
+        ]
+      },
+      "BandejaInspectorResponseDTO": {
+        "type": "object",
+        "properties": {
+          "circuitos": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Circuitos PENDIENTE_INSPECTOR de farmacias de tu provincia sin tomar, más los que tomaste",
+            "example": 1
+          },
+          "cuarentenas": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Cuarentenas ACTIVA de tu provincia sin tomar, más las que tomaste",
+            "example": 1
+          },
+          "empresas": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Solicitudes de habilitación de tu provincia sin tomar, más las que tomaste",
+            "example": 2
+          },
+          "lotesBiologicos": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Lotes biológicos PENDIENTE_LIBERACION de laboratorios de tu provincia",
+            "example": 0
+          },
+          "reportes": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Reportes ciudadanos ABIERTO de tu provincia, más los que investigás",
+            "example": 3
+          }
+        },
+        "required": [
+          "circuitos",
+          "cuarentenas",
+          "empresas",
+          "lotesBiologicos",
+          "reportes"
         ]
       },
       "BultoRequestDTO": {
@@ -7969,6 +8305,11 @@
             "format": "int32",
             "example": 10
           },
+          "circuitoCodigo": {
+            "type": "string",
+            "description": "el código del circuito de destino del bulto (destinoId)",
+            "example": "CIR-0001"
+          },
           "codigo": {
             "type": "string",
             "example": "BUL-0001"
@@ -7977,8 +8318,16 @@
             "type": "string",
             "format": "uuid"
           },
+          "distribuidorRazonSocial": {
+            "type": "string",
+            "description": "la razón social de la distribuidora del circuito de destino"
+          },
           "estado": {
             "$ref": "#/components/schemas/EstadoBulto"
+          },
+          "farmaciaRazonSocial": {
+            "type": "string",
+            "description": "la razón social de la farmacia del circuito de destino"
           },
           "fechaActualizacion": {
             "type": "string",
@@ -7996,6 +8345,11 @@
             "type": "string",
             "format": "uuid"
           },
+          "loteCodigo": {
+            "type": "string",
+            "description": "el código del lote del bulto",
+            "example": "L2026-0001"
+          },
           "loteId": {
             "type": "string",
             "format": "uuid"
@@ -8009,8 +8363,14 @@
             "example": "el lote L2026-0415 está vencido"
           },
           "motivoBloqueo": {
-            "type": "null",
-            "$ref": "#/components/schemas/CausaBloqueo",
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CausaBloqueo"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "description": "Causa del bloqueo (código); null si no está bloqueado"
           },
           "precinto": {
@@ -8039,13 +8399,17 @@
         "required": [
           "bloqueado",
           "cantidad",
+          "circuitoCodigo",
           "codigo",
           "destinoId",
+          "distribuidorRazonSocial",
           "estado",
+          "farmaciaRazonSocial",
           "fechaActualizacion",
           "fechaArmado",
           "fechaCreacion",
           "id",
+          "loteCodigo",
           "loteId",
           "precinto",
           "version"
@@ -8182,6 +8546,13 @@
               "null"
             ],
             "format": "uuid"
+          },
+          "loteCodigo": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "el código del lote de la medida (null si no es de alcance LOTE)"
           },
           "loteId": {
             "type": [
@@ -8326,11 +8697,22 @@
             "type": "string",
             "format": "uuid"
           },
+          "origenRazonSocial": {
+            "type": "string",
+            "description": "la razón social de la empresa de origen del viaje"
+          },
           "paradaIds": {
             "type": "array",
             "items": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          "paradaRazonesSociales": {
+            "type": "array",
+            "description": "las razones sociales de las paradas, en el mismo orden que paradaIds",
+            "items": {
+              "type": "string"
             }
           },
           "patente": {
@@ -8356,7 +8738,9 @@
           "fechaEstimadaEntrega",
           "id",
           "origenId",
+          "origenRazonSocial",
           "paradaIds",
+          "paradaRazonesSociales",
           "patente",
           "tramo",
           "version"
@@ -8704,7 +9088,14 @@
           "tipo": {
             "$ref": "#/components/schemas/TipoEmpresa"
           }
-        }
+        },
+        "required": [
+          "cuit",
+          "id",
+          "provincia",
+          "razonSocial",
+          "tipo"
+        ]
       },
       "EnlaceCuitRequestDTO": {
         "type": "object",
@@ -8738,12 +9129,20 @@
             "type": "string",
             "format": "uuid"
           },
+          "distribuidorRazonSocial": {
+            "type": "string",
+            "description": "la razón social de la distribuidora"
+          },
           "estado": {
             "$ref": "#/components/schemas/EstadoEnlaceCuit"
           },
           "farmaciaId": {
             "type": "string",
             "format": "uuid"
+          },
+          "farmaciaRazonSocial": {
+            "type": "string",
+            "description": "la razón social de la farmacia"
           },
           "fechaAceptacionDistribuidor": {
             "type": [
@@ -8800,6 +9199,10 @@
             "type": "string",
             "format": "uuid"
           },
+          "laboratorioRazonSocial": {
+            "type": "string",
+            "description": "la razón social del laboratorio"
+          },
           "motivoRechazo": {
             "type": [
               "string",
@@ -8817,8 +9220,14 @@
             "format": "uuid"
           },
           "rechazadoPor": {
-            "type": "null",
-            "$ref": "#/components/schemas/OrigenRechazo"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OrigenRechazo"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "suspendidoPorEmpresa": {
             "type": "boolean"
@@ -8831,13 +9240,16 @@
         "required": [
           "codigo",
           "distribuidorId",
+          "distribuidorRazonSocial",
           "estado",
           "farmaciaId",
+          "farmaciaRazonSocial",
           "fechaActualizacion",
           "fechaCreacion",
           "fechaPropuesta",
           "id",
           "laboratorioId",
+          "laboratorioRazonSocial",
           "propuestoPorId",
           "suspendidoPorEmpresa",
           "version"
@@ -8912,6 +9324,16 @@
           "FALLIDO"
         ]
       },
+      "EstadoAnclajeCaja": {
+        "type": "string",
+        "description": "Anclaje que cubre el recorrido público de la caja: CONFIRMADO o ENVIADO (con transacción), PENDIENTE (todavía no se ancló) o NO_DISPONIBLE (el anclaje está deshabilitado).",
+        "enum": [
+          "CONFIRMADO",
+          "ENVIADO",
+          "PENDIENTE",
+          "NO_DISPONIBLE"
+        ]
+      },
       "EstadoAnclajeResponseDTO": {
         "type": "object",
         "properties": {
@@ -8919,8 +9341,14 @@
             "type": "boolean"
           },
           "anclajeEnCurso": {
-            "type": "null",
-            "$ref": "#/components/schemas/RegistroBlockchainResponseDTO"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RegistroBlockchainResponseDTO"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "anclajesEstimados": {
             "type": [
@@ -9035,8 +9463,14 @@
             ]
           },
           "ultimoAnclaje": {
-            "type": "null",
-            "$ref": "#/components/schemas/RegistroBlockchainResponseDTO"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RegistroBlockchainResponseDTO"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "ultimoNumeroAnclado": {
             "type": [
@@ -9175,6 +9609,17 @@
           "NO_DISPONIBLE"
         ]
       },
+      "EtapaRecorrido": {
+        "type": "string",
+        "description": "Hito del recorrido público de una caja: FABRICADO y LIBERADO (lote), DESPACHADO (salida de un viaje), RECIBIDO o RECHAZADO (recepción del bulto). Nunca la dispensación (R13).",
+        "enum": [
+          "FABRICADO",
+          "LIBERADO",
+          "DESPACHADO",
+          "RECIBIDO",
+          "RECHAZADO"
+        ]
+      },
       "EtapaRecorridoDTO": {
         "type": "object",
         "properties": {
@@ -9182,7 +9627,7 @@
             "type": "string"
           },
           "etapa": {
-            "type": "string"
+            "$ref": "#/components/schemas/EtapaRecorrido"
           },
           "fecha": {
             "type": "string",
@@ -9337,6 +9782,11 @@
       "InspectorAnmatResponseDTO": {
         "type": "object",
         "properties": {
+          "apellido": {
+            "type": "string",
+            "description": "el apellido del inspector (de su cuenta de usuario)",
+            "example": "Quiroga"
+          },
           "dni": {
             "type": "string"
           },
@@ -9369,6 +9819,11 @@
           "legajo": {
             "type": "string"
           },
+          "nombre": {
+            "type": "string",
+            "description": "el nombre del inspector (de su cuenta de usuario)",
+            "example": "Rocío"
+          },
           "provincia": {
             "$ref": "#/components/schemas/Provincia"
           },
@@ -9386,6 +9841,7 @@
           }
         },
         "required": [
+          "apellido",
           "dni",
           "estado",
           "fechaActualizacion",
@@ -9393,6 +9849,7 @@
           "fechaCreacion",
           "id",
           "legajo",
+          "nombre",
           "provincia",
           "usuarioAltaId",
           "usuarioId",
@@ -9454,8 +9911,14 @@
             "example": "Elena"
           },
           "provincia": {
-            "type": "null",
-            "$ref": "#/components/schemas/Provincia",
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provincia"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "description": "Provincia del inspector (la de su jurisdicción); null para los demás roles"
           },
           "rol": {
@@ -9566,8 +10029,14 @@
             "$ref": "#/components/schemas/EstadoLote"
           },
           "estadoPrevio": {
-            "type": "null",
-            "$ref": "#/components/schemas/EstadoLote"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EstadoLote"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "fechaActualizacion": {
             "type": "string",
@@ -9602,6 +10071,10 @@
             "type": "string",
             "format": "uuid"
           },
+          "laboratorioRazonSocial": {
+            "type": "string",
+            "description": "la razón social del laboratorio del lote"
+          },
           "liberadoPorId": {
             "type": [
               "string",
@@ -9613,6 +10086,11 @@
             "type": "string",
             "format": "uuid"
           },
+          "medicamentoNombre": {
+            "type": "string",
+            "description": "el nombre comercial del medicamento del lote",
+            "example": "Cuyafen"
+          },
           "mensajeBloqueo": {
             "type": [
               "string",
@@ -9622,8 +10100,14 @@
             "example": "el lote L2026-0415 está vencido"
           },
           "motivoBloqueo": {
-            "type": "null",
-            "$ref": "#/components/schemas/CausaBloqueo",
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CausaBloqueo"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "description": "Causa del bloqueo (código); null si no está bloqueado"
           },
           "version": {
@@ -9642,7 +10126,9 @@
           "fechaVencimiento",
           "id",
           "laboratorioId",
+          "laboratorioRazonSocial",
           "medicamentoId",
+          "medicamentoNombre",
           "version"
         ]
       },
@@ -10343,6 +10829,21 @@
           "version"
         ]
       },
+      "RecorridoCodigoResponseDTO": {
+        "type": "object",
+        "properties": {
+          "resultados": {
+            "type": "array",
+            "description": "Coincidencias dentro de lo que el usuario puede ver (al menos una; si no, 404)",
+            "items": {
+              "$ref": "#/components/schemas/ResultadoRecorridoDTO"
+            }
+          }
+        },
+        "required": [
+          "resultados"
+        ]
+      },
       "RegistroBlockchainResponseDTO": {
         "type": "object",
         "properties": {
@@ -10763,8 +11264,14 @@
             "$ref": "#/components/schemas/Provincia"
           },
           "provinciaCaja": {
-            "type": "null",
-            "$ref": "#/components/schemas/Provincia"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provincia"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "serieReportada": {
             "type": "string"
@@ -10782,6 +11289,61 @@
           "serieReportada"
         ]
       },
+      "ResultadoRecorridoDTO": {
+        "type": "object",
+        "properties": {
+          "codigo": {
+            "type": "string",
+            "description": "Código del lote, código del bulto o serie de la caja",
+            "example": "L2026-0001"
+          },
+          "entidadId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Id de lo encontrado (lote, bulto o caja)"
+          },
+          "eventos": {
+            "type": "array",
+            "description": "Eventos de lo encontrado y de lo que lo rodea, del más viejo al más nuevo",
+            "items": {
+              "$ref": "#/components/schemas/EventoTrazabilidadResponseDTO"
+            }
+          },
+          "laboratorioRazonSocial": {
+            "type": "string",
+            "description": "Razón social del laboratorio del lote (un código de lote puede repetirse entre laboratorios)"
+          },
+          "loteCodigo": {
+            "type": "string",
+            "description": "Código del lote (el mismo lote si se buscó un lote)",
+            "example": "L2026-0001"
+          },
+          "medicamentoNombre": {
+            "type": "string",
+            "description": "Nombre comercial del medicamento",
+            "example": "Cuyafen"
+          },
+          "tipo": {
+            "$ref": "#/components/schemas/TipoCodigoBuscado",
+            "description": "Qué se encontró: LOTE, BULTO o CAJA"
+          },
+          "truncado": {
+            "type": "boolean",
+            "description": "true si había más eventos que el máximo devuelto (1000)",
+            "example": false
+          }
+        },
+        "required": [
+          "codigo",
+          "entidadId",
+          "eventos",
+          "laboratorioRazonSocial",
+          "loteCodigo",
+          "medicamentoNombre",
+          "tipo",
+          "truncado"
+        ]
+      },
       "RolUsuario": {
         "type": "string",
         "description": "Perfil de acceso de un usuario dentro del sistema.",
@@ -10792,6 +11354,62 @@
           "DISTRIBUIDOR",
           "FARMACIA",
           "PACIENTE"
+        ]
+      },
+      "TableroResumenResponseDTO": {
+        "type": "object",
+        "properties": {
+          "anclajesConfirmados": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Anclajes en Sepolia CONFIRMADO (con sus 3 confirmaciones)",
+            "example": 0
+          },
+          "circuitosAprobados": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Circuitos APROBADO",
+            "example": 2
+          },
+          "cuarentenasActivas": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Cuarentenas y recalls en estado ACTIVA",
+            "example": 0
+          },
+          "empresas": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Empresas registradas, en cualquier estado",
+            "example": 6
+          },
+          "empresasPendientes": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Empresas con la solicitud de habilitación PENDIENTE",
+            "example": 1
+          },
+          "eventos": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Eventos en la cadena (el último número: la numeración no tiene huecos)",
+            "example": 30
+          },
+          "inspectoresActivos": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Inspectores ACTIVO",
+            "example": 1
+          }
+        },
+        "required": [
+          "anclajesConfirmados",
+          "circuitosAprobados",
+          "cuarentenasActivas",
+          "empresas",
+          "empresasPendientes",
+          "eventos",
+          "inspectoresActivos"
         ]
       },
       "TelemetriaGpsRequestDTO": {
@@ -10980,6 +11598,15 @@
           "version"
         ]
       },
+      "TipoCodigoBuscado": {
+        "type": "string",
+        "description": "Qué encontró la búsqueda por código: un LOTE, un BULTO o una CAJA (GTIN + serie).",
+        "enum": [
+          "LOTE",
+          "BULTO",
+          "CAJA"
+        ]
+      },
       "TipoEmpresa": {
         "type": "string",
         "description": "Clasifica el rol que cumple una empresa dentro del circuito de trazabilidad: laboratorio (fabrica), distribuidor (transporta/almacena) o farmacia (dispensa al paciente).",
@@ -11103,9 +11730,19 @@
             "type": "string",
             "format": "uuid"
           },
+          "loteCodigo": {
+            "type": "string",
+            "description": "el código del lote de la caja",
+            "example": "L2026-0001"
+          },
           "loteId": {
             "type": "string",
             "format": "uuid"
+          },
+          "medicamentoNombre": {
+            "type": "string",
+            "description": "el nombre comercial del medicamento de la caja",
+            "example": "Cuyafen"
           },
           "mensajeBloqueo": {
             "type": [
@@ -11116,8 +11753,14 @@
             "example": "el lote L2026-0415 está vencido"
           },
           "motivoBloqueo": {
-            "type": "null",
-            "$ref": "#/components/schemas/CausaBloqueo",
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CausaBloqueo"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "description": "Causa del bloqueo (código); null si no está bloqueado"
           },
           "serie": {
@@ -11137,7 +11780,9 @@
           "fechaCreacion",
           "gtin",
           "id",
+          "loteCodigo",
           "loteId",
+          "medicamentoNombre",
           "serie",
           "version"
         ]
@@ -11228,6 +11873,13 @@
               "null"
             ],
             "format": "uuid"
+          },
+          "empresaRazonSocial": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "la razón social de la empresa del usuario (null si no tiene empresa)"
           },
           "esAdminEmpresa": {
             "type": "boolean"
@@ -11383,8 +12035,14 @@
         "type": "object",
         "properties": {
           "anclaje": {
-            "type": "null",
-            "$ref": "#/components/schemas/AnclajeDTO"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AnclajeDTO"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "concentracion": {
             "type": [

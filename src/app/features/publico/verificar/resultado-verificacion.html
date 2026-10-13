@@ -44,7 +44,7 @@
     <ol class="recorrido">
       @for (etapa of resultado().recorrido; track $index) {
         <li>
-          <span class="etapa">{{ legible(etapa.etapa) }}</span>
+          <span class="etapa">{{ rotuloEtapa[etapa.etapa] }}</span>
           <span class="empresa">{{ etapa.empresa }}</span>
           <span class="fecha">{{ etapa.fecha | dia }}</span>
         </li>

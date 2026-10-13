@@ -1,5 +1,6 @@
 import {
   AlcanceCuarentena,
+  EtapaRecorrido,
   MotivoDevolucion,
   MotivoBloqueo,
   MotivoReporte,
@@ -120,6 +121,15 @@ export const ROTULO_TIPO_EVENTO: Record<TipoEvento, string> = {
   REPORTE_CIUDADANO: 'Reporte ciudadano',
   REPORTE_TOMADO: 'Reporte tomado',
   REPORTE_CERRADO: 'Reporte cerrado',
+};
+
+/** Hito del recorrido público de una caja (verificación y trazabilidad). */
+export const ROTULO_ETAPA_RECORRIDO: Record<EtapaRecorrido, string> = {
+  FABRICADO: 'Fabricado',
+  LIBERADO: 'Liberado',
+  DESPACHADO: 'Despachado',
+  RECIBIDO: 'Recibido',
+  RECHAZADO: 'Rechazado',
 };
 
 /** Tramo de un viaje. */

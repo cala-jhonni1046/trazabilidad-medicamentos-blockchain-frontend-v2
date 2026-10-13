@@ -8,8 +8,8 @@ import { AvisosService } from '../../../core/errores/avisos.service';
 import { ErrorApi } from '../../../core/errores/error-api';
 import { proveerPaginadorEs } from '../../../core/tema/paginador-es';
 import {
+  PRESENTACION_ESTADO_ANCLAJE,
   PRESENTACION_ESTADO_VERIFICACION_BLOCKCHAIN,
-  presentarEstadoAnclaje,
 } from '../../../shared/estados/catalogo-estados';
 import { Estado } from '../../../shared/estados/estado';
 import { ROTULO_TIPO_EVENTO } from '../../../shared/formato/etiquetas';
@@ -41,7 +41,7 @@ export class CadenaSepolia {
   private readonly sesion = inject(SesionService);
 
   protected readonly rotuloEvento = ROTULO_TIPO_EVENTO;
-  protected readonly presentarAnclaje = presentarEstadoAnclaje;
+  protected readonly presentarAnclaje = PRESENTACION_ESTADO_ANCLAJE;
   protected readonly presentarBlockchain = PRESENTACION_ESTADO_VERIFICACION_BLOCKCHAIN;
 
   /** Solo la Sede ve "Anclar ya" (la API rechaza a cualquier otro rol). */

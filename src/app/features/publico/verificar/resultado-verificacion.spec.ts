@@ -111,13 +111,14 @@ describe('mc-resultado-verificacion', () => {
     expect(enlace.rel).toBe('noopener noreferrer');
   });
 
-  it('un valor de anclaje desconocido no rompe la pantalla: neutro y con el texto tal cual', async () => {
+  it('anclaje PENDIENTE (todavía no se ancló): tono de blockchain, sin enlace', async () => {
     const raiz = await pintar(
-      respuesta({ anclaje: { estado: 'ESTADO_FUTURO', red: null, bloque: null, enlace: null, transactionHash: null } }),
+      respuesta({ anclaje: { estado: 'PENDIENTE', red: null, bloque: null, enlace: null, transactionHash: null } }),
     );
 
-    expect(raiz.querySelector('.anclaje mc-estado')?.textContent).toContain('ESTADO_FUTURO');
-    expect(raiz.querySelector('.anclaje mc-estado')?.classList.contains('tono-neutro')).toBe(true);
+    expect(raiz.querySelector('.anclaje mc-estado')?.textContent).toContain('Pendiente de anclaje');
+    expect(raiz.querySelector('.anclaje mc-estado')?.classList.contains('tono-blockchain')).toBe(true);
+    expect(raiz.querySelector('.anclaje a')).toBeNull();
   });
 
   it('un enlace que no es https (por ejemplo javascript:) no se convierte en enlace', async () => {

@@ -14,6 +14,7 @@ export * from './generado/models';
 export { ALCANCE_CUARENTENA } from './generado/models/alcance-cuarentena-array';
 export { CAUSA_BLOQUEO } from './generado/models/causa-bloqueo-array';
 export { ESTADO_ANCLAJE } from './generado/models/estado-anclaje-array';
+export { ESTADO_ANCLAJE_CAJA } from './generado/models/estado-anclaje-caja-array';
 export { ESTADO_AUDITORIA } from './generado/models/estado-auditoria-array';
 export { ESTADO_BULTO } from './generado/models/estado-bulto-array';
 export { ESTADO_CUARENTENA } from './generado/models/estado-cuarentena-array';
@@ -23,6 +24,7 @@ export { ESTADO_HABILITACION } from './generado/models/estado-habilitacion-array
 export { ESTADO_INSPECTOR } from './generado/models/estado-inspector-array';
 export { ESTADO_LOTE } from './generado/models/estado-lote-array';
 export { ESTADO_UNIDAD } from './generado/models/estado-unidad-array';
+export { ETAPA_RECORRIDO } from './generado/models/etapa-recorrido-array';
 export { ESTADO_VERIFICACION } from './generado/models/estado-verificacion-array';
 export { ESTADO_VERIFICACION_BLOCKCHAIN } from './generado/models/estado-verificacion-blockchain-array';
 export { MOTIVO_BLOQUEO } from './generado/models/motivo-bloqueo-array';
